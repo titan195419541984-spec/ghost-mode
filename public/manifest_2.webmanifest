@@ -1,0 +1,12 @@
+{
+  "name": "Ghost Mode — Signal Intelligence",
+  "short_name": "Ghost Mode",
+  "description": "Catch the signal before the noise. Trend intelligence across public sources.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07080d",
+  "theme_color": "#090a0f",
+  "icons": [
+    { "src": "/ghost.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

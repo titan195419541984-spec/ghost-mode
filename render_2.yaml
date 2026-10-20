@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: ghost-mode
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CACHE_MS
+        value: 180000
+      - key: ADS_ENABLED
+        value: false
+      - key: AD_CLIENT_ID
+        sync: false
+      - key: ADS_TXT_CONTENT
+        sync: false
