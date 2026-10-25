@@ -481,3 +481,104 @@ input:focus-visible,button:focus-visible,a:focus-visible,select:focus-visible{ou
 .failed-card-image{display:none}
 .trend-card-image-wrap:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 @media(max-width:640px){.trend-card-image-wrap{height:174px}}
+
+
+/* Ghost Mode — market-terminal visual refinement */
+:root{
+  --bg:#080b11;--bg-2:#0b1018;--bg-3:#101722;--card:#0e151f;--card-2:#121b27;
+  --border:#202b39;--border-2:#29384a;--text:#edf3fb;--muted:#91a0b4;--muted-2:#68798e;
+  --violet:#8b7cff;--violet-2:#b3a8ff;--cyan:#58d8e8;--mint:#55d6a2;
+  --radius:12px;--radius-sm:8px;--shadow:0 12px 32px rgba(0,0,0,.2);
+}
+html{background:var(--bg)}
+body{
+  background:
+    radial-gradient(ellipse at 76% -15%,rgba(61,94,139,.13),transparent 38%),
+    linear-gradient(180deg,#080b11 0%,#090e15 55%,#080b11 100%);
+  letter-spacing:-.008em;
+}
+.app-shell{gap:0}
+.sidebar{background:rgba(9,13,20,.96);border-right:1px solid #1c2734;backdrop-filter:blur(22px)}
+.brand{padding-bottom:23px;border-bottom:1px solid rgba(145,160,180,.11)}
+.brand-mark{filter:none;box-shadow:0 0 0 1px rgba(139,124,255,.22),0 5px 18px rgba(0,0,0,.24)}
+.brand-copy strong{letter-spacing:.12em}
+.workspace-label{font-size:9px;letter-spacing:.17em;color:#718198}
+.nav-item{min-height:39px;border-radius:8px;color:#a3b0c1}
+.nav-item:hover{background:rgba(255,255,255,.035);color:#eef3fb}
+.nav-item.active{background:linear-gradient(90deg,rgba(139,124,255,.13),rgba(139,124,255,.035));box-shadow:inset 2px 0 0 #9487ff;color:#f0edff}
+.nav-item.active .nav-icon{color:#b7adff}
+.source-row{color:#9eacbe}
+.main-content{background:transparent}
+.topbar{min-height:62px;padding-inline:clamp(18px,3vw,38px);background:rgba(8,12,18,.78);border-bottom:1px solid #1c2734}
+.breadcrumb{font-size:10px;letter-spacing:.12em}
+.system-status{font-size:9px;letter-spacing:.08em;background:rgba(85,214,162,.045);border-color:rgba(85,214,162,.16)}
+.hero-row{padding-top:28px;padding-bottom:14px;gap:20px}
+.hero-row h1,.page-title-row h1{font-size:clamp(34px,4vw,54px);letter-spacing:-.06em;line-height:1.02;font-weight:650}
+.hero-row h1 em,.page-title-row h1 em{background:linear-gradient(100deg,#b7adff,#70dce8 90%);-webkit-background-clip:text;background-clip:text}
+.hero-subtitle{font-size:13px;line-height:1.65;color:#9eacbf;max-width:54ch}
+.radar-visual{opacity:.78;transform:scale(.92);transform-origin:center right}
+.metric-strip,.ooda-strip{gap:0;border:1px solid #202b39;border-radius:11px;overflow:hidden;background:rgba(12,18,27,.8)}
+.metric,.ooda-metric{
+  min-width:0;border:0!important;border-right:1px solid #202b39!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;padding:14px 16px!important;
+}
+.ooda-metric:last-child{border-right:0!important}
+.ooda-metric:hover{transform:none!important;background:rgba(255,255,255,.025)!important}
+.ooda-head{gap:8px}
+.ooda-letter{width:22px;height:22px;border-radius:6px;background:rgba(139,124,255,.1);font-size:10px}
+.metric-label{font-size:9px;letter-spacing:.12em;color:#8292a7}
+.ooda-metric>strong,.metric>strong{font-size:25px;letter-spacing:-.055em;font-weight:620}
+.metric-foot{font-size:10px;color:#7e8da1}
+.ooda-bar{height:2px;border-radius:0;background:#1c2937}
+.section-heading{margin-top:25px;margin-bottom:13px;align-items:flex-end}
+.section-heading h2,.panel-heading h2{font-size:21px;font-weight:620;letter-spacing:-.045em}
+.section-subtitle{font-size:11px;line-height:1.5;color:#8190a4}
+.heading-actions{gap:8px}
+.sort-label{font-size:9px;letter-spacing:.13em;color:#75869b}
+select,.subtle-button,.view-toggle,.icon-button,.refresh-button,.share-app-button{
+  border-radius:8px!important;border-color:#263342!important;background:#0e151f!important;color:#b7c4d5;
+}
+select{font-size:11px;padding:9px 30px 9px 11px}
+.view-toggle{width:32px;height:32px}
+.view-toggle.active{border-color:rgba(139,124,255,.48)!important;background:rgba(139,124,255,.12)!important;color:#c9c0ff}
+.trend-grid{gap:12px}
+.trend-card{
+  border-radius:11px!important;border:1px solid #202c3a!important;
+  background:linear-gradient(155deg,rgba(17,25,36,.98),rgba(12,18,27,.98))!important;
+  box-shadow:0 3px 12px rgba(0,0,0,.1)!important;padding:11px!important;
+  transition:border-color .18s ease,background .18s ease!important;
+}
+.trend-card:before{display:none}
+.trend-card:hover{transform:translateY(-2px)!important;border-color:#43536b!important;background:#121c29!important;box-shadow:0 8px 24px rgba(0,0,0,.2)!important}
+.trend-card-image-wrap{height:126px;border-radius:7px;margin-bottom:11px;border-color:rgba(255,255,255,.055)}
+.trend-card-image{filter:saturate(.72) contrast(1.03)}
+.trend-card:hover .trend-card-image{filter:saturate(.92) contrast(1.04)}
+.trend-title{font-size:15px;line-height:1.35;letter-spacing:-.025em;font-weight:610}
+.category-tag{border-radius:4px;font-size:9px;letter-spacing:.08em}
+.momentum{border:1px solid #263342;background:rgba(255,255,255,.025);font-size:10px}
+.score-ring{box-shadow:none}
+.card-action{border-radius:7px!important}
+.radar-page{gap:14px}
+.radar-canvas-wrap,.radar-legend-card,.preferences-panel,.vault-stats>div{
+  border-radius:11px!important;border-color:#202b39!important;background:rgba(13,20,29,.86)!important;box-shadow:none!important
+}
+.underground-banner{border-radius:10px!important}
+.interest-option{border-radius:8px!important}
+.app-footer{border-top:1px solid #1c2734;color:#66768b}
+.search-modal,.detail-modal,.info-modal{border-radius:14px!important;background:#0e151f!important;border-color:#2b394a!important}
+input,select{accent-color:var(--violet)}
+button{ -webkit-tap-highlight-color:transparent }
+@media(min-width:1200px){.trend-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){
+ .metric,.ooda-metric{padding:12px!important}
+ .trend-card-image-wrap{height:136px}
+}
+@media(max-width:640px){
+ .hero-row{padding-top:20px}
+ .metric-strip,.ooda-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ooda-metric:nth-child(2){border-right:0!important}
+ .ooda-metric:nth-child(-n+2){border-bottom:1px solid #202b39!important}
+ .trend-grid{gap:10px}
+ .trend-card-image-wrap{height:148px}
+ .section-heading{align-items:flex-start}
+}
