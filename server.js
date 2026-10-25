@@ -138,7 +138,7 @@ function categoryFor(title=''){
 async function aggregate(){
   const defs=[['Google Trends',sourceGoogleTrends],['Hacker News',sourceHackerNews],['Mastodon',sourceMastodon],['Global News',sourceGdelt]];
   const settled=await Promise.allSettled(defs.map(([,fn])=>fn()));
-  const sources=settled.map((r,i)=>({name:defs[i][0],status:r.status==='fulfilled'?'connected':'unavailable',count:r.status==='fulfilled'?r.value.length:0,error:r.status==='rejected'?'Source temporarily unavailable':undefined, latency:0}));
+  const sources=settled.map((r,i)=>{if(r.status==='rejected'){const raw=String(r.reason?.message||r.reason?.name||'Request failed');const reason=/abort|timeout/i.test(raw)?'Timed out':/^HTTP \d+/.test(raw)?raw.slice(0,24):/fetch failed|network/i.test(raw)?'Network request failed':'Request failed';console.warn('[trend-source-unavailable]',defs[i][0],reason,raw.slice(0,140));return {name:defs[i][0],status:'unavailable',count:0,error:reason,latency:0};}return {name:defs[i][0],status:'connected',count:r.value.length,latency:0};});
   const raw=settled.flatMap(r=>r.status==='fulfilled'?r.value:[]);
   // dedup by URL
   const seenUrl=new Set();
