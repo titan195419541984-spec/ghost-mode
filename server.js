@@ -232,6 +232,16 @@ const server=http.createServer(async(req,res)=>{
     log(req,200,Date.now()-start);
     return;
   }
+  if(pathname==='/api/image'){
+    res.setHeader('content-type','application/json; charset=utf-8');
+    res.setHeader('cache-control','public, max-age=3600');
+    Object.entries(secHeaders).forEach(([k,v])=>res.setHeader(k,v));
+    const title=String(url.searchParams.get('title')||'').trim().slice(0,120);
+    if(!title){res.writeHead(400);res.end(JSON.stringify({error:'A topic title is required.'}));log(req,400,Date.now()-start);return;}
+    const image=await findCommonsImage(title);
+    res.writeHead(200);res.end(JSON.stringify({image}));
+    log(req,200,Date.now()-start,image?'image-found':'no-image');return;
+  }
   if(pathname==='/api/trends'){
     res.setHeader('content-type','application/json; charset=utf-8');
     res.setHeader('cache-control','no-store');
