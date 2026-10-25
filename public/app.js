@@ -1,6 +1,6 @@
 
 const $=(q,root=document)=>root.querySelector(q);const $$=(q,root=document)=>[...root.querySelectorAll(q)];
-const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'pulse',saved:new Set(),interests:new Set(),lastPayload:null, offline:false};
+const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'pulse',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
 const DEMO=[
  {id:'ai-agents',title:'AI agents move from demos into everyday workflows',category:'Technology',score:91,momentum:'Surging',confidence:'Moderate',sources:['Hacker News','Global News'],sourceCount:2,source:'Hacker News',detail:'Discussion and coverage are appearing across more than one source.',url:'https://news.ycombinator.com/',publishedAt:new Date(Date.now()-14*60000).toISOString(),engagement:1250,kind:'cross-source'},
  {id:'creator-economy',title:'Creators are experimenting with new ways to own their audience',category:'Entertainment',score:84,momentum:'Surging',confidence:'Limited',sources:['Google Trends'],sourceCount:1,source:'Google Trends',detail:'Search interest is a useful early signal, but does not confirm future popularity.',url:'https://trends.google.com/trending?geo=US',publishedAt:new Date(Date.now()-25*60000).toISOString(),engagement:0,kind:'single-source'},
@@ -169,15 +169,17 @@ function renderCards(){
     const html=early.length? early.map(cardTrend).join('') : `<div class="empty-state"><span>⌁</span><h3>The surface is calm</h3><p>Early signals appear when fresh topics surface from a single source. Check back after the next sweep.</p></div>`;
     undergroundGrid.innerHTML=html + adSlotHTML('ad-underground','underground');
   }
-  // Vault
+  // Vault: keep saved snapshots available even after a signal leaves the live feed.
   if(vaultGrid){
-    const saved=list.filter(t=>state.saved.has(t.id));
-    const allSaved=state.trends.filter(t=>state.saved.has(t.id));
+    const savedMap=new Map(state.savedItems);
+    state.trends.filter(t=>state.saved.has(t.id)).forEach(t=>savedMap.set(t.id,t));
+    const allSaved=[...state.saved].map(id=>savedMap.get(id)).filter(Boolean);
+    const saved=allSaved.filter(t=>state.category==='All'||t.category===state.category);
     $('#vault-count').textContent=allSaved.length;
     if(!allSaved.length){
-      vaultGrid.innerHTML=`<div class="empty-state"><span>▣</span><h3>Your vault is quiet.</h3><p>Save a signal from The Pulse and it will appear here.</p><button class="primary-button" data-go="pulse">Explore signals <span>↗</span></button></div>`;
+      vaultGrid.innerHTML='<div class="empty-state"><span>▣</span><h3>Your vault is quiet.</h3><p>Save a signal and it stays here, even when it leaves the live feed.</p><button class="primary-button" data-go="pulse">Explore signals <span>↗</span></button></div>';
     }else{
-      vaultGrid.innerHTML=saved.length? saved.map(cardTrend).join('') : `<div class="empty-state"><h3>No matches in vault</h3><p>Clear filters to see all saved.</p></div>`;
+      vaultGrid.innerHTML=saved.length? saved.map(cardTrend).join('') : '<div class="empty-state"><h3>No matches in vault</h3><p>Try another category to see saved signals.</p></div>';
     }
   }
   // Radar visualization
@@ -192,22 +194,27 @@ function renderRadar(container, trends){
   container.innerHTML='';
   container.className='radar-canvas';
   if(!trends.length){ container.innerHTML='<div class="empty-state" style="grid-column:1/-1">No data for radar</div>'; return;}
-  // map score to radius, category to angle sector
-  const categories=[...new Set(trends.map(t=>t.category))];
-  trends.forEach((t,i)=>{
-    const angle=(i / trends.length)*Math.PI*2 - Math.PI/2;
-    const radius= 30 + (100 - t.score)*1.1 + Math.random()*18; // higher score closer to center
-    const cx=50 + Math.cos(angle)* (Math.min(42, radius*0.42));
-    const cy=50 + Math.sin(angle)* (Math.min(42, radius*0.42));
-    const dot=document.createElement('div');
+  // Stable ID-based placement prevents the radar from visually reshuffling on each render.
+  const hash=(value)=>{let h=2166136261;for(const ch of String(value||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
+  trends.forEach((t)=>{
+    const score=Math.max(0,Math.min(100,Number(t.score)||0));
+    const seed=hash(t.id||t.title);
+    const angle=((seed%360)*Math.PI/180);
+    const radius=12+(100-score)*0.30+((seed>>>9)%9);
+    const spread=Math.min(41,radius);
+    const cx=Math.max(7,Math.min(93,50+Math.cos(angle)*spread));
+    const cy=Math.max(8,Math.min(92,50+Math.sin(angle)*spread));
+    const dot=document.createElement('button');
+    dot.type='button';
     dot.className='radar-dot';
-    const col= t.sourceCount>=3 ? '#7c5cff' : t.sourceCount===2 ? '#22d3ee' : '#8b8da8';
+    const sourceCount=Number(t.sourceCount)||1;
+    const col=sourceCount>=3?'#9b8cff':sourceCount===2?'#44d9e9':'#8d96ad';
     dot.style.left=cx+'%'; dot.style.top=cy+'%'; dot.style.background=col; dot.style.color=col;
-    dot.title=`${t.title} — ${t.score} · ${t.category}`;
+    dot.setAttribute('aria-label','Open signal: '+t.title+', Ghost Score '+score+', '+sourceCount+' source'+(sourceCount===1?'':'s'));
+    dot.title=t.title+' — '+score+' · '+t.category;
     dot.addEventListener('click',()=>openDetail(t.id));
     container.appendChild(dot);
   });
-  // add rings already via CSS background
 }
 function renderSearch(q){
   const results=$('#search-results');
@@ -219,13 +226,28 @@ function renderSearch(q){
   renderCards();
 }
 function saveToggle(id){
-  if(state.saved.has(id)) state.saved.delete(id); else state.saved.add(id);
+  if(state.saved.has(id)){
+    state.saved.delete(id);
+    state.savedItems.delete(id);
+  }else{
+    const trend=state.trends.find(t=>t.id===id)||DEMO.find(t=>t.id===id);
+    state.saved.add(id);
+    if(trend) state.savedItems.set(id,trend);
+  }
   persist();
   renderCards();
   toast(state.saved.has(id)?'Saved to vault.':'Removed from vault.');
 }
-function persist(){try{localStorage.setItem('gm-saved',JSON.stringify([...state.saved]));localStorage.setItem('gm-interests',JSON.stringify([...state.interests]));}catch{}}
-function loadPrefs(){try{state.saved=new Set(JSON.parse(localStorage.getItem('gm-saved')||'[]'));state.interests=new Set(JSON.parse(localStorage.getItem('gm-interests')||'[]'));}catch{state.saved=new Set();state.interests=new Set();}}
+function persist(){try{
+  localStorage.setItem('gm-saved',JSON.stringify([...state.saved]));
+  localStorage.setItem('gm-saved-items',JSON.stringify([...state.savedItems.entries()]));
+  localStorage.setItem('gm-interests',JSON.stringify([...state.interests]));
+}catch{}}
+function loadPrefs(){try{
+  state.saved=new Set(JSON.parse(localStorage.getItem('gm-saved')||'[]'));
+  state.savedItems=new Map(JSON.parse(localStorage.getItem('gm-saved-items')||'[]'));
+  state.interests=new Set(JSON.parse(localStorage.getItem('gm-interests')||'[]'));
+}catch{state.saved=new Set();state.savedItems=new Map();state.interests=new Set();}}
 function renderInterestControls(){ $$('#interest-grid input').forEach(i=>{ if(i) i.checked=state.interests.has(i.value); });const el=$('#interest-count'); if(el) el.textContent=state.interests.size?`${state.interests.size} interest${state.interests.size===1?'':'s'} selected`:'No interests selected';}
 function openInfo(title,copy){$('#info-title').textContent=title;$('#info-copy').innerHTML=copy;$('#info-modal').classList.add('open');$('#info-modal').setAttribute('aria-hidden','false');}
 function closeModal(sel){const m=$(sel); if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }}
@@ -300,7 +322,9 @@ async function loadTrends(opts={}){
       state.mode='demo';
       state.sources=[{name:'Google Trends',status:'unavailable'},{name:'Hacker News',status:'unavailable'},{name:'Mastodon',status:'unavailable'},{name:'Global News',status:'unavailable'}];
     }
-    $('#system-status-text').textContent= data.cached? `CACHED · ${new Date(data.updatedAt).toLocaleTimeString()}` : `LIVE · ${new Date(data.updatedAt).toLocaleTimeString()}`;
+    $('#system-status-text').textContent= data.cached? `CACHED · ${new Date(data.updatedAt).toLocaleTimeString()}` : `UPDATED · ${new Date(data.updatedAt).toLocaleTimeString()}`;
+    state.trends.forEach(t=>{if(state.saved.has(t.id)) state.savedItems.set(t.id,t);});
+    persist();
     renderCards();
     if(data.notice && !quiet) toast(data.notice);
   }catch(e){
