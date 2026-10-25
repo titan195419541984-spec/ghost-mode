@@ -115,9 +115,9 @@ async function sourceMastodon(){
   return (json||[]).map(x=>({title:'#'+clean(x.name),url:`https://mastodon.social/tags/${encodeURIComponent(x.name)}`,source:'Mastodon',sourceType:'social',publishedAt:new Date().toISOString(),engagement:(x.history||[]).reduce((n,h)=>n+Number(h.uses||0),0),detail:'Trending social hashtag'}));
 }
 async function sourceGdelt(){
-  const url='https://api.gdeltproject.org/api/v2/doc/doc?query=trending&mode=ArtList&maxrecords=25&format=json&sort=HybridRel';
-  const json=JSON.parse(await fetchText(url,12000));
-  return (json.articles||[]).map(x=>({title:clean(x.title),url:safeUrlValidate(x.url)||'https://www.gdeltproject.org/',source:'Global News',sourceType:'news',publishedAt:parseGdeltDate(x.seendate),engagement:0,detail:x.domain||'News coverage'})).filter(x=>x.title);
+  const url='https://news.google.com/rss/search?q=trending&hl=en-US&gl=US&ceid=US:en';
+  const xml=await fetchText(url,9000);
+  return xmlItems(xml).map(x=>({title:clean(x.title),url:safeUrlValidate(x.url)||'https://news.google.com/',source:'Global News',sourceType:'news',publishedAt:x.publishedAt?new Date(x.publishedAt).toISOString():new Date().toISOString(),engagement:0,detail:'Google News public RSS'})).filter(x=>x.title&&x.url);
 }
 function parseGdeltDate(value){
   const m=String(value||'').match(/^(\d{4})(\d{2})(\d{2})T?(\d{2})(\d{2})(\d{2})/);
