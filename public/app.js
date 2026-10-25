@@ -323,6 +323,13 @@ async function loadTrends(opts={}){
       state.sources=[{name:'Google Trends',status:'unavailable'},{name:'Hacker News',status:'unavailable'},{name:'Mastodon',status:'unavailable'},{name:'Global News',status:'unavailable'}];
     }
     $('#system-status-text').textContent= data.cached? `CACHED · ${new Date(data.updatedAt).toLocaleTimeString()}` : `UPDATED · ${new Date(data.updatedAt).toLocaleTimeString()}`;
+    const heroStatus=$('#hero-signal-status');
+    if(heroStatus){
+      const isDemo=!(data.trends||[]).length;
+      heroStatus.textContent=isDemo?'ILLUSTRATIVE DATA':data.cached?'CACHED FEED':'SOURCE FEED';
+      heroStatus.classList.toggle('demo',isDemo);
+      heroStatus.classList.toggle('cached',!isDemo&&!!data.cached);
+    }
     state.trends.forEach(t=>{if(state.saved.has(t.id)) state.savedItems.set(t.id,t);});
     persist();
     renderCards();
@@ -332,6 +339,8 @@ async function loadTrends(opts={}){
     state.offline=true;
     if(!state.trends.length){ state.trends=[...DEMO]; state.mode='demo'; }
     $('#system-status-text').textContent='OFFLINE · DEMO CARDS';
+    const heroStatus=$('#hero-signal-status');
+    if(heroStatus){heroStatus.textContent='DEMO MODE';heroStatus.classList.add('demo');heroStatus.classList.remove('cached');}
     renderCards();
     if(!quiet) toast('Live sources unavailable — showing illustrative cards.');
   }
