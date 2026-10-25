@@ -468,3 +468,6 @@ input:focus-visible,button:focus-visible,a:focus-visible,select:focus-visible{ou
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+.eyebrow-live.demo{color:#f2c879;border-color:rgba(242,200,121,.26);background:rgba(242,200,121,.075)}
+.eyebrow-live.cached{color:#79dff0;border-color:rgba(73,217,232,.25);background:rgba(73,217,232,.07)}
