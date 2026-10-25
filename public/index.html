@@ -1,183 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-<title>Ghost Mode - Viral Trend Lab | Growth-Window Method</title>
-<meta name="description" content="Ghost Mode is a viral trend testing lab. Discover sub-20k trends before they blow up. Track throwable beings, earn points, unlock tiers." />
-
-<!-- AdSense + AdMob Verification -->
-<meta name="google-adsense-account" content="ca-pub-5558048915852406">
-<meta name="admob-app-id" content="ca-app-pub-5558048915852406~6245510920">
-<meta name="admob-rewarded-interstitial" content="ca-app-pub-5558048915852406/6905740494">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5558048915852406" crossorigin="anonymous"></script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap');
-  :root { --neon: #ccff00; --neon-2: #aaff00; --bg: #0a0a0a; --card: #141414; --line: #222; --text: #f5f5f0; }
-  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;}
-  h1,h2,h3{font-family:'Syne',sans-serif;letter-spacing:-0.02em}
-  .wrap{max-width:1100px;margin:0 auto;padding:24px}
-  header{border-bottom:1px solid var(--line);padding:24px 0;position:sticky;top:0;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);z-index:10}
-  .logo{display:flex;align-items:center;gap:12px}
-  .dot{width:12px;height:12px;background:var(--neon);border-radius:50%;box-shadow:0 0 18px var(--neon)}
-  .ghost-title{font-size:clamp(32px,8vw,72px);font-weight:800;line-height:0.9;margin:0}
-  .ghost-title span{color:var(--neon)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:32px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:transform .2s}
-  .card:hover{transform:translateY(-2px);border-color:#333}
-  .card.throwable{cursor:grab;user-select:none}
-  .card.throwable:active{cursor:grabbing}
-  .tier{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--neon);border:1px solid var(--neon);padding:4px 8px;border-radius:99px;display:inline-block}
-  .points{position:absolute;top:16px;right:16px;background:#fff;color:#000;font-weight:700;padding:4px 10px;border-radius:99px;font-size:12px}
-  .btn{appearance:none;border:0;background:var(--neon);color:#000;font-family:'Syne',sans-serif;font-weight:800;padding:14px 22px;border-radius:99px;font-size:14px;letter-spacing:0.02em;cursor:pointer;min-height:48px;min-width:48px}
-  .btn:active{transform:scale(0.98)}
-  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--text)}
-  .scorebar{display:flex;justify-content:space-between;align-items:center;background:#111;border:1px solid var(--line);border-radius:99px;padding:8px 8px 8px 20px;margin:24px 0}
-  .longform{margin-top:64px;line-height:1.75;font-size:16px;color:#d0d0cc;max-width:760px}
-  .longform h2{color:#fff;font-size:28px;margin-top:56px;margin-bottom:16px;line-height:1.1}
-  .longform h3{color:var(--neon);font-size:18px;margin-top:36px}
-  .longform p{margin:0 0 18px}
-  .case{border-left:2px solid var(--neon);padding-left:20px;margin:28px 0}
-  footer{margin-top:80px;border-top:1px solid var(--line);padding:32px 0 48px;color:#888;font-size:13px;display:flex;flex-wrap:wrap;gap:16px}
-  footer a{color:#aaa;text-decoration:none;border-bottom:1px solid #333;padding-bottom:2px}
-  footer a:hover{color:#fff}
-  .ad-slot{margin:56px 0 24px;padding:16px;border:1px dashed #333;border-radius:12px;text-align:center;color:#666;font-size:12px;min-height:90px;display:flex;align-items:center;justify-content:center}
-  @media(max-width:600px){.wrap{padding:16px}.ghost-title{font-size:42px}}
-</style>
+  <meta name="google-adsense-account" content="ca-pub-5558048915852406">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#090a0f" />
+  <meta name="description" content="See what is rising across the internet before it hits the mainstream. Track emerging signals, source coverage, and momentum with Ghost Mode." />
+  <meta property="og:title" content="Ghost Mode — Catch the Signal" />
+  <meta property="og:description" content="Your internet radar. Discover emerging trends, inspect the sources, and share the signals worth watching." />
+  <meta name="color-scheme" content="dark" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/ghost.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css?v=2.1-ooda" />
+  <title>Ghost Mode — Signal Intelligence</title>
 </head>
 <body>
-<header>
-  <div class="wrap" style="display:flex;justify-content:space-between;align-items:center">
-    <div class="logo"><div class="dot"></div><div style="font-family:Syne;font-weight:800;letter-spacing:0.08em">GHOST LABS v5.1</div></div>
-    <div style="font-size:11px;color:#777">OREGON • OHIO • GHOST MODE</div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#pulse" aria-label="Ghost Mode home">
+        <span class="brand-mark"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4.5c-8.2 0-14 6.3-14 14.5v15l7-4.2 7 4.2 7-4.2 7 4.2V19C34 10.8 28.2 4.5 20 4.5Z"/><path d="M14.3 17.2h.1m11.2 0h.1M15 23.4c3.2 2.4 6.8 2.4 10 0"/></svg></span>
+        <span class="brand-copy"><strong>GHOST<span>MODE</span></strong><small>INTERNET INTELLIGENCE</small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE <span class="live-dot"></span></div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="pulse"><span class="nav-icon">◈</span><span>The Pulse</span><kbd>1</kbd></button>
+        <button class="nav-item" data-view="radar"><span class="nav-icon">◎</span><span>Trend Radar</span><kbd>2</kbd></button>
+        <button class="nav-item" data-view="underground"><span class="nav-icon">⌁</span><span>The Underground</span><kbd>3</kbd></button>
+        <button class="nav-item" data-view="signal"><span class="nav-icon">⌘</span><span>Your Signal</span><kbd>4</kbd></button>
+        <button class="nav-item" data-view="vault"><span class="nav-icon">▣</span><span>Your Vault</span><kbd>5</kbd></button>
+      </nav>
+      <div class="sidebar-divider"></div>
+      <div class="workspace-label">SIGNAL SOURCES</div>
+      <div class="source-list" id="source-list">
+        <div class="source-row"><span class="source-logo google">G</span><span>Google Trends</span><i class="source-status pending"></i></div>
+        <div class="source-row"><span class="source-logo hn">Y</span><span>Hacker News</span><i class="source-status pending"></i></div>
+        <div class="source-row"><span class="source-logo mastodon">M</span><span>Mastodon</span><i class="source-status pending"></i></div>
+        <div class="source-row"><span class="source-logo news">N</span><span>Global News</span><i class="source-status pending"></i></div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="plan-card"><div class="plan-orbit">✳</div><div><strong>Stay ahead.</strong><p>Signals move fast.<br/>Keep your radar open.</p></div><span class="plan-pill">FREE</span></div>
+        <button class="profile-button" id="profile-button"><span class="avatar">GM</span><span class="profile-text"><strong>Ghost Explorer</strong><small>Personal workspace</small></span><span class="more">···</span></button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu icon-button" id="mobile-menu" aria-label="Open menu">☰</button>
+        <div class="breadcrumb"><span>GHOST MODE</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">THE PULSE</strong></div>
+        <div class="topbar-actions">
+          <div class="system-status"><span class="live-dot"></span><span id="system-status-text">INITIALIZING SIGNALS</span></div>
+          <button class="icon-button" id="search-open" aria-label="Search trends">⌕</button>
+          <button class="icon-button notification-button" id="alerts-button" aria-label="Alerts">♧<i></i></button>
+          <button class="share-app-button" id="invite-button" title="Share Ghost Mode"><span>↗</span><span>Share Ghost Mode</span></button><button class="refresh-button" id="refresh-button"><span class="refresh-symbol">↻</span><span>Refresh</span></button>
+        </div>
+      </header>
+
+      <section class="view active" id="view-pulse">
+        <div class="hero-row">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR INTERNET RADAR <span class="eyebrow-live">LIVE SIGNALS</span></div><h1>Catch the <em>signal.</em><br/>Before the noise.</h1><p class="hero-subtitle">A real-time read on what's rising across the internet.<br class="desktop-break"/> Find the momentum before it hits the mainstream.</p></div>
+          <div class="radar-visual" aria-label="Decorative signal radar"><div class="radar-ring ring-1"></div><div class="radar-ring ring-2"></div><div class="radar-ring ring-3"></div><div class="radar-sweep"></div><span class="radar-point point-a"></span><span class="radar-point point-b"></span><span class="radar-point point-c"></span><span class="radar-center">GM</span><span class="radar-label radar-label-a">SIGNAL FOUND</span><span class="radar-label radar-label-b">01 / 04</span></div>
+        </div>
+                <div class="metric-strip ooda-strip">
+          <div class="metric ooda-metric" id="ooda-observe">
+            <div class="ooda-head"><span class="ooda-letter">O</span><span class="metric-label">OBSERVE</span><span class="ooda-pulse"></span></div>
+            <strong id="metric-observe">—<small> sigs</small></strong>
+            <div class="ooda-bar"><i id="observe-bar" style="width:0%"></i></div>
+            <span class="metric-foot" id="metric-observe-foot"><i class="mini-dot violet"></i> Fast lane 30s</span>
+          </div>
+          <div class="metric ooda-metric" id="ooda-orient">
+            <div class="ooda-head"><span class="ooda-letter">O</span><span class="metric-label">ORIENT</span><span class="ooda-delta" id="orient-delta">+0</span></div>
+            <strong id="metric-orient">—<small> cross</small></strong>
+            <div class="ooda-bar"><i id="orient-bar" style="width:0%"></i></div>
+            <span class="metric-foot" id="metric-orient-foot"><i class="mini-dot cyan"></i> Accelerating</span>
+          </div>
+          <div class="metric ooda-metric" id="ooda-decide">
+            <div class="ooda-head"><span class="ooda-letter">D</span><span class="metric-label">DECIDE</span><span class="ooda-badge" id="decide-badge">TOP</span></div>
+            <strong id="metric-decide">—<small> ms</small></strong>
+            <div class="ooda-bar"><i id="decide-bar" style="width:0%"></i></div>
+            <span class="metric-foot" id="metric-decide-foot"><i class="mini-dot amber"></i> Filtered to 5</span>
+          </div>
+          <div class="metric ooda-metric" id="ooda-act">
+            <div class="ooda-head"><span class="ooda-letter">A</span><span class="metric-label">ACT</span><span class="ooda-live">LIVE</span></div>
+            <strong id="metric-act">—<small> saved</small></strong>
+            <div class="ooda-bar"><i id="act-bar" style="width:0%"></i></div>
+            <span class="metric-foot" id="metric-act-foot"><i class="mini-dot mint"></i> Vault growth</span>
+          </div>
+        </div>
+        <div class="section-heading"><div><div class="eyebrow small-eyebrow">THE MOMENTUM BOARD</div><h2>Trending <span>right now</span></h2><p class="section-subtitle">Signals from public sources. Every card has a trail back to the original.</p></div><div class="heading-actions"><span class="sort-label">SORT BY</span><select id="sort-select" aria-label="Sort trends"><option value="score">Ghost Score</option><option value="recent">Most recent</option><option value="sources">Source coverage</option></select><button class="view-toggle active" data-layout="grid" aria-label="Grid view">▦</button><button class="view-toggle" data-layout="list" aria-label="List view">☷</button></div></div>
+        <div class="trend-grid" id="pulse-grid"><div class="loading-card"><span class="loader"></span><strong>Scanning public sources</strong><span>Google Trends · Hacker News · Mastodon · Global News</span></div></div>
+      </section>
+
+      <section class="view secondary-view" id="view-radar">
+        <div class="page-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> VISUAL INTELLIGENCE</div><h1>Trend <em>Radar.</em></h1><p class="hero-subtitle">Positioned by momentum and confidence. Calculated from available signals, not predictions.</p></div><button class="subtle-button" id="methodology-link">How Ghost Score works</button></div>
+        <div class="radar-page">
+          <div class="radar-canvas-wrap"><div class="eyebrow small-eyebrow" style="margin-bottom:10px">LIVE RADAR — CENTER = HIGHER SCORE</div><div id="radar-canvas" class="radar-canvas"></div><p style="color:var(--muted-2);font-size:11px;margin-top:10px">Dot color: violet = 3+ sources, cyan = 2 sources, gray = single source. Click a dot for details. Radar uses real trend data.</p><div id="ad-radar" class="ad-container" data-slot="radar" data-enabled="false" style="margin-top:14px"><span class="ad-label">SPONSORED</span><div class="ad-placeholder"><strong>SPONSORED AREA</strong> Reserved.</div><ins class="adsbygoogle" style="display:block;min-height:90px" data-ad-format="auto" data-full-width-responsive="true"></ins></div></div>
+          <div class="radar-legend"><div class="radar-legend-card"><div class="eyebrow small-eyebrow">HOW IT IS CALCULATED</div><p style="color:var(--muted);font-size:13px;line-height:1.6;margin:8px 0 0">Ghost Score = 32 + sourceOverlap×10 + recency×20 + engagement×18 + rankBonus. Recency decays over 72h. Engagement uses log10(points+comments). Confidence = source count. <br><br><strong style="color:var(--text)">Not a virality prediction.</strong> Source coverage is incomplete and grouping is heuristic.</p></div><div class="radar-legend-card"><div class="eyebrow small-eyebrow">FILTERS</div><div id="category-filters" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"><button class="subtle-button active" data-category="All">All</button><button class="subtle-button" data-category="Technology">Technology</button><button class="subtle-button" data-category="Entertainment">Entertainment</button><button class="subtle-button" data-category="Sports">Sports</button><button class="subtle-button" data-category="Gaming">Gaming</button><button class="subtle-button" data-category="World">World</button><button class="subtle-button" data-category="Culture">Culture</button><button class="subtle-button" data-category="Business">Business</button></div></div></div>
+        </div>
+      </section>
+
+      <section class="view secondary-view" id="view-underground"><div class="page-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> EARLY DISCOVERY</div><h1>The <em>Underground.</em></h1><p class="hero-subtitle">Fresh signals from the edges of the conversation. Only labeled underground when data justifies it.</p></div><div class="underground-mark">⌁</div></div><div class="underground-banner" style="background:linear-gradient(135deg, rgba(124,92,255,.12), rgba(34,211,238,.08));border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;gap:14px;margin-bottom:16px"><div class="underground-symbol" style="width:36px;height:36px;border-radius:999px;background:var(--bg-3);display:grid;place-items:center">◌</div><div><span class="eyebrow small-eyebrow">THE EARLY SIGNAL ADVANTAGE</span><h2 style="margin:6px 0 4px">Before it breaks through.</h2><p style="margin:0;color:var(--muted);font-size:13px;line-height:1.5">Discover topics while they are still forming. A signal can be interesting before it becomes popular. Underground shows score &lt;70 or single-source early momentum.</p></div></div><div class="section-heading"><div><div class="eyebrow small-eyebrow">NEW & EMERGING</div><h2>Just surfaced</h2><p class="section-subtitle" style="color:var(--muted);font-size:13px">Low coverage ≠ unimportant — it means limited evidence so far.</p></div></div><div class="trend-grid" id="underground-grid"><div class="loading-card"><span class="loader"></span><strong>Looking beneath the surface</strong></div></div></section>
+
+      <section class="view secondary-view" id="view-signal"><div class="page-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> PERSONAL DISCOVERY</div><h1>Your <em>Signal.</em></h1><p class="hero-subtitle">Tune your radar to what matters to you.</p></div><div class="signal-profile-mark">✳</div></div><div class="preferences-panel"><div class="panel-heading"><div><h2>Your interests</h2><p>Choose categories to personalize your discovery view. Stored locally.</p></div><button class="subtle-button" id="clear-interests">Reset</button></div><div class="interest-grid" id="interest-grid"><label class="interest-option"><input type="checkbox" value="Technology"><span>⌘</span> Technology</label><label class="interest-option"><input type="checkbox" value="Entertainment"><span>♫</span> Entertainment</label><label class="interest-option"><input type="checkbox" value="Sports"><span>◉</span> Sports</label><label class="interest-option"><input type="checkbox" value="Gaming"><span>▧</span> Gaming</label><label class="interest-option"><input type="checkbox" value="World"><span>◎</span> World</label><label class="interest-option"><input type="checkbox" value="Culture"><span>✳</span> Culture</label><label class="interest-option"><input type="checkbox" value="Business"><span>↗</span> Business</label></div><div class="panel-footer"><span id="interest-count">No interests selected</span><button class="primary-button" id="save-interests">Save preferences <span>↗</span></button></div></div><div class="preferences-panel privacy-panel"><div class="panel-heading"><div><h2>Privacy by design</h2><p>Your saved topics and interests stay in this browser in this build. No account, no tracking.</p></div><span class="privacy-icon">⌑</span></div><div class="privacy-row"><span><strong>Local personalization</strong><small>No account required. Data in localStorage. Clear via browser settings.</small></span><span class="toggle on" aria-label="Local personalization enabled"><i></i></span></div><div class="privacy-row"><span><strong>Trend alerts</strong><small>Push alerts require notification setup in a later release.</small></span><span class="coming-soon">COMING SOON</span></div></div></section>
+
+      <section class="view secondary-view" id="view-vault"><div class="page-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR COLLECTION</div><h1>Your <em>Vault.</em></h1><p class="hero-subtitle">The signals worth coming back to.</p></div><div class="vault-mark">▣</div></div><div class="vault-stats"><div><span class="metric-label">SAVED SIGNALS</span><strong id="vault-count">0</strong></div><div><span class="metric-label">COLLECTION STATUS</span><strong class="vault-status">PRIVATE <span class="live-dot"></span></strong></div></div><div class="section-heading"><div><div class="eyebrow small-eyebrow">BOOKMARKS</div><h2>Saved for later</h2><p class="section-subtitle" style="color:var(--muted);font-size:13px">Persisted in localStorage. Preserved across refreshes.</p></div><button class="subtle-button" id="clear-vault">Clear vault</button></div><div class="trend-grid" id="vault-grid"><div class="empty-state"><span>▣</span><h3>Your vault is quiet.</h3><p>Save a signal from The Pulse and it will appear here.</p><button class="primary-button" data-go="pulse">Explore signals <span>↗</span></button></div></div></section>
+
+      <footer class="app-footer"><span>GHOST MODE <b>·</b> SIGNAL INTELLIGENCE</span><span id="footer-source-note">Public sources only · Built for curious minds</span><a href="#privacy" data-go="privacy">Privacy</a><a href="#terms" data-go="terms">Terms</a><a href="#contact" data-go="contact">Contact</a><a href="#ads" data-go="ads">Ads</a><a href="#about" id="about-link">About Ghost Mode</a></footer>
+
+      <!-- Legal pages as sections for SPA routing -->
+      <section class="view" id="view-privacy"><div class="legal-page"><h1>Privacy Policy</h1><p><em>Last updated: October 2026 — placeholder, replace CONTACT_EMAIL and SITE_URL in .env.example before launch.</em></p><h2>What we collect</h2><p>This starter build stores your saved signals and interest preferences in your browser's localStorage. No server-side account, database, or analytics SDK is enabled by default. Trend data is fetched server-side from public sources and cached for 3 minutes.</p><h2>Advertising</h2><p>When ads are disabled (default), no ad network requests are made. When you enable Google AdSense after approval, Google may use cookies and device identifiers per Google's policies. See our Ads page for disclosure and consent handling. We do not sell personal data.</p><h2>Cookies</h2><p>Essential: PWA shell cache via Service Worker. Optional: AdSense cookies only after you enable ads and obtain user consent where required. No other trackers in this build.</p><h2>Your rights</h2><p>Clear localStorage to delete saved signals and interests. Contact: <code>CONTACT_EMAIL</code>. For GDPR/CCPA requests, provide your jurisdiction.</p><h2>Contact</h2><p>For privacy questions, email CONTACT_EMAIL placeholder.</p></div></section>
+      <section class="view" id="view-terms"><div class="legal-page"><h1>Terms of Service</h1><p>Ghost Mode provides trend information from public sources for informational purposes. No guarantee of accuracy, completeness, or future virality. Scores are directional estimates, not predictions.</p><h2>Use</h2><p>Do not misuse, scrape beyond rate limits, or attempt to bypass source restrictions. Respect source terms. You are responsible for compliance with laws in your jurisdiction.</p><h2>Content</h2><p>External links point to third-party content. We are not responsible for external content. All trademarks belong to their owners.</p><h2>Disclaimer</h2><p>Provided as-is without warranties. Limitation of liability to the extent permitted by law.</p><p>Company details: PLACEHOLDER — replace before public launch.</p></div></section>
+      <section class="view" id="view-contact"><div class="legal-page"><h1>Contact</h1><p>Ghost Mode is built by independent operators. For support, feedback, or takedown requests, reach us at CONTACT_EMAIL placeholder.</p><p>When reporting an issue, include URL, screenshot, and timestamp. We review source accuracy and moderation concerns.</p><p>Site URL: SITE_URL placeholder.</p></div></section>
+      <section class="view" id="view-ads"><div class="legal-page"><h1>Advertising Disclosure</h1><p>Ghost Mode reserves clearly labeled sponsored areas that never cover navigation or trend content. In this build, ads are disabled and no requests are made.</p><h2>When enabled</h2><p>If you enable Google AdSense after verification and approval:</p><ul><li>Ads are served by Google. Google may use cookies and similar technologies.</li><li>Ad containers have fixed reserved space to avoid layout shifts.</li><li>No forced clicks, deceptive close buttons, popups, or ads disguised as navigation.</li><li>No ads on privacy-sensitive screens unless policy explicitly permits.</li><li>Consent handling via Google Funding Choices or equivalent where required.</li></ul><h2>ads.txt</h2><p>We serve /ads.txt from ADS_TXT_CONTENT env or generated from AD_CLIENT_ID. See ADVERTISING.md for verification steps.</p></div></section>
+
+    </main>
   </div>
-</header>
-
-<main class="wrap">
-  <h1 class="ghost-title">GHOST<br><span>MODE</span></h1>
-  <p style="max-width:520px;color:#999;margin-top:16px;font-size:15px;line-height:1.5">We hunt trends under 20k posts. No noise. Only the growth-window. Throw beings to test momentum, earn points, unlock tiers.</p>
-
-  <div class="scorebar">
-    <div><span style="color:#777;font-size:11px;letter-spacing:0.1em">SCORE</span> <strong id="score" style="font-family:Syne;font-size:20px;margin-left:8px">120 pts</strong> <span id="tierLabel" style="margin-left:12px;color:var(--neon)">• SCOUT</span></div>
-    <button class="btn" id="rewardBtn" style="min-height:48px">WATCH TO UNLOCK +20 PTS</button>
-  </div>
-
-  <div class="grid" id="beingGrid">
-    <div class="card throwable" data-points="15"><div class="tier">Growth-Window • 8.4k</div><div class="points">+15</div><h3>Shoe Kick Transition</h3><p style="color:#888;font-size:13px">Sub-20k kick edit. 12% velocity last 48h. Throw to lab.</p></div>
-    <div class="card throwable" data-points="20"><div class="tier">Growth-Window • 12.1k</div><div class="points">+20</div><h3>AI Boyfriend Glitch</h3><p style="color:#888;font-size:13px">Conversational AI partner edits. Comment-to-save ratio 4.2x.</p></div>
-    <div class="card throwable" data-points="10"><div class="tier">Growth-Window • 4.2k</div><div class="points">+10</div><h3>Tung Tung Sahur Meme</h3><p style="color:#888;font-size:13px">Absurd audio loop. Duet chain forming in Jakarta cluster.</p></div>
-    <div class="card"><div class="tier">TIER SYSTEM</div><h3>Scout → Hunter → Ghost</h3><p style="color:#888;font-size:13px">Earn points by testing. Hunter at 500 pts. Ghost at 1500 pts. Ghosts see trends 72h early.</p><div style="margin-top:12px;height:6px;background:#222;border-radius:99px;overflow:hidden"><div id="progress" style="height:100%;width:24%;background:var(--neon)"></div></div></div>
-  </div>
-
-  <!-- 800+ WORDS ORIGINAL CONTENT - BELOW CARDS, ABOVE AD -->
-  <article class="longform">
-    <h2>What Is Ghost Mode?</h2>
-    <p>Ghost Mode is a trend-testing protocol we built after watching hundreds of creators chase trends too late. Most trend reports show you what's already at 2M posts. By then, the algorithm has moved on. Ghost Mode flips that. We only track sounds, formats, and visual jokes that sit under 20,000 posts. We call this the growth-window. It's the quiet period where velocity matters more than volume.</p>
-    <p>Think of it like early-stage investing, but for culture. A trend at 3,000 posts that gains 800 posts per day is infinitely more valuable than a trend at 500,000 posts gaining 5,000 per day. The first is exponential. The second is linear and crowded. Ghost Mode was designed to find the first kind. We built a set of manual filters: we ignore anything promoted by a major label, we ignore anything that has already hit the TikTok Discover banner, and we require a minimum of three unrelated creators making the same format without copying each other directly. If those three conditions are true, and total volume is under 20k, it enters our lab.</p>
-    <p>Why the name Ghost? Because the best time to use a trend is when you're invisible. When you post in the growth-window, you look original, not late. The algorithm rewards originality in that window with disproportionate reach. Viewers don't see you as the 10,000th version; they see you as one of the first 50. That perception changes everything about how your video is judged. Ghost Mode is not a scheduler, not an AI writer, not a content factory. It's a filter and a discipline.</p>
-
-    <h2>How It Works</h2>
-    <p>The system has four parts: Beings, Throws, Points, and Tiers. A Being is our word for a trend entity. Each Being has a current post count, a velocity score, and a cluster origin. When you see a Being in the lab, you can throw it. Throwing means you mark it as tested or to-be-tested, and the lab records the interaction. You earn points for each throw because you are doing the work of validation. Ten points for a small Being, twenty for a mid-size, fifteen for a high-velocity anomaly.</p>
-    <p>Points are not just gamification. They are your proof of work. Most creators consume trend lists passively. Ghost Mode requires you to actively test. When you test a trend at 8k and it hits 100k two days later, you learn to trust your eye. Points accumulate into Tiers. Scout tier is everyone from 0 to 499 points. You get access to the basic lab. Hunter tier starts at 500 points. Hunters get a private feed of trends with comment-to-save ratio above 3x, which is a strong predictor of shareability. Ghost tier starts at 1500 points. Ghosts get a 72-hour early window on our highest conviction Beings and can submit Beings for review.</p>
-    <p>The growth-window sub-20k rule is non-negotiable. We have tried expanding it to 50k, but the signal degraded immediately. Under 20k, you can still read every top video manually. You can see if the comments are real, if the sound is being used sincerely or ironically, if there is a second-order meme forming. Above 20k, you lose that granularity. The method is intentionally manual and slow. It is built to prevent you from moving fast in the wrong direction.</p>
-
-    <h2>Case Studies From The Lab</h2>
-
-    <div class="case">
-      <h3>1. Shoe Kick Transition — 1.2k to 340k in 6 Days</h3>
-      <p>We first logged Shoe Kick at 1,200 posts. The format: a creator points a shoe at the camera, kicks, and the outfit changes mid-air. The audio was a distorted kick drum, not a trending song. Velocity was low, about 90 new posts per day, but the completion rate in the three videos we watched was 92%. The comment-to-save ratio was unusually high because people were asking for a tutorial. We threw it at 1.2k. Two days later it hit 18k. The tutorial angle had become the dominant caption. By day four it was at 120k, and brands started using it. The lesson was not that shoe transitions are new, but that this specific audio timing created a new searchable behavior. The Being was not the shoe; it was the kick-sync at 0.4 seconds.</p>
-    </div>
-
-    <div class="case">
-      <h3>2. AI Boyfriend Glitch — 850 to 210k</h3>
-      <p>AI Boyfriend entered at 850 posts. The format showed a screen recording of a chat with an AI companion, but the AI glitched and said something overly human and jealous. It was creepy, funny, and highly duet-able. What flagged it was not views but the save rate. People were saving it to show their partners. We noticed three creators in different languages — Spanish, Turkish, and English — all using the same glitch prompt structure without copying each other's script. That cross-language independent invention is a Ghost Mode green flag. We threw it. Within 72 hours, AI companion apps started seeing review-bombing with references to the trend. The trend peaked at 210k, which is small by viral standards, but the conversion to app downloads was massive for the creators who caught it at 2k to 10k. This is the kind of mid-size trend Ghost Mode exists for.</p>
-    </div>
-
-    <div class="case">
-      <h3>3. Tung Tung Sahur — 2.1k to 890k</h3>
-      <p>Tung Tung Sahur is an absurdist Indonesian audio meme built around the words tung tung tung and sahur, referencing the pre-dawn meal during Ramadan but used completely out of context. We found it at 2,100 posts clustered in Jakarta and Bandung. The humor is non-translatable, which made many trend tools ignore it. But the duet chain was growing in a perfect branching pattern — one video spawned five, each of those spawned five more. The sound had not been added to TikTok's commercial library, so it was still unclaimed. We threw it at 2.1k. By 40k, it had crossed into Malaysia. By 200k, Turkish meme pages were using it with completely different visuals. At 890k it hit the global meme page circuit. The takeaway: non-English audio loops with strong rhythmic repetition have a higher chance of breaking out if they stay under 20k for at least 72 hours. The longer they stay small and rhythmic, the more remixable they become.</p>
-    </div>
-
-    <p style="margin-top:48px;color:#666;font-size:12px">Ghost Mode is an independent research lab. We are not affiliated with TikTok, Meta, or any trend platform. All data is manually collected and verified by our team.</p>
-  </article>
-
-  <!-- FLUID AD - AFTER 800 WORDS, NOT ABOVE FOLD -->
-  <div class="ad-slot">
-    <div>
-      <div style="margin-bottom:8px">Advertisement</div>
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-5558048915852406"
-           data-ad-slot="6332005361"
-           data-ad-format="fluid"
-           data-ad-layout-key="-fb+5w+4e-db+86"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-  </div>
-
-  <footer>
-    <a href="./privacy.html">Privacy Policy</a>
-    <a href="./terms.html">Terms of Service</a>
-    <a href="./about.html">About Ghost Mode</a>
-    <a href="./contact.html">Contact</a>
-    <span style="margin-left:auto">© 2025 Ghost Labs • ca-pub-5558048915852406 • ghostmode.trends@gmail.com</span>
-  </footer>
-</main>
-
-<script>
-  let score = 120;
-  const scoreEl = document.getElementById('score');
-  const progressEl = document.getElementById('progress');
-  const tierLabel = document.getElementById('tierLabel');
-  const grid = document.getElementById('beingGrid');
-
-  function updateScore(add) {
-    score += add;
-    scoreEl.textContent = score + ' pts';
-    const pct = Math.min(100, (score/1500)*100);
-    progressEl.style.width = pct + '%';
-    if (score >= 1500) tierLabel.textContent = '• GHOST';
-    else if (score >= 500) tierLabel.textContent = '• HUNTER';
-    else tierLabel.textContent = '• SCOUT';
-  }
-
-  grid.addEventListener('click', (e) => {
-    const card = e.target.closest('.throwable');
-    if (!card) return;
-    const pts = parseInt(card.dataset.points || '10');
-    updateScore(pts);
-    card.style.transform = 'translateY(-8px) scale(0.98)';
-    setTimeout(()=>card.style.transform='', 220);
-  });
-
-  // Rewarded ad - ONLY on button click, never auto
-  document.getElementById('rewardBtn').addEventListener('click', () => {
-    if (typeof adsbygoogle !== 'undefined') {
-      // AdMob Rewarded Interstitial: ca-app-pub-5558048915852406/6905740494
-      // This button is the ONLY trigger. No auto-load.
-      console.log('Rewarded ad requested: ca-app-pub-5558048915852406/6905740494');
-      // In WebView/Android, intercept this to show AdMob rewarded
-      if (window.Android && window.Android.showRewarded) {
-        window.Android.showRewarded('ca-app-pub-5558048915852406/6905740494');
-      } else {
-        // Fallback reward for web preview
-        updateScore(20);
-        const btn = document.getElementById('rewardBtn');
-        btn.textContent = 'UNLOCKED +20 PTS ✓';
-        btn.style.background = '#fff';
-        setTimeout(()=>{btn.textContent='WATCH TO UNLOCK +20 PTS';btn.style.background='';}, 2500);
-      }
-    } else {
-      updateScore(20);
-    }
-  });
-
-  // Simple drag to throw effect for desktop
-  let isDragging = false;
-  grid.addEventListener('mousedown', ()=>isDragging=false);
-  grid.addEventListener('mousemove', ()=>{isDragging=true});
-</script>
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <div class="modal-backdrop" id="search-modal" aria-hidden="true"><div class="search-modal" role="dialog" aria-modal="true" aria-labelledby="search-title"><div class="search-modal-top"><span class="search-symbol">⌕</span><input id="search-input" type="search" placeholder="Search topics, sources, keywords…" autocomplete="off"/><kbd>ESC</kbd><button class="modal-close" id="search-close" aria-label="Close search">×</button></div><div class="search-results" id="search-results"><p class="search-hint">Search the current signal field.</p></div><div class="search-modal-foot" style="display:flex;justify-content:space-between;padding:10px 16px;font-size:10px;letter-spacing:.16em;color:var(--muted-2);border-top:1px solid var(--border)"><span>GHOST MODE SEARCH</span><span>ESC TO CLOSE</span></div></div></div>
+  <div class="modal-backdrop" id="detail-modal" aria-hidden="true"><div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button class="modal-close detail-close" id="detail-close" aria-label="Close details">×</button><div id="detail-content"></div></div></div>
+  <div class="modal-backdrop" id="info-modal" aria-hidden="true"><div class="info-modal" role="dialog" aria-modal="true"><button class="modal-close detail-close" id="info-close" aria-label="Close">×</button><div class="eyebrow"><span class="eyebrow-line"></span> TRANSPARENCY FIRST</div><h2 id="info-title">How Ghost Score works</h2><div id="info-copy"><p>Ghost Score is a directional index based on available public signals, freshness, engagement when provided, and source overlap. It is not a probability of going viral, and source coverage is incomplete.</p><p>Ghost Mode does not claim private platform data. Sources may be temporarily unavailable, and every trend links back to its origin where possible.</p></div></div></div>
+  <script src="/ads.js" defer></script>
+  <script src="/app.js?v=2.1-ooda" defer></script>
 </body>
 </html>
