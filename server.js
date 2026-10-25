@@ -116,7 +116,7 @@ async function sourceMastodon(){
 }
 async function sourceGdelt(){
   const url='https://api.gdeltproject.org/api/v2/doc/doc?query=trending&mode=ArtList&maxrecords=25&format=json&sort=HybridRel';
-  const json=JSON.parse(await fetchText(url,7000));
+  const json=JSON.parse(await fetchText(url,12000));
   return (json.articles||[]).map(x=>({title:clean(x.title),url:safeUrlValidate(x.url)||'https://www.gdeltproject.org/',source:'Global News',sourceType:'news',publishedAt:parseGdeltDate(x.seendate),engagement:0,detail:x.domain||'News coverage'})).filter(x=>x.title);
 }
 function parseGdeltDate(value){
