@@ -345,3 +345,50 @@ h1 em{font-style:normal;background:linear-gradient(135deg,var(--violet-2),var(--
   background: rgba(28,28,42,0.88) !important;
   color: var(--text) !important;
 }
+
+
+/* v2.2 — compact, content-first responsive polish */
+@media (max-width: 640px) {
+  .topbar { gap: 8px; padding: 10px 12px; }
+  .breadcrumb { font-size: 9px; letter-spacing: .12em; gap: 6px; min-width: 0; }
+  .topbar-actions { gap: 6px; }
+  .system-status { max-width: 116px; padding: 6px 8px; font-size: 9px; letter-spacing: .02em; white-space: nowrap; overflow: hidden; }
+  .share-app-button { display: none; }
+  .refresh-button { width: 36px; padding: 0; justify-content: center; }
+  .refresh-button > span:last-child { display: none; }
+  .view { padding: 14px 12px 22px; }
+  .hero-row { margin: 2px 0 12px; gap: 12px; }
+  .hero-row .hero-subtitle { max-width: 38ch; font-size: 13px; }
+  .hero-row .desktop-break { display: none; }
+  .hero-row .radar-visual { display: none; }
+  h1 { font-size: clamp(30px, 8vw, 36px); line-height: 1; }
+  .eyebrow { font-size: 9px; letter-spacing: .15em; gap: 7px; }
+  .eyebrow-live { font-size: 8px; margin-left: 2px; }
+  .ooda-strip { margin: 12px 0 18px; gap: 8px; }
+  .ooda-metric { padding: 11px; border-radius: 12px; }
+  .ooda-head { gap: 6px; margin-bottom: 7px; }
+  .ooda-letter { width: 23px; height: 23px; border-radius: 7px; font-size: 10px; }
+  .metric-label { font-size: 9px; letter-spacing: .1em; }
+  .metric strong { font-size: 20px; }
+  .metric-foot { font-size: 10px; }
+  .section-heading { gap: 10px; align-items: flex-start; }
+  .section-heading h2 { font-size: 21px; }
+  .section-subtitle { font-size: 11px; line-height: 1.45; }
+  .heading-actions { gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+  .sort-label { display: none; }
+  .heading-actions select { max-width: 118px; min-width: 0; font-size: 11px; }
+  .view-toggle { width: 30px; height: 30px; }
+  .trend-grid { gap: 10px; }
+  .trend-card { padding: 14px; border-radius: 14px; }
+  .trend-title { font-size: 15px; line-height: 1.35; }
+  .trend-description { font-size: 12px; line-height: 1.45; }
+  .trend-card-meta { gap: 6px; flex-wrap: wrap; }
+  .trend-card-meta > span:first-child { font-size: 10px; }
+  .app-footer { margin-top: 18px; gap: 10px; font-size: 10px; }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  .hero-row { margin-top: 4px; }
+  .radar-visual { width: 220px; height: 150px; }
+  .view { padding: 18px 20px; }
+  .trend-grid { grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
+}
