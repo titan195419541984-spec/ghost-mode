@@ -126,6 +126,7 @@ function filtered(){
   }
   if(state.sort==='recent') list.sort((a,b)=> new Date(b.publishedAt)-new Date(a.publishedAt));
   else if(state.sort==='sources') list.sort((a,b)=> b.sourceCount-a.sourceCount || b.score-a.score);
+  else if(state.sort==='engagement') list.sort((a,b)=>(Number(b.engagement)||0)-(Number(a.engagement)||0)||b.score-a.score);
   else list.sort((a,b)=> b.score-a.score);
   return list;
 }
