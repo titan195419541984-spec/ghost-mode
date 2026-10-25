@@ -9,6 +9,33 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = join(__dirname, 'public');
 const USER_AGENT = 'GhostModeTrendIntelligence/1.2.0 (public aggregation; contact: operator)';
+const commonsImageCache = new Map();
+const COMMONS_IMAGE_TTL = 6 * 60 * 60 * 1000;
+async function findCommonsImage(title) {
+  const query = String(title || '').replace(/https?:\\/\\/\\S+/g, '').trim().slice(0, 120);
+  if (!query) return null;
+  const key = query.toLowerCase();
+  const cached = commonsImageCache.get(key);
+  if (cached && Date.now() - cached.at < COMMONS_IMAGE_TTL) return cached.image;
+  try {
+    const endpoint = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrlimit=6&gsrsearch=' + encodeURIComponent(query) + '&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=720&format=json';
+    const response = await fetch(endpoint, { signal: AbortSignal.timeout(3200), headers: { 'user-agent': USER_AGENT, accept: 'application/json' } });
+    if (!response.ok) throw new Error('Commons image search unavailable');
+    const data = await response.json();
+    const pages = Object.values(data.query?.pages || {});
+    const candidate = pages.find(page => {
+      const info = page.imageinfo?.[0], mime = String(info?.mime || ''), name = String(page.title || '').toLowerCase();
+      return info?.thumburl && mime.startsWith('image/') && !/\\.svg$/.test(name) && !/(logo|icon|flag|map|diagram|screenshot|symbol)/i.test(name);
+    });
+    const info = candidate?.imageinfo?.[0]; let image = null;
+    if (candidate && info) {
+      const meta = info.extmetadata || {};
+      const plain = value => String(value?.value || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\\s+/g, ' ').trim().slice(0, 180);
+      image = { url: info.thumburl, pageUrl: info.descriptionurl || ('https://commons.wikimedia.org/wiki/' + encodeURIComponent(candidate.title.replace(/ /g, '_'))), title: candidate.title.replace(/^File:/, ''), artist: plain(meta.Artist) || 'Wikimedia Commons contributor', license: plain(meta.LicenseShortName) || 'See license', alt: plain(meta.ObjectName) || candidate.title.replace(/^File:/, '') };
+    }
+    commonsImageCache.set(key, { at: Date.now(), image }); return image;
+  } catch { commonsImageCache.set(key, { at: Date.now(), image: null }); return null; }
+}
 const CACHE_MS = Number(process.env.CACHE_MS || 3*60*1000);
 const ADS_ENABLED = String(process.env.ADS_ENABLED||'false').toLowerCase()==='true';
 const AD_CLIENT_ID = process.env.AD_CLIENT_ID || '';
@@ -139,6 +166,8 @@ async function aggregate(){
   }
   trends.sort((a,b)=>b.sourceCount-a.sourceCount || b.engagement-a.engagement || new Date(b.publishedAt)-new Date(a.publishedAt));
   trends.forEach((t,i)=>{t.score=scoreFor(t,t.sourceCount,i);t.momentum=t.score>=78?'Surging':t.score>=60?'Rising':'Early signal';t.confidence=t.sourceCount>=3?'High':t.sourceCount===2?'Moderate':'Limited';});
+  // Add topic-searched Commons photography to the most visible cards; each image carries attribution metadata.
+  await Promise.all(trends.slice(0, 24).map(async trend => { trend.image = await findCommonsImage(trend.title); }));
   return {updatedAt:new Date().toISOString(),sources,trendCount:trends.length,trends:trends.slice(0,80),mode:'live',notice:sources.some(s=>s.status==='unavailable')?'Some sources are temporarily unavailable; scores reflect only connected sources.':'Scores summarize available public signals and are not predictions of future virality.'};
 }
 
