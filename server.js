@@ -12,7 +12,7 @@ const USER_AGENT = 'GhostModeTrendIntelligence/1.2.0 (public aggregation; contac
 const commonsImageCache = new Map();
 const COMMONS_IMAGE_TTL = 6 * 60 * 60 * 1000;
 async function findCommonsImage(title) {
-  const query = String(title || '').replace(/https?:\\/\\/\\S+/g, '').trim().slice(0, 120);
+  const query = String(title || '').replace(/https?:\/\/\S+/g, '').trim().slice(0, 120);
   if (!query) return null;
   const key = query.toLowerCase();
   const cached = commonsImageCache.get(key);
@@ -25,12 +25,12 @@ async function findCommonsImage(title) {
     const pages = Object.values(data.query?.pages || {});
     const candidate = pages.find(page => {
       const info = page.imageinfo?.[0], mime = String(info?.mime || ''), name = String(page.title || '').toLowerCase();
-      return info?.thumburl && mime.startsWith('image/') && !/\\.svg$/.test(name) && !/(logo|icon|flag|map|diagram|screenshot|symbol)/i.test(name);
+      return info?.thumburl && mime.startsWith('image/') && !/\.svg$/.test(name) && !/(logo|icon|flag|map|diagram|screenshot|symbol)/i.test(name);
     });
     const info = candidate?.imageinfo?.[0]; let image = null;
     if (candidate && info) {
       const meta = info.extmetadata || {};
-      const plain = value => String(value?.value || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\\s+/g, ' ').trim().slice(0, 180);
+      const plain = value => String(value?.value || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim().slice(0, 180);
       image = { url: info.thumburl, pageUrl: info.descriptionurl || ('https://commons.wikimedia.org/wiki/' + encodeURIComponent(candidate.title.replace(/ /g, '_'))), title: candidate.title.replace(/^File:/, ''), artist: plain(meta.Artist) || 'Wikimedia Commons contributor', license: plain(meta.LicenseShortName) || 'See license', alt: plain(meta.ObjectName) || candidate.title.replace(/^File:/, '') };
     }
     commonsImageCache.set(key, { at: Date.now(), image }); return image;
