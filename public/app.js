@@ -140,7 +140,7 @@ function renderSources(){
     if(!statusEl) return;
     const src= key? map[key] : null;
     statusEl.className='source-status '+(src? src.status : 'pending');
-    statusEl.title=src? `${src.name}: ${src.status} (${src.count})` : 'Connecting';
+    statusEl.title=src? `${src.name}: ${src.status} (${src.count})${src.error?' — '+src.error:''}` : 'Connecting';
   });
 }
 function filtered(){
