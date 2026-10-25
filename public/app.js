@@ -18,6 +18,26 @@ function fmtTime(iso){if(!iso)return'Waiting…';return new Date(iso).toLocaleTi
 function safeURL(raw){try{const u=new URL(raw,location.origin);return ['http:','https:'].includes(u.protocol)?u.href:'#';}catch{return'#';}}
 function scoreRing(score){return `<span class="score-ring" style="--score:${Number(score)||0}"><span>${Number(score)||0}</span></span>`;}
 function catClass(category){return String(category||'Culture').toLowerCase().replace(/[^a-z]/g,'');}
+const imageLookupDone=new Set();
+function hydrateCardImages(){
+  const cards=[...document.querySelectorAll('.trend-card:not(.has-card-image)')].slice(0,12);
+  cards.forEach(async article=>{
+    const id=article.dataset.id;
+    if(!id||imageLookupDone.has(id))return;
+    const trend=state.trends.find(t=>t.id===id)||DEMO.find(t=>t.id===id)||state.savedItems.get(id);
+    if(!trend)return;
+    imageLookupDone.add(id);
+    try{
+      const response=await fetch('/api/image?title='+encodeURIComponent(trend.title),{headers:{accept:'application/json'}});
+      if(!response.ok)return;
+      const payload=await response.json();
+      if(payload.image&&article.isConnected){
+        article.insertAdjacentHTML('afterbegin',cardImageHTML({...trend,image:payload.image}));
+        article.classList.add('has-card-image');
+      }
+    }catch{}
+  });
+}
 function cardImageHTML(t){
   const img=t.image;
   if(!img?.url) return '';
@@ -192,6 +212,7 @@ function renderCards(){
   if(radarCanvas){
     renderRadar(radarCanvas, list.slice(0,18));
   }
+  hydrateCardImages();
   renderMetrics();
   renderSources();
   renderInterestControls();
