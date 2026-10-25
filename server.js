@@ -43,7 +43,12 @@ function keywords(title){
 }
 function topicKey(title){
   const ws=keywords(title);
-  return ws.slice(0, Math.min(4,ws.length)).sort().join('-') || 'emerging-topic-'+Math.random().toString(36).slice(2,6);
+  const key=ws.slice(0, Math.min(4,ws.length)).sort().join('-');
+  if(key) return key;
+  // Stable fallback IDs avoid signals changing identity between refreshes.
+  let hash=2166136261;
+  for(const ch of clean(title).toLowerCase()){hash^=ch.charCodeAt(0);hash=Math.imul(hash,16777619);}
+  return 'emerging-topic-'+(hash>>>0).toString(36);
 }
 function scoreFor(item, sources, rank){
   const parsedTime = item.publishedAt ? new Date(item.publishedAt).getTime() : NaN;
