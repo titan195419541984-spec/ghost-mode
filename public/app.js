@@ -382,10 +382,12 @@ async function loadNews(opts={}){
     renderNews();
   }finally{newsState.loading=false;}
 }
-\nfunction bindEvents(){
+
+function bindEvents(){
   $$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $('#mobile-menu').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
-  $('#refresh-button').addEventListener('click',()=>{loadTrends();loadNews();});\n  $('#news-refresh')?.addEventListener('click',()=>loadNews());
+  $('#refresh-button').addEventListener('click',()=>{loadTrends();loadNews();});
+  $('#news-refresh')?.addEventListener('click',()=>loadNews());
   $('#sort-select').addEventListener('change',e=>{state.sort=e.target.value;renderCards();});
   $$('.view-toggle').forEach(b=>b.addEventListener('click',()=>{state.layout=b.dataset.layout;$$('.view-toggle').forEach(x=>x.classList.toggle('active',x===b));renderCards();}));
   $$('#category-filters [data-category]').forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category;$$('#category-filters [data-category]').forEach(x=>x.classList.toggle('active',x===b));renderCards();}));
