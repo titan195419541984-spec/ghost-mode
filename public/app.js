@@ -1,6 +1,8 @@
 
 const $=(q,root=document)=>root.querySelector(q);const $$=(q,root=document)=>[...root.querySelectorAll(q)];
 const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'pulse',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
+const rewardState={points:0,level:1,providerReady:false};
+const rewardLevels=[{level:1,name:'Scout',points:0},{level:2,name:'Tracker',points:100},{level:3,name:'Analyst',points:300},{level:4,name:'Insider',points:700}];
 const DEMO=[
  {id:'ai-agents',title:'AI agents move from demos into everyday workflows',category:'Technology',score:91,momentum:'Surging',confidence:'Moderate',sources:['Hacker News','Global News'],sourceCount:2,source:'Hacker News',detail:'Discussion and coverage are appearing across more than one source.',url:'https://news.ycombinator.com/',publishedAt:new Date(Date.now()-14*60000).toISOString(),engagement:1250,kind:'cross-source'},
  {id:'creator-economy',title:'Creators are experimenting with new ways to own their audience',category:'Entertainment',score:84,momentum:'Surging',confidence:'Limited',sources:['Google Trends'],sourceCount:1,source:'Google Trends',detail:'Search interest is a useful early signal, but does not confirm future popularity.',url:'https://trends.google.com/trending?geo=US',publishedAt:new Date(Date.now()-25*60000).toISOString(),engagement:0,kind:'single-source'},
@@ -55,6 +57,7 @@ function switchView(name){
   $('#breadcrumb-current').textContent=name.toUpperCase();
   $('#sidebar').classList.remove('open');
   if(name==='vault'||name==='signal'||name==='underground'||name==='radar') renderCards();
+  if(name==='rewards') renderRewards();
   history.replaceState(null,'',`#${name}`);
 }
 function renderMetrics(){
@@ -269,12 +272,50 @@ function persist(){try{
   localStorage.setItem('gm-saved',JSON.stringify([...state.saved]));
   localStorage.setItem('gm-saved-items',JSON.stringify([...state.savedItems.entries()]));
   localStorage.setItem('gm-interests',JSON.stringify([...state.interests]));
+  localStorage.setItem('gm-reward-points',String(rewardState.points));
 }catch{}}
 function loadPrefs(){try{
   state.saved=new Set(JSON.parse(localStorage.getItem('gm-saved')||'[]'));
   state.savedItems=new Map(JSON.parse(localStorage.getItem('gm-saved-items')||'[]'));
   state.interests=new Set(JSON.parse(localStorage.getItem('gm-interests')||'[]'));
+  rewardState.points=Math.max(0,Math.floor(Number(localStorage.getItem('gm-reward-points')||0)));
 }catch{state.saved=new Set();state.savedItems=new Map();state.interests=new Set();}}
+function getRewardLevel(points=rewardState.points){return [...rewardLevels].reverse().find(x=>points>=x.points)||rewardLevels[0];}
+function renderRewards(){
+  const current=getRewardLevel(); rewardState.level=current.level;
+  const next=rewardLevels.find(x=>x.level===current.level+1);
+  const points=$('#reward-points'), name=$('#reward-level-name'), pill=$('#reward-level-pill'), mark=$('#rewards-level-mark'), nav=$('#nav-level'), fill=$('#reward-progress-fill'), progress=$('#reward-progress-label'), nextLabel=$('#reward-next-label');
+  if(points) points.innerHTML=`${rewardState.points.toLocaleString()} <small>pts</small>`;
+  if(name) name.textContent=`Level ${current.level} · ${current.name}`;
+  if(pill) pill.textContent=`LV ${String(current.level).padStart(2,'0')}`;
+  if(mark) mark.textContent=String(current.level).padStart(2,'0');
+  if(nav) nav.textContent=`LV ${current.level}`;
+  const prev=current.points, goal=next?.points||current.points;
+  const pct=next?Math.max(0,Math.min(100,(rewardState.points-prev)/(goal-prev)*100)):100;
+  if(fill) fill.style.width=pct+'%';
+  if(progress) progress.textContent=next?`${rewardState.points-prev} / ${goal-prev} points`:'MAX LEVEL REACHED';
+  if(nextLabel) nextLabel.textContent=next?`${Math.max(0,goal-rewardState.points)} pts to Level ${next.level}`:'All tiers unlocked';
+  $('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier);const level=rewardLevels.find(x=>x.level===tier);const unlocked=rewardState.points>=level.points;card.classList.toggle('current',tier===current.level);card.classList.toggle('unlocked',unlocked);card.classList.toggle('locked',!unlocked);const stateLabel=card.querySelector('.tier-state');const lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent=tier===current.level?'CURRENT':unlocked?'UNLOCKED':'LOCKED';if(lock)lock.textContent=unlocked?(tier===current.level?'✓ Your current level':'✓ Unlocked'):`🔒 Unlock at ${level.points} points`;});
+  const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function');
+  rewardState.providerReady=ready;
+  const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
+  if(btn){btn.disabled=!ready;btn.textContent=ready?'▶  Watch to earn':'▶  Watch to earn';btn.setAttribute('aria-disabled',String(!ready));}
+  if(note)note.textContent=ready?'Complete the full rewarded video to receive points.':'Rewarded video provider is not configured yet. No points will be granted until completion is verified.';
+}
+async function watchRewardedVideo(){
+  renderRewards();
+  if(!rewardState.providerReady){openInfo('Reward videos are not connected yet','<p>The level and unlock system is built, but this deployment does not yet have a rewarded-ad provider configured.</p><p>To prevent fake rewards and abuse, Ghost Mode will not award points from a button click or a skipped/failed video. The next integration needs a real provider completion callback and server-side verification before points can be issued.</p>');return;}
+  const btn=$('#watch-reward-button');if(btn)btn.disabled=true;
+  try{
+    const result=await window.GhostRewardsProvider.showRewardedAd();
+    if(!result||result.completed!==true||!result.verificationToken){toast('No points awarded — video completion could not be verified.');return;}
+    const response=await fetch('/api/rewards/claim',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({verificationToken:result.verificationToken})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||!data.verified){toast(data.error||'Reward verification failed. No points awarded.');return;}
+    rewardState.points=Math.max(0,Number(data.points)||0);persist();renderRewards();toast('Verified reward added. Your level progress is updated.');
+  }catch{toast('Video unavailable or incomplete. No points awarded.');}
+  finally{if(btn)btn.disabled=!rewardState.providerReady;}
+}
 function renderInterestControls(){ $$('#interest-grid input').forEach(i=>{ if(i) i.checked=state.interests.has(i.value); });const el=$('#interest-count'); if(el) el.textContent=state.interests.size?`${state.interests.size} interest${state.interests.size===1?'':'s'} selected`:'No interests selected';}
 function openInfo(title,copy){$('#info-title').textContent=title;$('#info-copy').innerHTML=copy;$('#info-modal').classList.add('open');$('#info-modal').setAttribute('aria-hidden','false');}
 function closeModal(sel){const m=$(sel); if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }}
@@ -329,6 +370,7 @@ document.addEventListener('click',e=>{const share=e.target.closest('[data-share]
   $('#about-link').addEventListener('click',e=>{e.preventDefault();openInfo('About Ghost Mode','<p>Ghost Mode is a trend intelligence prototype designed to help curious people explore emerging topics across public sources.</p><p>This starter release aggregates Google Trends RSS, Hacker News, Mastodon public trends, and GDELT news results where those sources are reachable. Availability varies. It does not have privileged access to TikTok, Instagram, YouTube, or private platform analytics.</p><p>All sponsored placements are reserved and labeled; this build does not serve paid ads until AdSense is approved and configured.</p>');});
   $('#alerts-button').addEventListener('click',()=>openInfo('Signal alerts','<p>Personalized push alerts are not active in this build yet. The next production step is to add opt-in notifications for followed categories and saved topics, with quiet hours and clear controls.</p>'));
   $('#profile-button').addEventListener('click',()=>switchView('signal'));
+  $('#watch-reward-button')?.addEventListener('click',watchRewardedVideo);
   window.addEventListener('online',()=>{state.offline=false;toast('Back online — refreshing signals.');loadTrends({quiet:true});});
   window.addEventListener('offline',()=>{state.offline=true;toast('You are offline — showing cached signals.');});
 }
@@ -376,6 +418,7 @@ async function loadTrends(opts={}){
 async function init(){
   loadPrefs();
   bindEvents();
+  renderRewards();
   renderInterestControls();
   const hash=location.hash.replace('#','');
   if(['pulse','radar','underground','signal','vault'].includes(hash)) switchView(hash);
