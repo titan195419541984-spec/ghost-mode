@@ -232,6 +232,19 @@ const server=http.createServer(async(req,res)=>{
     log(req,200,Date.now()-start);
     return;
   }
+  if(pathname==='/api/rewards/status' && req.method==='GET'){
+    const body={pointsPerVerifiedVideo:5,dailyCap:40,maxVideosPerDay:8,tiers:[{level:1,name:'Scout',points:250},{level:2,name:'Tracker',points:450},{level:3,name:'Analyst',points:1200},{level:4,name:'Insider',points:2000}],providerConfigured:false};
+    res.writeHead(200,{'content-type':'application/json; charset=utf-8','cache-control':'no-store',...secHeaders});
+    res.end(JSON.stringify(body));
+    log(req,200,Date.now()-start,'reward-policy');
+    return;
+  }
+  if(pathname==='/api/rewards/claim' && req.method==='POST'){
+    res.writeHead(503,{'content-type':'application/json; charset=utf-8','cache-control':'no-store',...secHeaders});
+    res.end(JSON.stringify({verified:false,error:'Rewarded video verification is not configured. No points were awarded.'}));
+    log(req,503,Date.now()-start,'reward-provider-not-configured');
+    return;
+  }
   if(pathname==='/api/image'){
     res.setHeader('content-type','application/json; charset=utf-8');
     res.setHeader('cache-control','public, max-age=3600');
