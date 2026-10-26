@@ -41,7 +41,8 @@ const ADS_ENABLED = String(process.env.ADS_ENABLED||'false').toLowerCase()==='tr
 const AD_CLIENT_ID = process.env.AD_CLIENT_ID || '';
 const ADS_TXT_CONTENT = process.env.ADS_TXT_CONTENT || '';
 
-let cache = { at: 0, data: null, staleAt: 0 };\nlet newsCache = {at:0,items:[]};
+let cache = { at: 0, data: null, staleAt: 0 };
+let newsCache = {at:0,items:[]};
 const ipHits = new Map(); // simple rate limit
 
 const stopwords = new Set(('about after again all also and are back been before being best between big but can cant could day did do does down each for from get gets got had has have here how into its just like make many more most new not now off one only other our out over people really said see she should since some such than that the their them then there these they this those through time today too trend trends under up use using very was way were what when where which while who why will with would you your www com http https official').split(' '));
