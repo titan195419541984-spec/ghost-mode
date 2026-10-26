@@ -148,7 +148,8 @@ async function sourceNewsWire(){
     if(!key||seen.has(key))return false;seen.add(key);return true;
   }).slice(0,24);
 }
-\nfunction parseGdeltDate(value){
+
+function parseGdeltDate(value){
   const m=String(value||'').match(/^(\d{4})(\d{2})(\d{2})T?(\d{2})(\d{2})(\d{2})/);
   if(!m) return new Date().toISOString();
   const d=new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`);
@@ -308,7 +309,8 @@ const server=http.createServer(async(req,res)=>{
       log(req,502,Date.now()-start,'news-error');return;
     }
   }
-\n  if(pathname==='/api/trends'){
+
+  if(pathname==='/api/trends'){
     res.setHeader('content-type','application/json; charset=utf-8');
     res.setHeader('cache-control','no-store');
     res.setHeader('access-control-allow-origin','*');
