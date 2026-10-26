@@ -28,6 +28,7 @@
         <button class="nav-item" data-view="underground"><span class="nav-icon">⌁</span><span>The Underground</span><kbd>3</kbd></button>
         <button class="nav-item" data-view="signal"><span class="nav-icon">⌘</span><span>Your Signal</span><kbd>4</kbd></button>
         <button class="nav-item" data-view="vault"><span class="nav-icon">▣</span><span>Your Vault</span><kbd>5</kbd></button>
+        <button class="nav-item" data-view="rewards"><span class="nav-icon">✧</span><span>Levels & Rewards</span><span class="nav-level" id="nav-level">LV 1</span></button>
       </nav>
       <div class="sidebar-divider"></div>
       <div class="workspace-label">SIGNAL SOURCES</div>
@@ -90,6 +91,21 @@
         <div class="trend-grid" id="pulse-grid"><div class="loading-card"><span class="loader"></span><strong>Scanning public sources</strong><span>Google Trends · Hacker News · Mastodon · Global News</span></div></div>
       </section>
 
+      <section class="view secondary-view" id="view-rewards">
+        <div class="page-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> GHOST MODE MEMBERSHIP</div><h1>Levels &amp; <em>Rewards.</em></h1><p class="hero-subtitle">Build your signal score. Unlock deeper trend intelligence as you level up.</p></div><div class="rewards-level-mark" id="rewards-level-mark">01</div></div>
+        <div class="rewards-overview">
+          <div class="rewards-balance"><span class="metric-label">YOUR SIGNAL POINTS</span><strong id="reward-points">0 <small>pts</small></strong><span class="rewards-note">Points are earned only after a verified rewarded-video completion.</span><button class="primary-button" id="watch-reward-button">▶ &nbsp; Watch to earn</button><p class="reward-provider-note" id="reward-provider-note">Reward video setup required before points can be issued.</p></div>
+          <div class="rewards-progress-panel"><div class="rewards-progress-head"><div><span class="metric-label">CURRENT LEVEL</span><strong id="reward-level-name">Level 1 · Scout</strong></div><span class="rewards-level-pill" id="reward-level-pill">LV 01</span></div><div class="rewards-progress-track"><i id="reward-progress-fill" style="width:0%"></i></div><div class="rewards-progress-foot"><span id="reward-progress-label">0 / 100 points</span><span id="reward-next-label">100 pts to Level 2</span></div><p class="rewards-note">Your progress is stored on this device in this preview. A production launch needs a verified ad provider and server-side reward ledger.</p></div>
+        </div>
+        <div class="section-heading"><div><div class="eyebrow small-eyebrow">ACCESS TIERS</div><h2>Unlock the intelligence</h2><p class="section-subtitle">Cards are visible at every level; deeper analysis unlocks as you progress.</p></div></div>
+        <div class="tier-grid" id="tier-grid">
+          <article class="tier-card current" data-tier="1"><div class="tier-card-top"><span class="tier-icon">◈</span><span class="tier-state">STARTER</span></div><span class="tier-kicker">LEVEL 1 · 0 POINTS</span><h3>Scout</h3><p>Spot the signal before the crowd.</p><ul><li>Live trend feed</li><li>Ghost Score and momentum</li><li>Source trail and basic details</li></ul><span class="tier-lock">✓ Available now</span></article>
+          <article class="tier-card locked" data-tier="2"><div class="tier-card-top"><span class="tier-icon">⌁</span><span class="tier-state">LOCKED</span></div><span class="tier-kicker">LEVEL 2 · 100 POINTS</span><h3>Tracker</h3><p>Separate early movement from noise.</p><ul><li>Momentum history</li><li>Expanded source comparison</li><li>Trend watchlist insights</li></ul><span class="tier-lock">🔒 Unlock at Level 2</span></article>
+          <article class="tier-card locked" data-tier="3"><div class="tier-card-top"><span class="tier-icon">◎</span><span class="tier-state">LOCKED</span></div><span class="tier-kicker">LEVEL 3 · 300 POINTS</span><h3>Analyst</h3><p>Read the pattern behind the spike.</p><ul><li>Cross-source signal breakdown</li><li>Related-topic clusters</li><li>Deeper trend context</li></ul><span class="tier-lock">🔒 Unlock at Level 3</span></article>
+          <article class="tier-card locked" data-tier="4"><div class="tier-card-top"><span class="tier-icon">✧</span><span class="tier-state">LOCKED</span></div><span class="tier-kicker">LEVEL 4 · 700 POINTS</span><h3>Insider</h3><p>Get the full intelligence view.</p><ul><li>Advanced signal dashboard</li><li>Priority watchlist tools</li><li>Premium intelligence cards</li></ul><span class="tier-lock">🔒 Unlock at Level 4</span></article>
+        </div>
+        <div class="rewards-footnote">Points have no cash value. Levels unlock Ghost Mode features only. Rewards are not issued for skipped, failed, or unverified ads.</div>
+      </section>
       <section class="view secondary-view" id="view-radar">
         <div class="page-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> VISUAL INTELLIGENCE</div><h1>Trend <em>Radar.</em></h1><p class="hero-subtitle">Positioned by momentum and confidence. Calculated from available signals, not predictions.</p></div><button class="subtle-button" id="methodology-link">How Ghost Score works</button></div>
         <div class="radar-page">
