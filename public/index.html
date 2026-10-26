@@ -57,7 +57,12 @@
         </div>
       </header>
 
-      <section class="view active" id="view-pulse">
+      <section class="view active" id="view-pulse">\n      <section class="news-ticker" aria-label="Live news ticker">
+        <div class="ticker-label"><span class="ticker-live-dot"></span><span>LIVE WIRE</span><small>WORLD · TECH · MARKETS</small></div>
+        <div class="ticker-window"><div class="ticker-track" id="news-ticker-track"><span class="ticker-placeholder">Connecting to live headlines…</span></div></div>
+        <button class="ticker-refresh" id="news-refresh" aria-label="Refresh news headlines" title="Refresh headlines">↻</button>
+      </section>
+
         <div class="hero-row">
           <div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR INTERNET RADAR <span class="eyebrow-live" id="hero-signal-status">CONNECTING</span></div><h1>Catch the <em>signal.</em><br/>Before the noise.</h1><p class="hero-subtitle">A real-time read on what's rising across the internet.<br class="desktop-break"/> Find the momentum before it hits the mainstream.</p></div>
           <div class="radar-visual" aria-label="Decorative signal radar"><div class="radar-ring ring-1"></div><div class="radar-ring ring-2"></div><div class="radar-ring ring-3"></div><div class="radar-sweep"></div><span class="radar-point point-a"></span><span class="radar-point point-b"></span><span class="radar-point point-c"></span><span class="radar-center">GM</span><span class="radar-label radar-label-a">SIGNAL FOUND</span><span class="radar-label radar-label-b">01 / 04</span></div>
@@ -88,6 +93,10 @@
             <span class="metric-foot" id="metric-act-foot"><i class="mini-dot mint"></i> Vault growth</span>
           </div>
         </div>
+        <section class="news-desk" aria-labelledby="news-desk-title">
+          <div class="news-desk-head"><div><div class="eyebrow small-eyebrow"><span class="news-live-pip"></span> THE WORLD, IN MOTION</div><h2 id="news-desk-title">Live <span>news wire</span></h2><p class="section-subtitle">Fresh headlines from public news feeds. Open any story at its source.</p></div><div class="news-desk-status"><span class="news-live-pip"></span><span id="news-updated">CONNECTING TO NEWS</span></div></div>
+          <div class="news-grid" id="news-grid"><article class="news-card news-loading"><span class="loader"></span><span>Pulling the latest headlines…</span></article></div>
+        </section>
         <div class="section-heading"><div><div class="eyebrow small-eyebrow">THE MOMENTUM BOARD</div><h2>Trending <span>right now</span></h2><p class="section-subtitle">Signals from public sources. Every card has a trail back to the original.</p></div><div class="heading-actions"><span class="sort-label">SORT BY</span><select id="sort-select" aria-label="Sort trends"><option value="score">Ghost Score</option><option value="recent">Most recent</option><option value="sources">Source coverage</option><option value="engagement">Most discussed</option></select><button class="view-toggle active" data-layout="grid" aria-label="Grid view">▦</button><button class="view-toggle" data-layout="list" aria-label="List view">☷</button></div></div>
         <div class="trend-grid" id="pulse-grid"><div class="loading-card"><span class="loader"></span><strong>Scanning public sources</strong><span>Google Trends · Hacker News · Mastodon · Global News</span></div></div>
       </section>
