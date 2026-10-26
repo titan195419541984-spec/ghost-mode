@@ -1,8 +1,8 @@
 
 const $=(q,root=document)=>root.querySelector(q);const $$=(q,root=document)=>[...root.querySelectorAll(q)];
 const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'pulse',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
-const rewardState={points:0,level:1,providerReady:false};
-const rewardLevels=[{level:1,name:'Scout',points:0},{level:2,name:'Tracker',points:100},{level:3,name:'Analyst',points:300},{level:4,name:'Insider',points:700}];
+const rewardState={points:0,level:0,providerReady:false};
+const rewardLevels=[{level:1,name:'Scout',points:250},{level:2,name:'Tracker',points:450},{level:3,name:'Analyst',points:1200},{level:4,name:'Insider',points:2000}];
 const DEMO=[
  {id:'ai-agents',title:'AI agents move from demos into everyday workflows',category:'Technology',score:91,momentum:'Surging',confidence:'Moderate',sources:['Hacker News','Global News'],sourceCount:2,source:'Hacker News',detail:'Discussion and coverage are appearing across more than one source.',url:'https://news.ycombinator.com/',publishedAt:new Date(Date.now()-14*60000).toISOString(),engagement:1250,kind:'cross-source'},
  {id:'creator-economy',title:'Creators are experimenting with new ways to own their audience',category:'Entertainment',score:84,momentum:'Surging',confidence:'Limited',sources:['Google Trends'],sourceCount:1,source:'Google Trends',detail:'Search interest is a useful early signal, but does not confirm future popularity.',url:'https://trends.google.com/trending?geo=US',publishedAt:new Date(Date.now()-25*60000).toISOString(),engagement:0,kind:'single-source'},
@@ -280,7 +280,7 @@ function loadPrefs(){try{
   state.interests=new Set(JSON.parse(localStorage.getItem('gm-interests')||'[]'));
   rewardState.points=Math.max(0,Math.floor(Number(localStorage.getItem('gm-reward-points')||0)));
 }catch{state.saved=new Set();state.savedItems=new Map();state.interests=new Set();}}
-function getRewardLevel(points=rewardState.points){return [...rewardLevels].reverse().find(x=>points>=x.points)||rewardLevels[0];}
+function getRewardLevel(points=rewardState.points){return [...rewardLevels].reverse().find(x=>points>=x.points)||{level:0,name:'Recruit',points:0};}
 function renderRewards(){
   const current=getRewardLevel(); rewardState.level=current.level;
   const next=rewardLevels.find(x=>x.level===current.level+1);
@@ -293,13 +293,13 @@ function renderRewards(){
   const prev=current.points, goal=next?.points||current.points;
   const pct=next?Math.max(0,Math.min(100,(rewardState.points-prev)/(goal-prev)*100)):100;
   if(fill) fill.style.width=pct+'%';
-  if(progress) progress.textContent=next?`${rewardState.points-prev} / ${goal-prev} points`:'MAX LEVEL REACHED';
+  if(progress) progress.textContent=next?`${Math.max(0,rewardState.points-prev)} / ${goal-prev} points`:'MAX LEVEL REACHED';
   if(nextLabel) nextLabel.textContent=next?`${Math.max(0,goal-rewardState.points)} pts to Level ${next.level}`:'All tiers unlocked';
   $('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier);const level=rewardLevels.find(x=>x.level===tier);const unlocked=rewardState.points>=level.points;card.classList.toggle('current',tier===current.level);card.classList.toggle('unlocked',unlocked);card.classList.toggle('locked',!unlocked);const stateLabel=card.querySelector('.tier-state');const lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent=tier===current.level?'CURRENT':unlocked?'UNLOCKED':'LOCKED';if(lock)lock.textContent=unlocked?(tier===current.level?'✓ Your current level':'✓ Unlocked'):`🔒 Unlock at ${level.points} points`;});
   const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function');
   rewardState.providerReady=ready;
   const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
-  if(btn){btn.disabled=!ready;btn.textContent=ready?'▶  Watch to earn':'▶  Watch to earn';btn.setAttribute('aria-disabled',String(!ready));}
+  if(btn){btn.disabled=false;btn.textContent='▶  Watch to earn';btn.setAttribute('aria-disabled','false');}
   if(note)note.textContent=ready?'Complete the full rewarded video to receive points.':'Rewarded video provider is not configured yet. No points will be granted until completion is verified.';
 }
 async function watchRewardedVideo(){
