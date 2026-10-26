@@ -272,13 +272,11 @@ function persist(){try{
   localStorage.setItem('gm-saved',JSON.stringify([...state.saved]));
   localStorage.setItem('gm-saved-items',JSON.stringify([...state.savedItems.entries()]));
   localStorage.setItem('gm-interests',JSON.stringify([...state.interests]));
-  localStorage.setItem('gm-reward-points',String(rewardState.points));
 }catch{}}
 function loadPrefs(){try{
   state.saved=new Set(JSON.parse(localStorage.getItem('gm-saved')||'[]'));
   state.savedItems=new Map(JSON.parse(localStorage.getItem('gm-saved-items')||'[]'));
   state.interests=new Set(JSON.parse(localStorage.getItem('gm-interests')||'[]'));
-  rewardState.points=Math.max(0,Math.floor(Number(localStorage.getItem('gm-reward-points')||0)));
 }catch{state.saved=new Set();state.savedItems=new Map();state.interests=new Set();}}
 function getRewardLevel(points=rewardState.points){return [...rewardLevels].reverse().find(x=>points>=x.points)||{level:0,name:'Recruit',points:0};}
 function renderRewards(){
