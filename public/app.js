@@ -343,10 +343,49 @@ function openDetail(id){
 async function shareText(title,text,url){const payload={title,text,url};try{if(navigator.share){await navigator.share(payload);toast('Ready to spread the signal.');return;}if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(`${text}\n${url}`);toast('Share text copied. Paste it anywhere.');return;}const area=document.createElement('textarea');area.value=`${text}\n${url}`;area.style.position='fixed';area.style.opacity='0';document.body.append(area);area.select();const ok=document.execCommand('copy');area.remove();toast(ok?'Share text copied.':'Copy unavailable.');}catch(e){if(e.name!=='AbortError')toast('Sharing is not available.');}}
 function shareTrend(id){const t=state.trends.find(x=>x.id===id)||DEMO.find(x=>x.id===id);if(!t)return;const link=location.href.split('#')[0];shareText(`Ghost Mode signal: ${t.title}`,`👻 GHOST MODE SIGNAL\n${t.title}\nGhost Score: ${Number(t.score)||0} · ${t.momentum||'Early signal'}\nSources: ${(t.sources||[t.source||'Public source']).join(', ')}\nOriginal source: ${safeURL(t.url)}\nScores are directional, not predictions.`,link);}
 function shareApp(){const url=location.href.split('#')[0];shareText('Ghost Mode — Catch the Signal','I found a new way to spot what is rising across the internet before it hits the mainstream. Check out Ghost Mode.',url);}
-function bindEvents(){
+
+const newsState={items:[],updatedAt:null,loading:false};
+function renderNews(){
+  const grid=$('#news-grid'), track=$('#news-ticker-track'), updated=$('#news-updated');
+  if(!grid||!track)return;
+  const items=newsState.items.slice(0,12);
+  if(!items.length){
+    grid.innerHTML='<article class="news-card news-loading"><span>◌</span><strong>News feed is reconnecting</strong><span>Use Refresh to try again.</span></article>';
+    track.innerHTML='<span class="ticker-placeholder">Live headlines temporarily unavailable · retrying automatically</span>';
+    if(updated)updated.textContent='FEED RECONNECTING';
+    return;
+  }
+  grid.innerHTML=items.slice(0,6).map((n,i)=>`<article class="news-card ${i===0?'news-featured':''}">
+    <div class="news-card-top"><span class="news-category">${escapeHTML(n.category||'WORLD')}</span><span class="news-time">${escapeHTML(ago(n.publishedAt))}</span></div>
+    <a class="news-headline" href="${safeURL(n.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(n.title)} <span aria-hidden="true">↗</span></a>
+    <div class="news-card-foot"><span class="news-source-mark">N</span><span>${escapeHTML(n.source||'Public news feed')}</span><span class="news-link-label">READ STORY</span></div>
+  </article>`).join('');
+  const tickerItems=items.slice(0,10);
+  const tickerHTML=tickerItems.map(n=>`<a class="ticker-item" href="${safeURL(n.url)}" target="_blank" rel="noopener noreferrer"><span class="ticker-item-dot"></span><span>${escapeHTML(n.title)}</span><small>${escapeHTML(n.source||'NEWS')}</small></a>`).join('');
+  track.innerHTML=tickerHTML+tickerHTML;
+  track.classList.toggle('ticker-static',tickerItems.length<2);
+  if(updated)updated.textContent='UPDATED '+(newsState.updatedAt?fmtTime(newsState.updatedAt):'JUST NOW')+' · '+items.length+' HEADLINES';
+}
+async function loadNews(opts={}){
+  if(newsState.loading)return;
+  newsState.loading=true;
+  try{
+    const r=await fetch('/api/news',{cache:'no-store'});
+    if(!r.ok)throw new Error('news '+r.status);
+    const data=await r.json();
+    if(Array.isArray(data.items)&&data.items.length)newsState.items=data.items;
+    newsState.updatedAt=data.updatedAt||new Date().toISOString();
+    renderNews();
+    if(data.stale&&!opts.quiet)toast('Showing cached headlines while the news feed reconnects.');
+  }catch(e){
+    console.warn('news load failed',e);
+    renderNews();
+  }finally{newsState.loading=false;}
+}
+\nfunction bindEvents(){
   $$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $('#mobile-menu').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
-  $('#refresh-button').addEventListener('click',()=>loadTrends());
+  $('#refresh-button').addEventListener('click',()=>{loadTrends();loadNews();});\n  $('#news-refresh')?.addEventListener('click',()=>loadNews());
   $('#sort-select').addEventListener('change',e=>{state.sort=e.target.value;renderCards();});
   $$('.view-toggle').forEach(b=>b.addEventListener('click',()=>{state.layout=b.dataset.layout;$$('.view-toggle').forEach(x=>x.classList.toggle('active',x===b));renderCards();}));
   $$('#category-filters [data-category]').forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category;$$('#category-filters [data-category]').forEach(x=>x.classList.toggle('active',x===b));renderCards();}));
@@ -424,4 +463,4 @@ async function init(){
   await loadTrends();
 }
 init();
-setInterval(()=>{ if(document.visibilityState==='visible') loadTrends({quiet:true}); }, 180000);
+setInterval(()=>{ if(document.visibilityState==='visible'){loadTrends({quiet:true});loadNews({quiet:true});} }, 180000);
