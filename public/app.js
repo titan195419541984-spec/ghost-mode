@@ -184,12 +184,7 @@ function renderCards(){
       pulseGrid.className=`trend-grid ${state.layout==='list'?'list-view':''}`;
       pulseGrid.innerHTML=cards.join('') || `<div class="empty-state"><h3>No matches</h3><p>Try a different category or search.</p></div>`;
       // after inject, set ad client/slot if enabled
-      if(window.GhostAds?.enabled){
-        document.querySelectorAll('.ad-container ins').forEach(ins=>{
-          ins.setAttribute('data-ad-client', window.GhostAds.clientId);
-          // slot mapping placeholder
-        });
-      }
+      
     }
   }
   // Underground: Early signal only
@@ -216,6 +211,7 @@ function renderCards(){
     renderRadar(radarCanvas, list.slice(0,18));
   }
   hydrateCardImages();
+  window.GhostAds?.refresh?.();
   renderMetrics();
   renderSources();
   renderInterestControls();
@@ -297,7 +293,7 @@ function renderRewards(){
   const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function');
   rewardState.providerReady=ready;
   const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
-  if(btn){btn.disabled=false;btn.textContent='▶  Watch to earn';btn.setAttribute('aria-disabled','false');}
+  if(btn){btn.disabled=!ready;btn.textContent=ready?'▶  Watch to earn':'Reward videos unavailable';btn.setAttribute('aria-disabled',String(!ready));btn.title=ready?'Watch a verified video to earn points':'Rewarded video provider is not connected';}
   if(note)note.textContent=ready?'Complete the full rewarded video to receive points.':'Rewarded video provider is not configured yet. No points will be granted until completion is verified.';
 }
 async function watchRewardedVideo(){
@@ -460,9 +456,9 @@ async function init(){
   renderRewards();
   renderInterestControls();
   const hash=location.hash.replace('#','');
-  if(['pulse','radar','underground','signal','vault'].includes(hash)) switchView(hash);
+  if(['pulse','radar','underground','signal','vault','rewards','privacy','terms','contact','ads'].includes(hash)) switchView(hash);
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('/sw.js'); }catch{} }
-  await loadTrends();
+  await Promise.all([loadTrends(),loadNews()]);
 }
 init();
 setInterval(()=>{ if(document.visibilityState==='visible'){loadTrends({quiet:true});loadNews({quiet:true});} }, 180000);

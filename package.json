@@ -1,13 +1,16 @@
 {
   "name": "ghost-mode-trend-intelligence",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "description": "Ghost Mode — premium futuristic mobile-first trend intelligence PWA",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js && node --check public/app.js && node --check public/ads.js && node --check public/sw.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "prestart": "npm run check && npm test"
   }
 }

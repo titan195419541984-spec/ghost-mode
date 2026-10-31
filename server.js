@@ -8,7 +8,7 @@ import { URL } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = join(__dirname, 'public');
-const USER_AGENT = 'GhostModeTrendIntelligence/1.2.0 (public aggregation; contact: operator)';
+const USER_AGENT = 'GhostModeTrendIntelligence/1.2.1 (public aggregation; contact: ghostmode.trends@gmail.com)';
 const commonsImageCache = new Map();
 const COMMONS_IMAGE_TTL = 6 * 60 * 60 * 1000;
 async function findCommonsImage(title) {
@@ -124,8 +124,8 @@ async function sourceGdelt(){
 async function sourceNewsWire(){
   const feeds=[
     {name:'Top Stories',url:'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en'},
-    {name:'Technology',url:'https://news.google.com/rss/search?q=technology+OR+artificial+intelligence&hl=en-US&gl=US&ceid=US:en'},
-    {name:'Business & Markets',url:'https://news.google.com/rss/search?q=business+OR+markets+OR+economy&hl=en-US&gl=US&ceid=US:en'}
+    {name:'Culture & Viral',url:'https://news.google.com/rss/search?q=TikTok+OR+viral+trends+OR+memes+OR+creators+OR+entertainment+OR+music&hl=en-US&gl=US&ceid=US:en'},
+    {name:'Technology',url:'https://news.google.com/rss/search?q=technology+OR+artificial+intelligence+OR+social+media+OR+apps&hl=en-US&gl=US&ceid=US:en'}
   ];
   const results=await Promise.allSettled(feeds.map(async feed=>({feed:feed.name,items:xmlItems(await fetchText(feed.url,8000))})));
   const all=[];
@@ -241,11 +241,11 @@ const server=http.createServer(async(req,res)=>{
     'referrer-policy':'strict-origin-when-cross-origin',
     'x-xss-protection':'0',
     'permissions-policy':'geolocation=(), microphone=(), camera=()',
-    'content-security-policy': "default-src 'self'; script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://fundingchoicesmessages.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://pagead2.googlesyndication.com; frame-src https://*.googlesyndication.com https://googleads.g.doubleclick.net; font-src 'self' data:; manifest-src 'self';"
+    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://fundingchoicesmessages.google.com https://unrealistic-push.com https://*.unrealistic-push.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://pagead2.googlesyndication.com https://unrealistic-push.com https://*.unrealistic-push.com; frame-src https://*.googlesyndication.com https://googleads.g.doubleclick.net https://unrealistic-push.com https://*.unrealistic-push.com; font-src 'self' data:; manifest-src 'self';"
   };
 
   if(pathname==='/api/health'){
-    const body={ok:true,service:'ghost-mode',version:'1.2.0',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{adsEnabled:ADS_ENABLED, nodeEnv:process.env.NODE_ENV||'development'}};
+    const body={ok:true,service:'ghost-mode',version:'1.2.1',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{adsEnabled:ADS_ENABLED, nodeEnv:process.env.NODE_ENV||'development'}};
     res.writeHead(200,{'content-type':'application/json','cache-control':'no-store',...secHeaders});
     res.end(JSON.stringify(body));
     log(req,200,Date.now()-start);
