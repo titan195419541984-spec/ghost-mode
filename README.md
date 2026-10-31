@@ -1,55 +1,29 @@
-# Ghost Mode — Signal Intelligence v1.2.0
+# Ghost Mode — Internet Trend Intelligence v1.2.1
 
-Premium, futuristic, mobile-first trend-intelligence PWA.
+Ghost Mode is a mobile-first PWA for discovering emerging internet topics from public sources.
 
-## What it does
-- **The Pulse**: continuously refreshable trend feed with titles, source attribution, timestamps, links, momentum, confidence, filtering, sorting, loading/empty/stale/error states. No fabricated live stats.
-- **Trend Radar**: functional visualization based on real trend data, accessible labels, mobile layout, honest Ghost Score explanation.
-- **The Underground**: early signals (score <70 or single-source) only when data justifies. Shows source coverage limitations.
-- **Your Signal**: choose topics, personalize via localStorage, controls to change/clear.
-- **Your Vault**: save/unsave, local persistence, preserved across refreshes, clear explanation of storage.
-- **Sharing**: native share where supported, clipboard fallback, shareable summary with source link + Ghost Mode branding, no fake social network.
-- **Navigation**: all buttons work, no dead links, no horizontal overflow, loading/empty/offline/failure states, accessible contrast, keyboard nav (1-5, /, ESC), reduced-motion support.
+## Current features
+- The Pulse: trend cards with source attribution, timestamps, Ghost Score, momentum, and source links.
+- Trend Radar: visualization of current signals.
+- The Underground: lower-scoring and single-source signals.
+- Your Signal and Your Vault: locally saved interests and signal snapshots.
+- Live news wire focused on culture, creators, technology, and the internet.
+- Wikimedia Commons image lookup with attribution when a relevant image is available.
+- PWA shell, responsive navigation, search, share, and offline fallback.
 
 ## Run locally
-Requires Node.js 20+.
+Requires Node.js 20 or later. Run npm start. Startup runs syntax checks and the Node test suite before starting the HTTP server.
 
-```bash
-npm start
-# or
-PORT=3000 npm start
-```
-Open http://localhost:3000
-Health: /api/health
-Trends: /api/trends
-Config: /api/config
-ads.txt: /ads.txt
+Health: /api/health; trends: /api/trends; news: /api/news; config: /api/config.
 
-## Deploy on Render
-1. Push to Git repo.
-2. Create Web Service, root = repo root, runtime Node.
-3. Build: npm install, Start: npm start, HealthCheck: /api/health
-4. Set env vars from .env.example (ADS_ENABLED=false until approved).
-`render.yaml` included.
+## Production
+The Render service is ghost-mode-umm5, connected to this repository's master branch. Render auto-deploys commits. Health endpoint: /api/health.
 
-## Android PWA
-Host over HTTPS, open in Chrome, Install app / Add to Home screen. Not a native APK.
+## Advertising
+HilltopAds is loaded from a same-origin loader file and its host is allowed by the Content Security Policy. Google AdSense remains disabled unless the publisher account is approved and valid ad-unit IDs are configured. See ADVERTISING.md. public/ads.txt contains the Google publisher record pub-5558048915852406.
 
-## Security basics
-- No secrets in client.
-- URL validation, HTML sanitization (no trusted HTML from feeds).
-- Rate limiting (120/min per IP), timeouts, response size cap.
-- Security headers: nosniff, DENY framing, strict-origin-when-cross-origin, CSP allowing self + AdSense when enabled, permissions-policy.
-- Privacy-conscious logs (no IP logged with PII, just method/path/status/duration).
+## Rewards and tiers
+The intended verified-video reward is 5 points per completed video, capped at 40 points per day. Tier thresholds are 250, 450, 1,200, and 2,000 points. No points are issued until a rewarded-video provider and server-side completion verification are integrated. Production tier gating requires authenticated accounts and server-side storage; client-side point totals are not secure entitlements.
 
-## Ads
-See ADVERTISING.md. Disabled by default. No fake impressions. Reserved containers never cover nav/content.
-
-## Legal
-Privacy, Terms, Contact, Ads pages are SPA routes (#privacy etc) with placeholders for CONTACT_EMAIL, SITE_URL. Replace before launch.
-
-## Data sources
-See DATA_SOURCES.md for provider details, limitations, credentials.
-
-## Testing
-See TESTING.md and TEST_REPORT.md
+## Privacy and limitations
+This release has no account system or analytics SDK. Saved signals and preferences are stored in localStorage. Trend scores summarize available public signals and are not predictions.
