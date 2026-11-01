@@ -863,3 +863,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
 .app-footer{max-width:1380px}
 @media(max-width:900px){.view{padding:20px 16px}.trend-grid{grid-template-columns:minmax(0,1fr);gap:14px}.trend-card-image-wrap{height:190px}.sidebar{width:min(300px,86vw)}}
 @media(min-width:901px) and (max-width:1150px){.trend-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Advertising safety: reserved slots stay in normal flow and cannot spill over content. */
+.ad-container{position:relative!important;display:block;float:none!important;clear:both;max-width:100%;min-width:0;overflow:clip;contain:layout paint;}
+.ad-container iframe,.ad-container ins{max-width:100%!important;}
+@media(max-width:640px){.ad-container{margin-inline:0!important;border-radius:10px!important;}}
