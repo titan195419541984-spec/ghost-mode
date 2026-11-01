@@ -1,4 +1,4 @@
-import { generateContentPackage, formatPublishingPack } from "./studio-engine.js?v=2.0.1";
+import { generateContentPackage, formatPublishingPack } from "./studio-engine.js?v=2.1.0";
 (()=>{
 "use strict";
 const $=s=>document.querySelector(s),form=$("#studio-form"),out=$("#studio-output"),status=$("#studio-status");
