@@ -295,8 +295,8 @@ function renderRewards(){
   const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function');
   rewardState.providerReady=ready;
   const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
-  if(btn){btn.disabled=!ready;btn.textContent=ready?'▶  Watch to earn':'Reward videos unavailable';btn.setAttribute('aria-disabled',String(!ready));btn.title=ready?'Watch a verified video to earn points':'Rewarded video provider is not connected';}
-  if(note)note.textContent=ready?'Complete the full rewarded video to receive points.':'Rewarded video provider is not configured yet. No points will be granted until completion is verified.';
+  if(btn){btn.hidden=!ready;btn.disabled=!ready;btn.textContent='▶  Watch to earn';btn.setAttribute('aria-disabled',String(!ready));btn.title=ready?'Watch a verified video to earn points':'Rewarded video provider is not connected';}
+  if(note)note.textContent=ready?'Complete the full rewarded video to receive points.':'Preview only: points, tier unlocks, and rewarded videos are not active in this beta.';
 }
 async function watchRewardedVideo(){
   renderRewards();
