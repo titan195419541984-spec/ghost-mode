@@ -6,7 +6,7 @@ describe("Ghost Studio content engine",()=>{
   it("requires a real topic",()=>{
     assert.throws(()=>generateContentPackage({topic:"   "}),/Enter a topic/);
   });
-  it("creates five scenes whose timing exactly matches the selected duration",()=>{
+  it("creates five or six scenes whose timing exactly matches the selected duration",()=>{
     for(const duration of [15,30,45,60]){
       const result=generateContentPackage({topic:"AI search trends",duration});
       assert.ok(result.scenes.length>=5&&result.scenes.length<=6);
