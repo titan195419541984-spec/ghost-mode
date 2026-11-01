@@ -100,17 +100,17 @@ function storyBeats(subject,seconds,tone,cta){
   lines=[
    ["THE HOOK",b.who+" found "+b.object+"."],
    ["THE SETUP","Then came a clue: "+b.clue+"."],
-   ["THE BUILD","The clue was in "+b.proof+"."],
+   ["THE BUILD",b.who+" checked "+b.proof+"."],
    ["THE TWIST",b.reveal+"."],
    ["THE CTA","Would you go back? Comment below."]
   ];
  }else if(medium){
   lines=[
    ["THE HOOK","At "+b.place+", "+b.who+" found "+b.object+"."],
-   ["THE SETUP","Everything was locked. Then she noticed "+b.clue+"."],
-   ["THE BUILD",b.who+" checked "+b.proof+". The timestamp matched tonight."],
-   ["THE TWIST",b.reveal+". Nobody else was inside."],
-   ["THE CTA",b.ending+". Would you go back? Comment below."]
+   ["THE SETUP","The place was locked. Then came the clue: "+b.clue+"."],
+   ["THE BUILD",b.who+" checked "+b.proof+". The details matched tonight."],
+   ["THE TWIST",b.reveal+". No one else was there."],
+   ["THE CTA",b.ending+". What would you do? Comment below."]
   ];
  }else if(seconds<=45){
   lines=[
