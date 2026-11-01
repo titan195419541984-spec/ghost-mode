@@ -99,37 +99,36 @@ function storyBeats(subject,seconds,tone,cta){
  if(short){
   lines=[
    ["THE HOOK",b.who+" found "+b.object+" at "+b.place+"."],
-   ["THE SETUP",b.clue+"."],
+   ["THE SETUP","The place was empty. Then "+b.clue+"."],
    ["THE BUILD",b.who+" checked "+b.proof+"."],
    ["THE TWIST",b.reveal+"."],
-   ["THE CTA",b.ending+" "+cta]
+   ["THE CTA","Would you go back? Comment below."]
   ];
  }else if(medium){
   lines=[
-   ["THE HOOK","At the worst possible moment, "+b.who+" found "+b.object+" at "+b.place+"."],
-   ["THE SETUP",b.who+" had one rule: never go near it alone. But tonight, "+b.clue+"."],
-   ["THE BUILD",b.who+" checked "+b.proof+", expecting a simple explanation. The details only made it worse."],
-   ["THE TWIST",b.reveal+"."],
-   ["THE PAYOFF",b.ending+"."],
-   ["THE CTA","What would you do? "+cta]
+   ["THE HOOK","Just after midnight at "+b.place+", "+b.who+" found "+b.object+"."],
+   ["THE SETUP","The doors were locked. The lights were off. Then "+b.clue+"."],
+   ["THE BUILD",b.who+" checked "+b.proof+", expecting a glitch. The timestamp matched tonight."],
+   ["THE TWIST",b.reveal+". There was no second person in the building."],
+   ["THE CTA",b.ending+". Would you go back? Tell me below."]
   ];
  }else if(seconds<=45){
   lines=[
-   ["THE HOOK","At "+b.place+", "+b.who+" discovered "+b.object+". It should not have been there."],
-   ["THE SETUP","Nobody else was around. "+b.who+" checked the doors, checked the time, and tried to explain it away."],
+   ["THE HOOK","At "+b.place+", "+b.who+" discovered "+b.object+". Nobody was meant to be there."],
+   ["THE SETUP","The doors were locked, the lights were off, and the building was supposed to be empty."],
    ["THE BUILD","Then came the detail that changed everything: "+b.clue+"."],
-   ["THE ESCALATION",b.who+" pulled up "+b.proof+". At first, it looked ordinary. Then one detail moved."],
-   ["THE TWIST",b.reveal+"."],
+   ["THE ESCALATION",b.who+" opened "+b.proof+". The first details looked normal, until one thing appeared where it could not be."],
+   ["THE TWIST",b.reveal+". "+b.who+" checked the room again. Nobody else was there."],
    ["THE CTA",b.ending+". Would you have kept investigating? "+cta]
   ];
  }else{
   lines=[
    ["THE HOOK","At "+b.place+", "+b.who+" discovered "+b.object+". It was the first thing that night that made no sense."],
-   ["THE SETUP",b.who+" checked the doors and windows. Everything was locked. Nobody had come in, and nobody was supposed to be there."],
+   ["THE SETUP",b.who+" checked every door and window. Everything was locked. Nobody had come in, and nobody was supposed to be there."],
    ["THE BUILD","Then came the detail that made it impossible to ignore: "+b.clue+". "+b.who+" stopped looking for a harmless explanation."],
    ["THE ESCALATION",b.who+" opened "+b.proof+". The first few details looked normal. Then one small thing appeared that had not been there before."],
    ["THE TURN",b.reveal+". For a few seconds, "+b.who+" could not move. The evidence was right there, but it made no sense."],
-   ["THE PAYOFF",b.ending+". No one could explain how it happened—or why it seemed meant for "+b.who+"."],
+   ["THE PAYOFF",b.ending+". Nobody could explain how it happened, or why it seemed meant for "+b.who+"."],
    ["THE CTA","Would you go back and find out what happened next? "+cta]
   ];
  }
