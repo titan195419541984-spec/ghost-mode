@@ -27,7 +27,20 @@ describe("Ghost Studio content engine",()=>{
     assert.ok(result.tags.some(tag=>/electric|vehicle|battery|research/.test(tag)));
     assert.ok(result.tags.every(tag=>/^#[a-z0-9]+$/.test(tag)));
   });
-  it("keeps spoken script length proportionate to the selected duration",()=>{\n    for(const duration of [15,30,45,60]){\n      const result=generateContentPackage({topic:"AI search trends",duration});\n      const count=result.script.trim().split(/\\s+/).length;\n      assert.ok(count<=duration*2.6,`${duration}s script is too long: ${count} words`);\n      assert.ok(count>=duration*0.8,`${duration}s script is too short: ${count} words`);\n    }\n  });\n  it("changes the hook when creative direction changes",()=>{\n    const cinematic=generateContentPackage({topic:"AI search trends",tone:"cinematic"});\n    const direct=generateContentPackage({topic:"AI search trends",tone:"direct"});\n    assert.notEqual(cinematic.scenes[0].text,direct.scenes[0].text);\n  });\n  it("keeps unsupported claims out of the generated editorial guidance",()=>{
+  it("keeps spoken script length proportionate to the selected duration",()=>{
+    for(const duration of [15,30,45,60]){
+      const result=generateContentPackage({topic:"AI search trends",duration});
+      const count=result.script.trim().split(/\s+/).length;
+      assert.ok(count<=duration*2.6,`${duration}s script is too long: ${count} words`);
+      assert.ok(count>=duration*0.8,`${duration}s script is too short: ${count} words`);
+    }
+  });
+  it("changes the hook when creative direction changes",()=>{
+    const cinematic=generateContentPackage({topic:"AI search trends",tone:"cinematic"});
+    const direct=generateContentPackage({topic:"AI search trends",tone:"direct"});
+    assert.notEqual(cinematic.scenes[0].text,direct.scenes[0].text);
+  });
+  it("keeps unsupported claims out of the generated editorial guidance",()=>{
     const result=generateContentPackage({topic:"New social media trend"});
     const pack=formatPublishingPack(result);
     assert.match(pack,/Verify names, dates, statistics, claims, and original sources/);
