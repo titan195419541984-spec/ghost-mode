@@ -14,6 +14,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="icon" href="/ghost.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/styles.css?v=2.6.0" />
+  <link rel="stylesheet" href="/studio.css?v=1.0.0" />
   <title>Ghost Mode — Signal Intelligence</title>
 </head>
 <body>
@@ -30,6 +31,7 @@
         <button class="nav-item" data-view="underground"><span class="nav-icon">⌁</span><span>The Underground</span><kbd>3</kbd></button>
         <button class="nav-item" data-view="signal"><span class="nav-icon">⌘</span><span>Your Signal</span><kbd>4</kbd></button>
         <button class="nav-item" data-view="vault"><span class="nav-icon">▣</span><span>Your Vault</span><kbd>5</kbd></button>
+        <button class="nav-item" data-view="studio"><span class="nav-icon">✦</span><span>Ghost Studio</span><span class="nav-level">NEW</span></button>
         <button class="nav-item" data-view="rewards"><span class="nav-icon">✧</span><span>Levels & Rewards</span><span class="nav-level" id="nav-level">LV 0</span></button>
       </nav>
       <div class="sidebar-divider"></div>
@@ -103,6 +105,24 @@
         <div class="trend-grid" id="pulse-grid"><div class="loading-card"><span class="loader"></span><strong>Scanning public sources</strong><span>Google Trends · Hacker News · Mastodon · Global News</span></div></div>
       </section>
 
+      <section class="view secondary-view" id="view-studio">
+        <div class="studio-page">
+          <div class="studio-hero"><div><div class="eyebrow"><span class="eyebrow-line"></span> TREND-TO-CONTENT WORKFLOW</div><h1>Ghost <em>Studio.</em></h1><p>Turn a topic or emerging signal into a short-form content package: hook, script, scene plan, caption, hashtags and a vertical video draft.</p></div><span class="studio-engine-pill">● CREATOR WORKSPACE</span></div>
+          <div class="studio-layout">
+            <form class="studio-controls" id="studio-form">
+              <h2>Build your content</h2>
+              <div class="studio-field"><label for="studio-topic">TOPIC OR TREND</label><input id="studio-topic" maxlength="180" placeholder="Paste a Ghost Mode signal or enter your own idea" required /></div>
+              <div class="studio-field"><label for="studio-platform">PLATFORM</label><select id="studio-platform"><option>TikTok</option><option>Instagram Reels</option><option>YouTube Shorts</option><option>Facebook Reels</option></select></div>
+              <div class="studio-field"><label for="studio-format">CONTENT FORMAT</label><select id="studio-format"><option value="explainer">Explainer / trend breakdown</option><option value="story">Psychological story / suspense</option></select></div>
+              <div class="studio-field"><label for="studio-tone">CREATIVE DIRECTION</label><select id="studio-tone"><option value="cinematic">Cinematic</option><option value="educational">Educational</option><option value="story">Story-driven</option><option value="direct">Fast and direct</option></select></div>
+              <div class="studio-field"><label for="studio-duration">TARGET LENGTH</label><select id="studio-duration"><option value="15">15 seconds</option><option value="30" selected>30 seconds</option><option value="45">45 seconds</option><option value="60">60 seconds</option></select></div>
+              <button class="primary-button studio-generate" type="submit">✦ Generate content package</button>
+              <p class="studio-hint">No API key required for the built-in script planner and visual renderer. Export is a silent WebM draft; voice, music and photorealistic footage are not connected in this release.</p>
+            </form>
+            <section class="studio-output-panel"><h2>Your production workspace</h2><div id="studio-output"><div class="studio-empty"><strong>Your next post starts here.</strong><span>Enter a topic or trend and generate a complete production package.</span></div></div></section>
+          </div>
+        </div>
+      </section>
       <section class="view secondary-view" id="view-rewards">
         <div class="page-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> GHOST MODE MEMBERSHIP</div><h1>Levels &amp; <em>Rewards.</em></h1><p class="hero-subtitle">Build your signal score. Unlock deeper trend intelligence as you level up.</p></div><div class="rewards-level-mark" id="rewards-level-mark">01</div></div>
         <div class="rewards-overview">
@@ -148,5 +168,6 @@
   <div class="modal-backdrop" id="info-modal" aria-hidden="true"><div class="info-modal" role="dialog" aria-modal="true"><button class="modal-close detail-close" id="info-close" aria-label="Close">×</button><div class="eyebrow"><span class="eyebrow-line"></span> TRANSPARENCY FIRST</div><h2 id="info-title">How Ghost Score works</h2><div id="info-copy"><p>Ghost Score is a directional index based on available public signals, freshness, engagement when provided, and source overlap. It is not a probability of going viral, and source coverage is incomplete.</p><p>Ghost Mode does not claim private platform data. Sources may be temporarily unavailable, and every trend links back to its origin where possible.</p></div></div></div>
   <script src="/ads.js?v=2.1.0" defer></script>
   <script src="/app.js?v=2.8.1" defer></script>
+  <script src="/studio.js?v=1.0.0" defer></script>
 </body>
 </html>
