@@ -869,3 +869,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
 .ad-container{position:relative!important;display:block;float:none!important;clear:both;max-width:100%;min-width:0;overflow:clip;contain:layout paint;}
 .ad-container iframe,.ad-container ins{max-width:100%!important;}
 @media(max-width:640px){.ad-container{margin-inline:0!important;border-radius:10px!important;}}
+
+/* Do not reserve visible ad space when a real approved ad unit is inactive. */
+.ad-container[data-enabled="false"]{display:none!important}
