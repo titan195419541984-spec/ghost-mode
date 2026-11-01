@@ -107,10 +107,10 @@ function storyBeats(subject,seconds,tone,cta){
  }else if(medium){
   lines=[
    ["THE HOOK","At "+b.place+", "+b.who+" found "+b.object+"."],
-   ["THE SETUP","The place was locked. Then came the clue: "+b.clue+"."],
-   ["THE BUILD",b.who+" checked "+b.proof+". The details matched tonight."],
-   ["THE TWIST",b.reveal+". No one else was there."],
-   ["THE CTA",b.ending+". Would you go back? What would you do? Comment below."]
+   ["THE SETUP","Every entrance was locked. Then "+b.clue+"."],
+   ["THE BUILD",b.who+" checked "+b.proof+". The record showed the same impossible detail."],
+   ["THE TWIST",b.reveal+". The building was still empty."],
+   ["THE CTA",b.ending+". Would you go back? Tell me what you would do."]
   ];
  }else if(seconds<=45){
   lines=[
@@ -175,7 +175,7 @@ export function generateContentPackage(input={}){
  const seconds=allocateSeconds(duration,beats.map((_,i)=>[1.3,1.15,1.1,1.1,1][i]||1));
  const scenes=beats.map(([label,text],i)=>({number:i+1,label,text,seconds:seconds[i],visual:visualFor(label,format,i)}));
  const storyCaption=format==="story"
-  ?`A fictional ${subject.toLowerCase()} story with an unsettling turn. Which moment would make you leave?`
+  ?`A fictional ${subject.toLowerCase()} suspense story. What would you do if you found this?`
   :`Before you believe the conversation around ${subject}, check the original source, the date, and what independent evidence actually confirms.`;
  const caption=platform==="YouTube Shorts"
   ?`${titleCase(subject)} | ${format==="story"?"A short mystery":"What to know"}\n\n${storyCaption}\n\n${PLATFORM[platform].cta}`
