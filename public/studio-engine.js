@@ -110,7 +110,7 @@ function storyBeats(subject,seconds,tone,cta){
    ["THE SETUP","The place was locked. Then came the clue: "+b.clue+"."],
    ["THE BUILD",b.who+" checked "+b.proof+". The details matched tonight."],
    ["THE TWIST",b.reveal+". No one else was there."],
-   ["THE CTA",b.ending+". What would you do? Comment below."]
+   ["THE CTA",b.ending+". Would you go back? What would you do? Comment below."]
   ];
  }else if(seconds<=45){
   lines=[
