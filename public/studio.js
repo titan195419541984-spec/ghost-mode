@@ -1,4 +1,4 @@
-import { generateContentPackage, formatPublishingPack } from "./studio-engine.js?v=2.1.0";
+import { generateContentPackage, formatPublishingPack } from "./studio-engine.js?v=2.2.0";
 (()=>{
 "use strict";
 const $=s=>document.querySelector(s),form=$("#studio-form"),out=$("#studio-output"),status=$("#studio-status");
@@ -41,7 +41,7 @@ function render(){
   const p=project;
   out.innerHTML=`
     <div class="studio-result-head">
-      <div><span class="studio-kicker">CONTENT PACKAGE DRAFT</span><h3>${esc(p.topic)}</h3><p>${esc(p.platform)} · ${p.duration} seconds · ${p.scenes.length} scenes</p></div>
+      <div><span class="studio-kicker">CONTENT PACKAGE DRAFT · STORY ENGINE 2.2.0</span><h3>${esc(p.topic)}</h3><p>${esc(p.platform)} · ${p.duration} seconds · ${p.scenes.length} scenes</p></div>
       <span class="studio-ready">● DRAFT CREATED</span>
     </div>
     <div class="studio-preview"><span class="preview-brand">GHOST MODE / STUDIO</span><strong>${esc(p.scenes[0].text)}</strong><small>HOOK / SCENE 01</small></div>
