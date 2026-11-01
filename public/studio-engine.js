@@ -37,6 +37,13 @@ function buildBeats(subject,format,duration,cta){
    ["THE QUESTION","Is interest reaching new audiences, or looping through the same feed? That distinction matters."],
    ["THE CTA",cta]
   ];
+  if(duration<=45)return [
+   ["THE HOOK",`Something about ${subject} is catching attention. But what is actually confirmed?`],
+   ["THE SETUP","Find the original source, check its date, and identify what it really says."],
+   ["THE TURN","Look beyond reactions. Are independent communities discussing it, or repeating the same unverified claim?"],
+   ["THE QUESTION","Is interest reaching new audiences? Does the underlying information hold up?"],
+   ["THE CTA",cta]
+  ];
   return [
    ["THE HOOK",`Something about ${subject} is catching attention. But the first version of a story is rarely the whole story.`],
    ["THE SETUP","Start at the source. Find the original post, report, product announcement, event, or discussion. Check its date and what it actually says."],
@@ -57,6 +64,13 @@ function buildBeats(subject,format,duration,cta){
   ["THE CONTEXT","Find the original source, check the date, and identify what people are actually responding to."],
   ["WHAT TO CHECK","Look for independent sources, new audiences, and evidence beyond likes or repeated headlines. Separate confirmed facts from speculation."],
   ["THE TAKEAWAY","A spike can fade quickly. Watch whether interest keeps spreading and whether the information stands up to checking."],
+  ["THE CTA",cta]
+ ];
+ if(duration<=45)return [
+  ["THE HOOK",`Why is ${subject} drawing attention? Start by checking what is confirmed.`],
+  ["THE CONTEXT","Find the original source, its date, and the claim people are responding to."],
+  ["WHAT TO CHECK","Look for independent coverage, new audiences, and evidence beyond likes or repeated headlines. Separate facts from speculation."],
+  ["THE TAKEAWAY","Attention can fade. Watch whether interest spreads and the underlying information holds up."],
   ["THE CTA",cta]
  ];
  return [
