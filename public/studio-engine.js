@@ -6,10 +6,10 @@ const PLATFORM = {
  "Facebook Reels":{opener:"Keep the setup easy to follow and finish with a question people can answer.",cta:"Would you go? Tell us in the comments."}
 };
 const TONE = {
- cinematic:{voice:"Atmospheric, vivid, restrained. Use contrast and deliberate reveals.",storyLead:"The unsettling part is this: ",explainerLead:"Here's the detail most people miss: "},
- educational:{voice:"Clear, grounded, useful. Explain the context without dramatizing uncertain claims.",storyLead:"Here's what makes the story interesting: ",explainerLead:"Let's break down what matters: "},
- story:{voice:"Build a beginning, escalation, turn, and payoff. Never invent real events or present folklore as verified fact.",storyLead:"It starts with one strange detail: ",explainerLead:"Start with the question everyone should ask: "},
- direct:{voice:"Short, concrete sentences. Remove filler. Deliver the payoff quickly.",storyLead:"Here's the strange part: ",explainerLead:"Here's the point: "}
+ cinematic:{voice:"Atmospheric, vivid, restrained. Use contrast and deliberate reveals.",storyLead:"Listen closely: ",explainerLead:"Here's the detail most people miss: "},
+ educational:{voice:"Clear, grounded, useful. Explain the context without dramatizing uncertain claims.",storyLead:"Here's what makes this worth examining: ",explainerLead:"Let's break down what matters: "},
+ story:{voice:"Build a beginning, escalation, turn, and payoff. Never invent real events or present folklore as verified fact.",storyLead:"It begins with: ",explainerLead:"Start with the question everyone should ask: "},
+ direct:{voice:"Short, concrete sentences. Remove filler. Deliver the payoff quickly.",storyLead:"The strange part: ",explainerLead:"Here's the point: "}
 };
 const clean=value=>String(value??"").replace(/[<>]/g,"").replace(/\s+/g," ").trim().slice(0,180);
 const titleCase=s=>s.replace(/\b[a-z]/g,m=>m.toUpperCase());
