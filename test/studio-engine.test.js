@@ -28,6 +28,13 @@ describe("Ghost Studio content engine",()=>{
     assert.ok(result.tags.includes("#paranormal"));
     assert.ok(!result.tags.includes("#places"));
   });
+  it("does not regress to the obsolete broken lighthouse narration",()=>{
+    const result=generateContentPackage({topic:"Haunted places",format:"story",duration:30});
+    assert.match(result.script,/At midnight, (Nora|Eli|Mara)|At the closed railway station/);
+    assert.doesNotMatch(result.script,/Every entrance was locked|the final page was dated tomorrow and signed in Mara's handwriting\. The building was still empty|Tell me what you would do/i);
+    assert.equal(result.scenes.length,5);
+    assert.equal(result.scenes.reduce((sum,scene)=>sum+scene.seconds,0),30);
+  });
   it("changes copy for the selected platform",()=>{
     const topic="AI search trends";
     const tiktok=generateContentPackage({topic,platform:"TikTok"});
