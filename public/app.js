@@ -56,7 +56,7 @@ function switchView(name){
   $$('.view').forEach(v=>v.classList.toggle('active', v.id===`view-${name}`));
   $('#breadcrumb-current').textContent=name.toUpperCase();
   $('#sidebar').classList.remove('open');
-  if(name!=='pulse') $('#pulse-grid .ad-container').forEach(el=>el.remove());
+  if(name!=='pulse') $$('#pulse-grid .ad-container').forEach(el=>el.remove());
   if(['pulse','vault','signal','underground','radar'].includes(name)) renderCards();
   if(name==='rewards') renderRewards();
   history.replaceState(null,'',`#${name}`);
