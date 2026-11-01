@@ -1,110 +1,132 @@
 const STOP = new Set("about after again also and are back been before being best between but can could day did does each from have here into just like many more most new not now only other our over people really said see some than that their them then there these they this those through time today very was what when where which who why will with you your".split(" "));
 const PLATFORM = {
- "TikTok":{opener:"Open with the strongest curiosity gap. Keep the delivery conversational.",cta:"Follow for more signals worth checking."},
- "Instagram Reels":{opener:"Lead with a clear visual idea and a concise first line.",cta:"Save this for your next deep dive."},
- "YouTube Shorts":{opener:"State the subject clearly, then give viewers a reason to stay.",cta:"Subscribe for more concise trend breakdowns."},
- "Facebook Reels":{opener:"Make the subject immediately understandable and invite discussion.",cta:"What are you seeing? Share your take below."}
+ "TikTok":{opener:"Hook viewers in the first line. Use conversational pacing and a clear payoff.",cta:"Follow for more stories worth staying up for."},
+ "Instagram Reels":{opener:"Lead with a strong visual and concise, save-worthy storytelling.",cta:"Save this and send it to someone who loves a good mystery."},
+ "YouTube Shorts":{opener:"Make the premise instantly clear, then deliver a satisfying payoff.",cta:"Subscribe for more short stories and strange discoveries."},
+ "Facebook Reels":{opener:"Keep the setup easy to follow and finish with a question people can answer.",cta:"Would you go? Tell us in the comments."}
 };
-const TONE={
- cinematic:{voice:"Vivid but restrained language. Short sentences. Deliberate reveals."},
- educational:{voice:"Plain explanations, useful context, and a practical way to assess the subject."},
- story:{voice:"Build curiosity in stages. Never invent events, statistics, quotes, or outcomes."},
- direct:{voice:"Short, concrete sentences. Remove filler and get to the point quickly."}
+const TONE = {
+ cinematic:{voice:"Atmospheric, vivid, restrained. Use contrast and deliberate reveals.",storyLead:"The unsettling part is this: ",explainerLead:"Here's the detail most people miss: "},
+ educational:{voice:"Clear, grounded, useful. Explain the context without dramatizing uncertain claims.",storyLead:"Here's what makes the story interesting: ",explainerLead:"Let's break down what matters: "},
+ story:{voice:"Build a beginning, escalation, turn, and payoff. Never invent real events or present folklore as verified fact.",storyLead:"It starts with one strange detail: ",explainerLead:"Start with the question everyone should ask: "},
+ direct:{voice:"Short, concrete sentences. Remove filler. Deliver the payoff quickly.",storyLead:"Here's the strange part: ",explainerLead:"Here's the point: "}
 };
 const clean=value=>String(value??"").replace(/[<>]/g,"").replace(/\s+/g," ").trim().slice(0,180);
+const titleCase=s=>s.replace(/\b[a-z]/g,m=>m.toUpperCase());
 function wordsFor(topic){return topic.toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s]/g," ").split(/\s+/).filter(w=>w.length>2&&!STOP.has(w)&&!/^\d+$/.test(w));}
 function hashtags(topic,category){
- const words=wordsFor(topic),tags=[],add=v=>{const t="#"+v.toLowerCase().replace(/[^a-z0-9]/g,"");if(t.length>2&&!tags.includes(t))tags.push(t);};
- words.slice(0,3).forEach(add);
- const map={Technology:["tech","technology","innovation"],Entertainment:["entertainment","popculture","creatornews"],Sports:["sports","sportsnews","culture"],Gaming:["gaming","gamer","gamingnews"],Business:["business","industry","marketwatch"],World:["worldnews","currentevents","news"],Culture:["culture","internetculture","trendwatch"]};
- (map[category]||map.Culture).forEach(add);["ghostmode","trendwatch"].forEach(add);return tags.slice(0,5);
-}
-function allocateSeconds(total,count){const base=Math.floor(total/count),extra=total%count;return Array.from({length:count},(_,i)=>base+(i<extra?1:0));}
-function buildBeats(subject,format,duration,cta){
- const short=duration<=15,medium=duration<=30;
- if(format==="story"){
-  if(short)return [
-   ["THE HOOK",`Why is ${subject} suddenly on your radar?`],
-   ["THE SETUP","Start with the original source."],
-   ["THE TURN","Separate facts from online reactions."],
-   ["THE QUESTION","Is interest spreading—or just repeating?"],
-   ["THE CTA",cta]
-  ];
-  if(medium)return [
-   ["THE HOOK",`Why is ${subject} suddenly getting attention? Here's what matters.`],
-   ["THE SETUP","Find the first credible source, then check when the conversation began."],
-   ["THE TURN","A busy comment section is not proof of a lasting trend. Look for independent coverage and real context."],
-   ["THE QUESTION","Is interest reaching new audiences, or looping through the same feed? That distinction matters."],
-   ["THE CTA",cta]
-  ];
-  if(duration<=45)return [
-   ["THE HOOK",`Something about ${subject} is catching attention. But what is actually confirmed?`],
-   ["THE SETUP","Find the original source, check its date, and identify what it really says."],
-   ["THE TURN","Look beyond reactions. Are independent communities discussing it, or repeating the same unverified claim?"],
-   ["THE QUESTION","Is interest reaching new audiences? Does the underlying information hold up?"],
-   ["THE CTA",cta]
-  ];
-  return [
-   ["THE HOOK",`Something about ${subject} is catching attention. But the first version of a story is rarely the whole story.`],
-   ["THE SETUP","Start at the source. Find the original post, report, product announcement, event, or discussion. Check its date and what it actually says."],
-   ["THE TURN","Then look beyond the reaction. Are independent communities discussing it? Are credible outlets adding new information? Or are people repeating the same unverified claim? Those are very different signals."],
-   ["THE QUESTION","The question is whether interest is spreading to new audiences and whether the underlying information holds up. A fast-moving conversation can still be misleading, recycled, or short-lived."],
-   ["THE CTA",cta]
-  ];
+ const text=topic.toLowerCase(),tags=[],add=v=>{const t="#"+v.toLowerCase().replace(/[^a-z0-9]/g,"");if(t.length>2&&!tags.includes(t))tags.push(t);};
+ const groups=[
+  [/haunt|ghost|paranormal|spirit|haunted|creep|eerie|supernatural|abandon(ed)? place/ ,["hauntedplaces","ghoststories","paranormal","creepytok","unexplained"]],
+  [/psycholog|mind|behavior|brain|memory|dream|illusion/ ,["psychology","humanbehavior","mindset","brainfacts","psychologytok"]],
+  [/mystery|unexplained|conspiracy|strange|weird|unsolved/ ,["unsolvedmysteries","mysterytok","unexplained","strangestories","deepdive"]],
+  [/horror|scary|fear|thriller|dark stor/ ,["horrortok","scarystories","darkstories","creepytok","thriller"]],
+  [/ai|artificial intelligence|robot|machine learn|software|app|tech|gadget/ ,["technology","aitools","technews","innovation","futuretech"]],
+  [/game|gaming|xbox|playstation|nintendo|minecraft/ ,["gaming","gametok","gamer","gamingnews","videogames"]],
+  [/music|song|singer|album|artist/ ,["music","newmusic","musictok","musicnews","nowplaying"]],
+  [/movie|film|tv show|series|actor|celebrity|entertainment/ ,["movies","filmtok","popculture","entertainment","tvshows"]],
+  [/sport|football|basketball|baseball|soccer|nfl|nba|mlb/ ,["sports","sportsnews","fans","highlights","sportsdebate"]],
+  [/business|money|market|brand|startup|economy|finance/ ,["business","entrepreneur","markets","industrynews","moneytalk"]],
+  [/travel|hotel|city|country|destination|places|landmark/ ,["travel","placestovisit","explore","hiddenplaces","travelguide"]]
+ ];
+ const group=groups.find(([re])=>re.test(text));
+ if(group)group[1].forEach(add);
+ else {
+  const words=wordsFor(topic);
+  if(words.length>=2)add(words.slice(0,2).join(""));
+  else if(words.length===1)add(words[0]+"stories");
+  ({"Technology":["tech","innovation","futuretech"],Entertainment:["popculture","entertainment","creatornews"],Sports:["sports","sportsnews","sportsfans"],Gaming:["gaming","gametok","gamingnews"],Business:["business","industrynews","entrepreneur"],World:["worldnews","currentevents","globalnews"],Culture:["culture","internetculture","trendwatch"]}[category]||["culture","internetculture","trendwatch"]).forEach(add);
  }
- if(short)return [
-  ["THE HOOK",`Why is ${subject} getting attention?`],
-  ["THE CONTEXT","Find the original source and date."],
-  ["WHAT TO CHECK","Look for independent coverage."],
-  ["THE TAKEAWAY","Attention alone does not prove momentum."],
+ add("ghostmode");
+ return tags.slice(0,5);
+}
+function allocateSeconds(total,weights){
+ const sum=weights.reduce((a,b)=>a+b,0),raw=weights.map(w=>total*w/sum),out=raw.map(Math.floor);
+ let left=total-out.reduce((a,b)=>a+b,0);
+ const order=raw.map((v,i)=>({i,frac:v-out[i]})).sort((a,b)=>b.frac-a.frac);
+ for(let i=0;i<left;i++)out[order[i%order.length].i]++;
+ return out;
+}
+function storyBeats(subject,seconds,tone,cta){
+ const short=seconds<=15,medium=seconds<=30;
+ const beats=short?[
+  ["THE HOOK",`The strangest thing about ${subject.toLowerCase()} isn't always what people see.`],
+  ["THE BUILD","It's the detail that makes the story hard to forget."],
+  ["THE TURN","But a chilling story and a confirmed event are not the same thing."],
+  ["THE PAYOFF","Sometimes the mystery is how the legend began."],
+  ["THE CTA",cta]
+ ]:medium?[
+  ["THE HOOK",`The creepiest part of ${subject.toLowerCase()} isn't always what people claim to have seen.`],
+  ["THE SETUP","It starts with a place, a strange detail, and a story people keep passing along."],
+  ["THE TURN","Then the details shift. One person tells it one way. The next adds something new."],
+  ["THE PAYOFF","Soon, separating the original account from the legend becomes the real mystery."],
+  ["THE CTA",cta]
+ ]:seconds<=45?[
+  ["THE HOOK",`Some stories about ${subject.toLowerCase()} stay with you long after you hear them.`],
+  ["THE SETUP","Picture an empty hallway, a light where no one should be, and a sound that stops the moment someone turns around."],
+  ["THE BUILD","A story like that gets retold. Each version adds a detail, removes another, and makes the place feel a little more unsettling."],
+  ["THE TURN","But what was actually witnessed? What came from local legend? And what can anyone verify?"],
+  ["THE PAYOFF", "That gap between the account and the legend is where the mystery lives."],
+  ["THE CTA",cta]
+ ]:[
+  ["THE HOOK",`The stories surrounding ${subject.toLowerCase()} often begin with one detail nobody can explain.`],
+  ["THE SETUP","Imagine arriving after dark. The building is quiet. Then comes a sound from somewhere you cannot see."],
+  ["THE BUILD","The first account is passed to someone else. The next version adds a shadow, a voice, or a room people avoid."],
+  ["THE TURN","Soon the story becomes bigger than the original account. Memory, rumor, and local folklore start to overlap."],
+  ["THE PAYOFF","That does not make every detail true. It makes the question more interesting: where did the story begin, and what evidence survived?"],
   ["THE CTA",cta]
  ];
- if(medium)return [
-  ["THE HOOK",`Why is ${subject} getting attention? The useful answer is more than just calling it a trend.`],
-  ["THE CONTEXT","Find the original source, check the date, and identify what people are actually responding to."],
-  ["WHAT TO CHECK","Look for independent sources, new audiences, and evidence beyond likes or repeated headlines. Separate confirmed facts from speculation."],
-  ["THE TAKEAWAY","A spike can fade quickly. Watch whether interest keeps spreading and whether the information stands up to checking."],
+ beats[0][1]=TONE[tone].storyLead+beats[0][1];
+ return beats;
+}
+function explainerBeats(subject,seconds,tone,cta){
+ const medium=seconds<=30;
+ const beats=medium?[
+  ["THE HOOK",`What should you actually know about ${subject.toLowerCase()}?`],
+  ["THE CONTEXT","Start with the original source. Check who made the claim and when."],
+  ["THE CHECK","Look for independent confirmation. Repeated posts are not separate evidence."],
+  ["THE TAKEAWAY","Keep confirmed facts separate from speculation. That is how you avoid repeating a bad signal."],
+  ["THE CTA",cta]
+ ]:[
+  ["THE HOOK",`There is more to ${subject.toLowerCase()} than the headline. Here's how to look closer.`],
+  ["THE CONTEXT","Find the earliest available source. Check its date, the person or organization behind it, and exactly what it claims."],
+  ["THE CHECK","Look for independent reporting or primary evidence. Several accounts repeating one post do not count as several confirmations."],
+  ["THE SIGNAL","Ask what has changed, who is affected, and whether the interest is reaching audiences beyond the original source."],
+  ["THE TAKEAWAY","Separate what is confirmed from what is still uncertain. If the evidence is thin, say so. Accuracy is more useful than hype."],
   ["THE CTA",cta]
  ];
- if(duration<=45)return [
-  ["THE HOOK",`Why is ${subject} drawing attention? Start by checking what is confirmed.`],
-  ["THE CONTEXT","Find the original source, its date, and the claim people are responding to."],
-  ["WHAT TO CHECK","Look for independent coverage, new audiences, and evidence beyond likes or repeated headlines. Separate facts from speculation."],
-  ["THE TAKEAWAY","Attention can fade. Watch whether interest spreads and the underlying information holds up."],
-  ["THE CTA",cta]
- ];
- return [
-  ["THE HOOK",`Why is ${subject} getting attention—and what does that attention actually tell us?`],
-  ["THE CONTEXT","First, define the subject in one clear sentence. Find the original post, report, product, event, or discussion that started the conversation. Check when it appeared and what the source can actually confirm."],
-  ["WHAT TO CHECK","Next, look for three signals. Are unrelated sources discussing the same subject? Is the conversation reaching audiences beyond its starting point? And are people responding to new information, or simply repeating the same headline? These checks help separate a real developing story from a temporary burst of noise."],
-  ["THE TAKEAWAY","Do not treat a high level of attention as proof that something will last. Look for sustained interest, credible context, and a clear reason people care. If the evidence is thin, say so. That makes the breakdown more useful—and more trustworthy."],
-  ["THE CTA",cta]
- ];
+ beats[0][1]=TONE[tone].explainerLead+beats[0][1];
+ return beats;
+}
+function visualFor(label,format,index){
+ if(format==="story"){
+  return ["Open on a striking atmospheric detail; reveal the subject in the first second.","Show an empty location or a close-up detail. Avoid implying this is documentary footage.","Build tension with a slow reveal, restrained movement, and minimal text.","Hold on the key question. Label folklore or dramatization clearly.","End on a clean question card and one call to action.","Use a quiet final image with no new factual claims."][index]||"Use a restrained atmospheric visual that supports the narration.";
+ }
+ return ["Show the subject clearly with a bold, readable opening line.","Display the original source, its date, and who published it.","Use two or three short points with source labels; do not invent metrics.","Show the evidence or comparison being discussed.","Summarize the verified takeaway in one sentence.","End with one clear call to action."][index]||"Use a clean visual that supports the spoken point.";
 }
 export function generateContentPackage(input={}){
  const topic=clean(input.topic);if(!topic)throw new Error("Enter a topic or paste a trend title first.");
  const platform=PLATFORM[input.platform]?input.platform:"TikTok",format=input.format==="story"?"story":"explainer",tone=TONE[input.tone]?input.tone:"cinematic";
  const duration=[15,30,45,60].includes(Number(input.duration))?Number(input.duration):30,category=String(input.category||"Culture"),subject=topic.replace(/[.!?]+$/,"");
- const beats=buildBeats(subject,format,duration,PLATFORM[platform].cta);
- const toneLead={cinematic:"Look closer: ",educational:"Here is what matters: ",story:"The detail worth following: ",direct:"The point: "};
- beats[0][1]=toneLead[tone]+beats[0][1];
- const seconds=allocateSeconds(duration,beats.length);
- const scenes=beats.map(([label,text],i)=>({number:i+1,label,text,seconds:seconds[i],visual:[
- "Full-screen title; make the subject readable immediately.",
- "Show the original source or a clearly attributed example.",
- "Use two or three concise on-screen points; avoid unsupported numbers.",
- "Close with a practical takeaway and source context.",
- "Simple end card with one clear call to action."
- ][i]}));
+ const beats=format==="story"?storyBeats(subject,duration,tone,PLATFORM[platform].cta):explainerBeats(subject,duration,tone,PLATFORM[platform].cta);
+ const seconds=allocateSeconds(duration,beats.map((_,i)=>[1.3,1.15,1.1,1.1,1][i]||1));
+ const scenes=beats.map(([label,text],i)=>({number:i+1,label,text,seconds:seconds[i],visual:visualFor(label,format,i)}));
+ const storyCaption=format==="story"
+  ?`Some stories about ${subject.toLowerCase()} blur the line between memory and legend. Which detail would make you turn around?`
+  :`Before you believe the conversation around ${subject}, check the original source, the date, and what independent evidence actually confirms.`;
  const caption=platform==="YouTube Shorts"
-  ? `${subject}\n\nA concise breakdown of what to check, what is confirmed, and what is still speculation.\n\n${PLATFORM[platform].cta}`
+  ?`${titleCase(subject)} | ${format==="story"?"A short mystery":"What to know"}\n\n${storyCaption}\n\n${PLATFORM[platform].cta}`
   :platform==="Facebook Reels"
-   ?`Let's look at ${subject}. Separate the original information from reactions and speculation. What have you noticed?\n\n${PLATFORM[platform].cta}`
+   ?`${storyCaption}\n\n${PLATFORM[platform].cta}`
    :platform==="Instagram Reels"
-    ?`${subject} — here's the part worth checking. Look at the source, the timing, and whether the conversation is spreading beyond its original audience.\n\n${PLATFORM[platform].cta}`
-    :`The conversation around ${subject} deserves a closer look. Here's what to verify before calling it the next big thing.\n\n${PLATFORM[platform].cta}`;
- return {topic,platform,format,tone,duration,category,scenes,script:scenes.map(s=>s.text).join("\n\n"),caption,tags:hashtags(topic,category),voiceDirection:TONE[tone].voice,platformDirection:PLATFORM[platform].opener,createdAt:new Date().toISOString()};
+    ?`${storyCaption}\n\nSave this for later.\n\n${PLATFORM[platform].cta}`
+    :`${storyCaption}\n\n${PLATFORM[platform].cta}`;
+ const tags=hashtags(topic,category);
+ const editorialNote=format==="story"
+  ?"Story framing uses atmosphere and folklore-style language. No specific haunting or incident is asserted as verified. If you name a real location or person, verify the account and label dramatization."
+  :"This is a general explainer draft, not a sourced report. Add primary sources and verify each factual claim before publishing.";
+ return {topic,platform,format,tone,duration,category,scenes,script:scenes.map(s=>s.text).join("\n\n"),caption,tags,voiceDirection:TONE[tone].voice,platformDirection:PLATFORM[platform].opener,editorialNote,createdAt:new Date().toISOString()};
 }
 export function formatPublishingPack(p){
- return ["GHOST MODE STUDIO — CONTENT PACKAGE","TOPIC: "+p.topic,"PLATFORM: "+p.platform+" | FORMAT: "+p.format+" | TARGET: "+p.duration+" seconds","","CREATIVE DIRECTION",p.platformDirection,p.voiceDirection,"","SCRIPT / VOICEOVER TRANSCRIPT",p.script,"","SCENE PLAN",...p.scenes.map(s=>`Scene ${s.number} — ${s.label} (${s.seconds}s)\nVoiceover: ${s.text}\nVisual: ${s.visual}`),"","CAPTION",p.caption,"","HASHTAGS",p.tags.join(" "),"","EDITORIAL CHECK","Verify names, dates, statistics, claims, quotations, and original sources before publishing. This is a draft content package, not a guarantee of reach or virality."].join("\n");
+ return ["GHOST MODE STUDIO — CONTENT PACKAGE","TOPIC: "+p.topic,"PLATFORM: "+p.platform+" | FORMAT: "+p.format+" | TARGET: "+p.duration+" seconds","","CREATIVE DIRECTION",p.platformDirection,p.voiceDirection,"","SCRIPT / VOICEOVER TRANSCRIPT",p.script,"","SCENE PLAN",...p.scenes.map(s=>`Scene ${s.number} — ${s.label} (${s.seconds}s)\nVoiceover: ${s.text}\nVisual: ${s.visual}`),"","CAPTION",p.caption,"","HASHTAGS",p.tags.join(" "),"","EDITORIAL CHECK",p.editorialNote,"Verify names, dates, statistics, claims, quotations, and original sources before publishing. This is a draft content package, not a guarantee of reach or virality."].join("\n");
 }
