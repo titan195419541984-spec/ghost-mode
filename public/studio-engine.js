@@ -71,7 +71,10 @@ export function generateContentPackage(input={}){
  const topic=clean(input.topic);if(!topic)throw new Error("Enter a topic or paste a trend title first.");
  const platform=PLATFORM[input.platform]?input.platform:"TikTok",format=input.format==="story"?"story":"explainer",tone=TONE[input.tone]?input.tone:"cinematic";
  const duration=[15,30,45,60].includes(Number(input.duration))?Number(input.duration):30,category=String(input.category||"Culture"),subject=topic.replace(/[.!?]+$/,"");
- const beats=buildBeats(subject,format,duration,PLATFORM[platform].cta);\n const toneLead={cinematic:"Look closer: ",educational:"Here is what matters: ",story:"The detail worth following: ",direct:"The point: "};\n beats[0][1]=toneLead[tone]+beats[0][1];\n const seconds=allocateSeconds(duration,beats.length);
+ const beats=buildBeats(subject,format,duration,PLATFORM[platform].cta);
+ const toneLead={cinematic:"Look closer: ",educational:"Here is what matters: ",story:"The detail worth following: ",direct:"The point: "};
+ beats[0][1]=toneLead[tone]+beats[0][1];
+ const seconds=allocateSeconds(duration,beats.length);
  const scenes=beats.map(([label,text],i)=>({number:i+1,label,text,seconds:seconds[i],visual:[
  "Full-screen title; make the subject readable immediately.",
  "Show the original source or a clearly attributed example.",
