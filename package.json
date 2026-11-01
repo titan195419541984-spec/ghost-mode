@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check public/app.js && node --check public/ads.js && node --check public/sw.js",
+    "check": "node --check server.js && node --check public/app.js && node --check public/studio.js && node --check public/ads.js && node --check public/sw.js",
     "test": "node --test test/*.test.js",
     "prestart": "npm run check && npm test"
   }
