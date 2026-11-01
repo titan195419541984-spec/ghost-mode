@@ -50,7 +50,7 @@ function allocateSeconds(total,weights){
 function storyBeats(subject,seconds,tone,cta){
  const short=seconds<=15,medium=seconds<=30;
  const beats=short?[
-  ["THE HOOK","Haunted places have one chilling detail."],
+  ["THE HOOK",`What makes ${subject.toLowerCase()} so unsettling?`],
   ["THE BUILD","The story changes every time it is told."],
   ["THE TURN","But a legend is not proof."],
   ["THE PAYOFF","Where did it begin?"],
