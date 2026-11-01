@@ -294,6 +294,8 @@ function renderRewards(){
   $$('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier);const level=rewardLevels.find(x=>x.level===tier);const unlocked=rewardState.points>=level.points;card.classList.toggle('current',tier===current.level);card.classList.toggle('unlocked',unlocked);card.classList.toggle('locked',!unlocked);const stateLabel=card.querySelector('.tier-state');const lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent=tier===current.level?'CURRENT':unlocked?'UNLOCKED':'LOCKED';if(lock)lock.textContent=unlocked?(tier===current.level?'✓ Your current level':'✓ Unlocked'):`🔒 Unlock at ${level.points} points`;});
   const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function');
   rewardState.providerReady=ready;
+  if(nav)nav.textContent=ready?`LV ${current.level}`:'PREVIEW';
+  if(!ready){$('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier),level=rewardLevels.find(x=>x.level===tier);const stateLabel=card.querySelector('.tier-state'),lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent='PREVIEW';if(lock&&level)lock.textContent=`Planned unlock at ${level.points.toLocaleString()} points`;});}
   const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
   if(btn){btn.hidden=!ready;btn.disabled=!ready;btn.textContent='▶  Watch to earn';btn.setAttribute('aria-disabled',String(!ready));btn.title=ready?'Watch a verified video to earn points':'Rewarded video provider is not connected';}
   if(note)note.textContent=ready?'Complete the full rewarded video to receive points.':'Preview only: points, tier unlocks, and rewarded videos are not active in this beta.';
