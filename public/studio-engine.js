@@ -98,19 +98,19 @@ function storyBeats(subject,seconds,tone,cta){
  let lines;
  if(short){
   lines=[
-   ["THE HOOK",b.who+" found "+b.object+" at "+b.place+"."],
-   ["THE SETUP","The place was empty. Then came a clue: "+b.clue+"."],
-   ["THE BUILD",b.who+" checked "+b.proof+"."],
+   ["THE HOOK",b.who+" found "+b.object+"."],
+   ["THE SETUP","Then came a clue: "+b.clue+"."],
+   ["THE BUILD","The clue was in "+b.proof+"."],
    ["THE TWIST",b.reveal+"."],
    ["THE CTA","Would you go back? Comment below."]
   ];
  }else if(medium){
   lines=[
-   ["THE HOOK","Just after midnight at "+b.place+", "+b.who+" found "+b.object+"."],
-   ["THE SETUP","The doors were locked. The lights were off. Then she noticed "+b.clue+"."],
-   ["THE BUILD",b.who+" checked "+b.proof+", expecting a glitch. The timestamp matched tonight."],
-   ["THE TWIST",b.reveal+". There was no second person in the building."],
-   ["THE CTA",b.ending+". Would you go back? Tell me below."]
+   ["THE HOOK","At "+b.place+", "+b.who+" found "+b.object+"."],
+   ["THE SETUP","Everything was locked. Then she noticed "+b.clue+"."],
+   ["THE BUILD",b.who+" checked "+b.proof+". The timestamp matched tonight."],
+   ["THE TWIST",b.reveal+". Nobody else was inside."],
+   ["THE CTA",b.ending+". Would you go back? Comment below."]
   ];
  }else if(seconds<=45){
   lines=[
