@@ -116,10 +116,10 @@
               <div class="studio-field"><label for="studio-format">CONTENT FORMAT</label><select id="studio-format"><option value="explainer">Explainer / trend breakdown</option><option value="story">Psychological story / suspense</option></select></div>
               <div class="studio-field"><label for="studio-tone">CREATIVE DIRECTION</label><select id="studio-tone"><option value="cinematic">Cinematic</option><option value="educational">Educational</option><option value="story">Story-driven</option><option value="direct">Fast and direct</option></select></div>
               <div class="studio-field"><label for="studio-duration">TARGET LENGTH</label><select id="studio-duration"><option value="15">15 seconds</option><option value="30" selected>30 seconds</option><option value="45">45 seconds</option><option value="60">60 seconds</option></select></div>
-              <button class="primary-button studio-generate" type="submit">✦ Generate content package</button>
+              <button class="primary-button studio-generate" type="submit">✦ Generate content package</button>\n              <p class="studio-status" id="studio-status" role="status" aria-live="polite"></p>
               <p class="studio-hint">Creates a structured writing draft locally in your browser. No AI footage, voice synthesis, music or video export in this release. Verify facts and sources before publishing.</p>
             </form>
-            <section class="studio-output-panel"><h2>Your production workspace</h2><div id="studio-output"><div class="studio-empty"><strong>Your next post starts here.</strong><span>Enter a topic or trend and generate a complete production package.</span></div></div></section>
+            <section class="studio-output-panel"><h2>Your production workspace</h2><div id="studio-output" aria-live="polite" aria-atomic="true"><div class="studio-empty"><strong>Your next post starts here.</strong><span>Enter a topic or trend and generate a complete production package.</span></div></div></section>
           </div>
         </div>
       </section>
