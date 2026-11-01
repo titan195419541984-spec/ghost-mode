@@ -47,37 +47,95 @@ function allocateSeconds(total,weights){
  for(let i=0;i<left;i++)out[order[i%order.length].i]++;
  return out;
 }
-function storyBeats(subject,seconds,tone,cta){
- const short=seconds<=15,medium=seconds<=30;
- const beats=short?[
-  ["THE HOOK",`What makes ${subject.toLowerCase()} so unsettling?`],
-  ["THE BUILD","The story changes every time it is told."],
-  ["THE TURN","But a legend is not proof."],
-  ["THE PAYOFF","Where did it begin?"],
-  ["THE CTA",cta]
- ]:medium?[
-  ["THE HOOK",`The creepiest part of ${subject.toLowerCase()} isn't always what people claim to have seen.`],
-  ["THE SETUP","It starts with a place, a strange detail, and a story people keep passing along."],
-  ["THE TURN","Then the details shift. One person tells it one way. The next adds something new."],
-  ["THE PAYOFF","Soon, separating the original account from the legend becomes the real mystery."],
-  ["THE CTA",cta]
- ]:seconds<=45?[
-  ["THE HOOK",`Some stories about ${subject.toLowerCase()} stay with you long after you hear them.`],
-  ["THE SETUP","Picture an empty hallway, a light where no one should be, and a sound that stops the moment someone turns around."],
-  ["THE BUILD","A story like that gets retold. Each version adds a detail, removes another, and makes the place feel a little more unsettling."],
-  ["THE TURN","But what was actually witnessed? What came from local legend? And what can anyone verify?"],
-  ["THE PAYOFF", "That gap between the account and the legend is where the mystery lives."],
-  ["THE CTA",cta]
- ]:[
-  ["THE HOOK",`The stories surrounding ${subject.toLowerCase()} often begin with one detail nobody can explain.`],
-  ["THE SETUP","Imagine arriving after dark. The building is quiet. Then comes a sound from somewhere you cannot see."],
-  ["THE BUILD","The first account is passed to someone else. The next version adds a shadow, a voice, or a room people avoid."],
-  ["THE TURN","Soon the story becomes bigger than the original account. Memory, rumor, and local folklore start to overlap."],
-  ["THE PAYOFF","That does not make every detail true. It makes the question more interesting: where did the story begin, and what evidence survived?"],
-  ["THE CTA",cta]
+function hashText(value){
+ let h=2166136261;
+ for(const ch of String(value)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}
+ return h>>>0;
+}
+function storyBlueprint(subject){
+ const s=subject.toLowerCase(),seed=hashText(s)%3;
+ if(/haunt|ghost|paranormal|spirit|abandon|eerie|supernatural|creep|horror/.test(s)){
+  const options=[
+   {who:"Nora",place:"the old hotel",object:"room 214 standing open",clue:"the room's curtains moving",proof:"the security monitor",reveal:"the camera showed Nora standing inside 214 while she watched from the desk",ending:"the guest ledger listed one new arrival: Nora"},
+   {who:"Eli",place:"the closed railway station",object:"platform three lit up",clue:"a train announcement for a service cancelled decades ago",proof:"the station's departure board",reveal:"the board displayed Eli's name as the next arrival",ending:"the platform clock stopped at the exact minute he disappeared from the camera"},
+   {who:"Mara",place:"the lighthouse",object:"the locked lantern room glowing",clue:"a second beam sweeping across the sea",proof:"the keeper's logbook",reveal:"the final page was dated tomorrow and signed in Mara's handwriting",ending:"outside, a fresh set of footprints led up the tower"}
+  ];
+  return {...options[seed],subject,kind:"haunting"};
+ }
+ if(/mystery|unsolved|strange|missing|disappear|secret|hidden|unexplained/.test(s)){
+  const options=[
+   {who:"June",place:"a town archive",object:"a photograph with one blank face",clue:"the same stranger appeared in pictures taken thirty years apart",proof:"the archive's oldest contact sheet",reveal:"someone had scratched June's name into the negative",ending:"the photograph was filed under tomorrow's date"},
+   {who:"Cal",place:"a roadside diner",object:"a receipt for a meal never ordered",clue:"the receipt carried tomorrow's date",proof:"the till record",reveal:"the order was placed by a customer whose face appeared on no camera",ending:"the receipt was still warm when Cal found it"},
+   {who:"Rae",place:"an empty apartment",object:"a key taped beneath the sink",clue:"every door opened onto the same hallway",proof:"a floor plan hidden behind the wallpaper",reveal:"the plan showed one extra room—and Rae was standing inside it",ending:"the building manager insisted that apartment did not exist"}
+  ];
+  return {...options[seed],subject,kind:"mystery"};
+ }
+ if(/psycholog|memory|dream|mind|brain|behavior|illusion|perception/.test(s)){
+  const options=[
+   {who:"Mina",place:"a quiet research lab",object:"a voice memo she did not remember recording",clue:"the memo described a choice she had not made yet",proof:"the timestamp and the lab's paper log",reveal:"the recording ended with Mina answering a question nobody had asked",ending:"then the same question came through the speaker"},
+   {who:"Theo",place:"his childhood home",object:"a family photo",clue:"one small detail changed every time he looked away",proof:"a second photograph taken minutes later",reveal:"both images showed Theo holding the camera—even though he was not there",ending:"the photograph was different when he looked again"},
+   {who:"Ava",place:"a crowded train",object:"a stranger's familiar warning",clue:"the stranger knew a sentence Ava had only thought",proof:"the message saved on Ava's phone",reveal:"it had been sent from Ava's own number one minute in the future",ending:"would you open the next message?"}
+  ];
+  return {...options[seed],subject,kind:"psychology"};
+ }
+ if(/ai|technology|tech|phone|app|internet|computer|robot|digital|software|algorithm|device/.test(s)){
+  const options=[
+   {who:"Dev",place:"his apartment",object:"a notification from an app he had deleted",clue:"it described the room behind him",proof:"the phone's offline activity log",reveal:"the final alert read 'Don't turn around'—then the screen went dark",ending:"the app had no network connection"},
+   {who:"Leah",place:"a nearly empty office",object:"a file named with tomorrow's date",clue:"it contained a recording of the meeting she was about to enter",proof:"the file's creation history",reveal:"the last voice on the recording was Leah saying 'I already heard this'",ending:"would you play the file again?"},
+   {who:"Omar",place:"a late-night bus",object:"a smart assistant waking without a command",clue:"it answered a question nobody had spoken aloud",proof:"the device's local transcript",reveal:"the transcript showed Omar asking the question twelve minutes later",ending:"who—or what—started the recording?"}
+  ];
+  return {...options[seed],subject,kind:"tech"};
+ }
+ const options=[
+  {who:"Alex",place:"a nearly empty building",object:"a message slipped beneath the door",clue:"it described an event that had not happened yet",proof:"the timestamp on the message",reveal:"the handwriting matched Alex's, down to a mistake made years earlier",ending:"would you follow the instruction?"},
+  {who:"Sam",place:"a quiet late-night shop",object:"a package with no return address",clue:"inside was an object Sam had lost as a child",proof:"a note folded beneath it",reveal:"the note said 'You left this here tomorrow'",ending:"what would you do next?"},
+  {who:"Riley",place:"an unfamiliar hotel room",object:"a second key on the bedside table",clue:"the key opened a door that was not on the floor plan",proof:"the hotel's printed map",reveal:"behind the door was the same room, with Riley already inside",ending:"would you step through?"}
  ];
- beats[0][1]=TONE[tone].storyLead+beats[0][1];
- return beats;
+ return {...options[seed],subject,kind:"fiction"};
+}
+function storyBeats(subject,seconds,tone,cta){
+ const b=storyBlueprint(subject),short=seconds<=15,medium=seconds<=30;
+ let lines;
+ if(short){
+  lines=[
+   ["THE HOOK",b.who+" found "+b.object+" at "+b.place+"."],
+   ["THE SETUP",b.clue+"."],
+   ["THE BUILD",b.who+" checked "+b.proof+"."],
+   ["THE TWIST",b.reveal+"."],
+   ["THE CTA",b.ending+" "+cta]
+  ];
+ }else if(medium){
+  lines=[
+   ["THE HOOK","At the worst possible moment, "+b.who+" found "+b.object+" at "+b.place+"."],
+   ["THE SETUP",b.who+" had one rule: never go near it alone. But tonight, "+b.clue+"."],
+   ["THE BUILD",b.who+" checked "+b.proof+", expecting a simple explanation. The details only made it worse."],
+   ["THE TWIST",b.reveal+"."],
+   ["THE PAYOFF",b.ending+"."],
+   ["THE CTA","What would you do? "+cta]
+  ];
+ }else if(seconds<=45){
+  lines=[
+   ["THE HOOK","At "+b.place+", "+b.who+" discovered "+b.object+". It should not have been there."],
+   ["THE SETUP","Nobody else was around. "+b.who+" checked the doors, checked the time, and tried to explain it away."],
+   ["THE BUILD","Then came the detail that changed everything: "+b.clue+"."],
+   ["THE ESCALATION",b.who+" pulled up "+b.proof+". At first, it looked ordinary. Then one detail moved."],
+   ["THE TWIST",b.reveal+"."],
+   ["THE CTA",b.ending+". Would you have kept investigating? "+cta]
+  ];
+ }else{
+  lines=[
+   ["THE HOOK","At "+b.place+", "+b.who+" discovered "+b.object+". It was the first thing that night that made no sense."],
+   ["THE SETUP",b.who+" checked the doors and windows. Everything was locked. Nobody had come in, and nobody was supposed to be there."],
+   ["THE BUILD","Then came the detail that made it impossible to ignore: "+b.clue+". "+b.who+" stopped looking for a harmless explanation."],
+   ["THE ESCALATION",b.who+" opened "+b.proof+". The first few details looked normal. Then one small thing appeared that had not been there before."],
+   ["THE TURN",b.reveal+". For a few seconds, "+b.who+" could not move. The evidence was right there, but it made no sense."],
+   ["THE PAYOFF",b.ending+". No one could explain how it happened—or why it seemed meant for "+b.who+"."],
+   ["THE CTA","Would you go back and find out what happened next? "+cta]
+  ];
+ }
+ const lead=tone==="direct"?"The strange part: ":tone==="educational"?"Imagine this fictional scenario: ":tone==="story"?"The story begins here: ":"Picture this: ";
+ lines[0][1]=lead+lines[0][1];
+ return lines;
 }
 function explainerBeats(subject,seconds,tone,cta){
  const medium=seconds<=30;
