@@ -16,10 +16,10 @@ describe("Ghost Studio content engine",()=>{
   });
   it("generates a real story arc for story format instead of a trend-analysis checklist",()=>{
     const result=generateContentPackage({topic:"Haunted places",format:"story",duration:30});
-    assert.match(result.scenes[0].text,/creepiest part/i);
-    assert.match(result.script,/legend/i);
+    assert.match(result.script,/Nora|Eli|Mara/);
+    assert.match(result.script,/room|platform|lighthouse/i);
     assert.doesNotMatch(result.script,/first credible source, then check when the conversation began/i);
-    assert.match(result.editorialNote,/No specific haunting or incident is asserted as verified/);
+    assert.match(result.editorialNote,/Fictional dramatization/);
     assert.ok(result.tags.includes("#hauntedplaces"));
     assert.ok(result.tags.includes("#paranormal"));
     assert.ok(!result.tags.includes("#places"));
