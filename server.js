@@ -12,7 +12,7 @@ const USER_AGENT = 'GhostModeTrendIntelligence/1.2.1 (public aggregation; contac
 const commonsImageCache = new Map();
 const COMMONS_IMAGE_TTL = 6 * 60 * 60 * 1000;
 async function findCommonsImage(title) {
-  const query = String(title || '').replace(/https?:\/\/\S+/g, '').trim().slice(0, 120);
+  const query = String(title || '').replace(/https?:\/\/\S+/g, '').replace(/^#+/, '').replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
   if (!query) return null;
   const key = query.toLowerCase();
   const cached = commonsImageCache.get(key);
