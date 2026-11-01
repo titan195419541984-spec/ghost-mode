@@ -1,19 +1,79 @@
-(()=>{'use strict';
-const $=s=>document.querySelector(s),form=$('#studio-form'),out=$('#studio-output'),status=$('#studio-status');if(!form)return;
-const hooks=['Stop scrolling. This is the part nobody is talking about.','You have probably seen this without realizing what it means.','Here is why this is suddenly everywhere.','Most people miss the detail that changes everything.'];
-const clean=s=>String(s||'').replace(/[<>]/g,'').trim(),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let project=null,recording=false;
-function build(){const topic=clean($('#studio-topic').value)||'The trend everyone is starting to notice',platform=$('#studio-platform').value,format=$('#studio-format').value,tone=$('#studio-tone').value,duration=Number($('#studio-duration').value),hook=hooks[Math.floor(Math.random()*hooks.length)];
-const beats=format==='story'?[['HOOK',hook],['SETUP','It started with a small signal: '+topic+'.'],['TENSION','At first, it looked like another passing moment. Then more people began noticing the same thing.'],['REVEAL','The interesting part is not just '+topic+'. It is what the growing attention could mean next.'],['PAYOFF','Watch the pattern, check the source, and decide whether this is worth your attention.'],['CTA','Follow for the next signal before it becomes obvious.']]:[['HOOK',hook],['CONTEXT',topic+' is drawing attention. But attention alone does not make something a lasting trend.'],['INSIGHT','Look for three things: whether interest is accelerating, whether independent communities are discussing it, and whether the conversation is spreading beyond its original audience.'],['TAKEAWAY','Understand why people care before copying what everyone else is doing.'],['CTA','Save this and follow for more emerging signals.']];
-project={topic,platform,format,tone,duration,scenes:beats.map((b,i)=>({label:b[0],text:b[1],seconds:Math.max(3,Math.round(duration/beats.length)),visual:['Bold opening statement','Cinematic context reveal','Sharp visual transition','High-contrast key insight','Final call to action'][Math.min(i,4)]})),script:beats.map((b,i)=>(i+1)+'. '+b[1]).join('\n\n'),caption:topic+'\n\n'+(tone==='educational'?'A clear explanation and a useful takeaway.':tone==='story'?'A curiosity gap that builds tension before the reveal.':'A visually driven idea with a strong payoff.')+'\n\nFollow for more signals worth watching.',tags:['#trending','#creatorinsights','#contentstrategy','#viralcontent','#ghostmode']};render();}
-function render(){if(!project)return;const p=project;out.innerHTML='<div class="studio-result-head"><div><span class="studio-kicker">PROJECT READY</span><h3>'+esc(p.topic)+'</h3><p>'+esc(p.platform)+' · '+p.duration+'s · '+p.scenes.length+' scenes</p></div><span class="studio-ready">● READY TO PRODUCE</span></div><div class="studio-preview"><span class="preview-brand">GHOST MODE / STUDIO</span><strong>'+esc(p.scenes[0].text)+'</strong><small>SCENE 01 / '+String(p.scenes.length).padStart(2,'0')+'</small></div><div class="studio-action-row"><button class="primary-button" id="studio-render">▶ Render vertical video</button><button class="subtle-button" id="studio-script-download">Download script</button><button class="subtle-button" id="studio-copy">Copy publish pack</button></div><div class="studio-columns"><section><div class="studio-section-label">SCRIPT & SCENE PLAN</div><div class="studio-scenes">'+p.scenes.map((s,i)=>'<article class="studio-scene"><span>'+String(i+1).padStart(2,'0')+'</span><div><b>'+esc(s.label)+'</b><p>'+esc(s.text)+'</p><small>'+esc(s.visual)+' · ~'+s.seconds+'s</small></div></article>').join('')+'</div></section><section><div class="studio-section-label">PUBLISHING PACK</div><div class="studio-copy-card"><b>Caption</b><p>'+esc(p.caption)+'</p><b>Hashtags</b><p>'+esc(p.tags.join(' '))+'</p><b>Voiceover transcript</b><p>'+esc(p.script)+'</p><small>This release supplies the transcript; it does not synthesize a voice track.</small></div></section></div><div class="studio-render-status" id="studio-render-status">Export is an animated 9:16 WebM with on-screen text. Add licensed voiceover and music in your editor.</div>';
-$('#studio-render').onclick=renderVideo;$('#studio-script-download').onclick=()=>download('ghost-mode-script.txt','GHOST MODE STUDIO\n'+p.topic+'\n\n'+p.script+'\n\nCAPTION\n'+p.caption+'\n\n'+p.tags.join(' '),'text/plain');$('#studio-copy').onclick=async()=>{try{await navigator.clipboard.writeText(p.caption+'\n\n'+p.tags.join(' '));toast('Publishing pack copied.')}catch{toast('Clipboard access unavailable.');}};}
-function toast(s){if(window.GhostToast)window.GhostToast(s);else status.textContent=s;}
-function download(name,data,type){const blob=data instanceof Blob?data:new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
-async function renderVideo(){if(!project||recording)return;const canvas=document.createElement('canvas');canvas.width=720;canvas.height=1280;const ctx=canvas.getContext('2d'),stream=canvas.captureStream(30);if(!window.MediaRecorder){toast('Video export is not supported in this browser. Try Chrome.');return;}const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));if(!mime){toast('WebM recording is not supported in this browser.');return;}const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000}),chunks=[];recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};const done=new Promise(resolve=>recorder.onstop=resolve);recorder.start(500);recording=true;$('#studio-render').disabled=true;const label=$('#studio-render-status'),p=project,total=Math.max(15,Math.min(60,p.duration)),per=total/p.scenes.length,start=performance.now();
-function draw(i,progress,elapsed){const w=canvas.width,h=canvas.height,g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,'#10152b');g.addColorStop(.55,'#281b4c');g.addColorStop(1,'#080b12');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.strokeStyle='rgba(173,151,255,.16)';ctx.lineWidth=2;for(let n=0;n<7;n++){ctx.beginPath();ctx.arc(w*.82,h*.19,60+n*45+Math.sin(elapsed/500)*10,0,Math.PI*2);ctx.stroke();}ctx.fillStyle='#b8a7ff';ctx.font='700 20px Arial';ctx.fillText('GHOST MODE / SIGNAL INTELLIGENCE',54,100);ctx.fillStyle='rgba(255,255,255,.45)';ctx.fillRect(54,h-142,w-108,3);ctx.fillStyle='#b8a7ff';ctx.fillRect(54,h-142,(w-108)*((i+progress)/p.scenes.length),3);ctx.fillStyle='#9d91cb';ctx.font='700 19px Arial';ctx.fillText(String(i+1).padStart(2,'0')+' / '+String(p.scenes.length).padStart(2,'0')+'   '+p.scenes[i].label,54,h-185);const words=p.scenes[i].text.split(' '),lines=[];let line='';ctx.font='700 54px Arial';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>w-108&&line){lines.push(line);line=word;}else line=test;}if(line)lines.push(line);const y=(h-lines.length*68)/2;ctx.fillStyle='#fff';ctx.shadowColor='#0008';ctx.shadowBlur=18;lines.forEach((t,n)=>ctx.fillText(t,54,y+n*68));ctx.shadowBlur=0;ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='18px Arial';ctx.fillText('DISCOVER THE SIGNAL. CREATE THE MOMENT.',54,h-76);}
-const wait=ms=>new Promise(r=>setTimeout(r,ms));for(let i=0;i<p.scenes.length;i++){const end=performance.now()+per*1000;while(performance.now()<end){draw(i,1-(end-performance.now())/(per*1000),performance.now()-start);await wait(33);}}draw(p.scenes.length-1,1,performance.now()-start);await wait(250);recorder.stop();await done;stream.getTracks().forEach(t=>t.stop());recording=false;$('#studio-render').disabled=false;const blob=new Blob(chunks,{type:mime});download('ghost-mode-video.webm',blob,mime);label.textContent='Export complete: '+(blob.size/1048576).toFixed(1)+' MB WebM · 720×1280. Silent visual track. Add voiceover and licensed music before publishing.';}
-form.addEventListener('submit',e=>{e.preventDefault();build();});
-function switchStudio(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('#view-studio').classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view==='studio'));$('#breadcrumb-current').textContent='GHOST STUDIO';history.replaceState(null,'','#studio');}
-document.querySelector('[data-view="studio"]')?.addEventListener('click',switchStudio);window.GhostStudio={openWithTrend(t){$('#studio-topic').value=t?.title||t||'';switchStudio();build();}};
+import { generateContentPackage, formatPublishingPack } from "./studio-engine.js";
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s),form=$("#studio-form"),out=$("#studio-output"),status=$("#studio-status");
+if(!form||!out)return;
+let project=null;
+const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(message){
+  if(window.GhostToast)window.GhostToast(message);
+  else if(status)status.textContent=message;
+  else {const el=$("#studio-feedback");if(el)el.textContent=message;}
+}
+function download(name,text){
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function copy(text,label){
+  try{
+    if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);
+    else {const area=document.createElement("textarea");area.value=text;area.style.position="fixed";area.style.opacity="0";document.body.appendChild(area);area.select();const ok=document.execCommand("copy");area.remove();if(!ok)throw new Error("copy unavailable");}
+    toast(label+" copied.");
+  }catch{toast("Copy is unavailable in this browser. Use Download content package instead.");}
+}
+function build(){
+  const topic=$("#studio-topic").value.trim();
+  if(!topic){$("#studio-topic").focus();toast("Enter a topic or paste a trend title first.");return;}
+  try{
+    project=generateContentPackage({
+      topic,
+      platform:$("#studio-platform").value,
+      format:$("#studio-format").value,
+      tone:$("#studio-tone").value,
+      duration:Number($("#studio-duration").value),
+      category:window.GhostStudio?.selectedCategory||"Culture"
+    });
+    render();
+  }catch(error){toast(error.message||"The content package could not be generated.");}
+}
+function render(){
+  if(!project)return;
+  const p=project;
+  out.innerHTML=`
+    <div class="studio-result-head">
+      <div><span class="studio-kicker">CONTENT PACKAGE DRAFT</span><h3>${esc(p.topic)}</h3><p>${esc(p.platform)} · ${p.duration} seconds · ${p.scenes.length} scenes</p></div>
+      <span class="studio-ready">● DRAFT CREATED</span>
+    </div>
+    <div class="studio-preview"><span class="preview-brand">GHOST MODE / STUDIO</span><strong>${esc(p.scenes[0].text)}</strong><small>HOOK / SCENE 01</small></div>
+    <div class="studio-direction"><b>CREATIVE DIRECTION</b><p>${esc(p.platformDirection)} ${esc(p.voiceDirection)}</p></div>
+    <div class="studio-action-row">
+      <button class="primary-button" id="studio-download">↓ Download full package</button>
+      <button class="subtle-button" id="studio-copy-pack">Copy full package</button>
+      <button class="subtle-button" id="studio-copy-script">Copy script</button>
+      <button class="subtle-button" id="studio-copy-caption">Copy caption</button>
+    </div>
+    <div class="studio-columns">
+      <section><div class="studio-section-label">SCRIPT & SCENE PLAN</div><div class="studio-scenes">${p.scenes.map(s=>`
+        <article class="studio-scene"><span>${String(s.number).padStart(2,"0")}</span><div><b>${esc(s.label)} · ${s.seconds}s</b><p>${esc(s.text)}</p><small>VISUAL: ${esc(s.visual)}</small></div></article>`).join("")}</div></section>
+      <section><div class="studio-section-label">PUBLISHING PACK</div><div class="studio-copy-card"><b>CAPTION</b><p>${esc(p.caption)}</p><b>HASHTAGS</b><p class="studio-hashtags">${esc(p.tags.join(" "))}</p><b>VOICEOVER TRANSCRIPT</b><p>${esc(p.script)}</p></div></section>
+    </div>
+    <p class="studio-editorial-note">Editorial check: verify names, dates, statistics, claims and original sources before publishing. This draft does not guarantee reach or virality.</p>
+  `;
+  $("#studio-download").addEventListener("click",()=>download("ghost-mode-content-package.txt",formatPublishingPack(p)));
+  $("#studio-copy-pack").addEventListener("click",()=>copy(formatPublishingPack(p),"Full content package"));
+  $("#studio-copy-script").addEventListener("click",()=>copy(p.script,"Script"));
+  $("#studio-copy-caption").addEventListener("click",()=>copy(p.caption+"\n\n"+p.tags.join(" "),"Caption and hashtags"));
+}
+form.addEventListener("submit",event=>{event.preventDefault();build();});
+const studioNav=document.querySelector('[data-view="studio"]');
+window.GhostStudio={
+  openWithTrend(trend){
+    const value=typeof trend==="string"?trend:trend?.title||trend?.topic||"";
+    $("#studio-topic").value=value;
+    this.selectedCategory=typeof trend==="object"&&trend?.category?trend.category:"Culture";
+    studioNav?.click();
+    build();
+  },
+  generate:build
+};
 })();
