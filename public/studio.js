@@ -45,7 +45,7 @@ function render(){
       <span class="studio-ready">● DRAFT CREATED</span>
     </div>
     <div class="studio-preview"><span class="preview-brand">GHOST MODE / STUDIO</span><strong>${esc(p.scenes[0].text)}</strong><small>HOOK / SCENE 01</small></div>
-    <div class="studio-direction"><b>CREATIVE DIRECTION</b><p>${esc(p.platformDirection)} ${esc(p.voiceDirection)}</p></div>
+    <div class="studio-direction"><b>CREATIVE DIRECTION · ${esc(p.format.toUpperCase())}</b><p>${esc(p.platformDirection)} ${esc(p.voiceDirection)}</p></div>
     <div class="studio-action-row">
       <button class="primary-button" id="studio-download">↓ Download full package</button>
       <button class="subtle-button" id="studio-copy-pack">Copy full package</button>
@@ -57,7 +57,7 @@ function render(){
         <article class="studio-scene"><span>${String(s.number).padStart(2,"0")}</span><div><b>${esc(s.label)} · ${s.seconds}s</b><p>${esc(s.text)}</p><small>VISUAL: ${esc(s.visual)}</small></div></article>`).join("")}</div></section>
       <section><div class="studio-section-label">PUBLISHING PACK</div><div class="studio-copy-card"><b>CAPTION</b><p>${esc(p.caption)}</p><b>HASHTAGS</b><p class="studio-hashtags">${esc(p.tags.join(" "))}</p><b>VOICEOVER TRANSCRIPT</b><p>${esc(p.script)}</p></div></section>
     </div>
-    <p class="studio-editorial-note">Editorial check: verify names, dates, statistics, claims and original sources before publishing. This draft does not guarantee reach or virality.</p>
+    <p class="studio-editorial-note">${esc(p.editorialNote)} Verify names, dates, statistics, claims and original sources before publishing. This draft does not guarantee reach or virality.</p>
   `;
   $("#studio-download").addEventListener("click",()=>download("ghost-mode-content-package.txt",formatPublishingPack(p)));
   $("#studio-copy-pack").addEventListener("click",()=>copy(formatPublishingPack(p),"Full content package"));
