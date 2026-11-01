@@ -56,7 +56,8 @@ function switchView(name){
   $$('.view').forEach(v=>v.classList.toggle('active', v.id===`view-${name}`));
   $('#breadcrumb-current').textContent=name.toUpperCase();
   $('#sidebar').classList.remove('open');
-  if(name==='vault'||name==='signal'||name==='underground'||name==='radar') renderCards();
+  if(name!=='pulse') $('#pulse-grid .ad-container').forEach(el=>el.remove());
+  if(['pulse','vault','signal','underground','radar'].includes(name)) renderCards();
   if(name==='rewards') renderRewards();
   history.replaceState(null,'',`#${name}`);
 }
@@ -174,12 +175,13 @@ function renderCards(){
     }else{
       const visible = searchVal? list.filter(t=> t.title.toLowerCase().includes(searchVal) || t.category.toLowerCase().includes(searchVal)) : list;
       const cards=visible.map(cardTrend);
-      // inject ad slots
-      if(cards.length>=3){
-        cards.splice(2,0, adSlotHTML('ad-pulse-top','pulseTop'));
+      // Only place ads on the primary live-content feed, never on demo data,
+      // empty searches, or secondary views with thin publisher content.
+      if(state.view==='pulse' && state.mode==='live' && cards.length>=5){
+        cards.splice(3,0, adSlotHTML('ad-pulse-top','pulseTop'));
       }
-      if(cards.length>=8){
-        cards.splice(7,0, adSlotHTML('ad-pulse-mid','pulseMid'));
+      if(state.view==='pulse' && state.mode==='live' && cards.length>=10){
+        cards.splice(9,0, adSlotHTML('ad-pulse-mid','pulseMid'));
       }
       pulseGrid.className=`trend-grid ${state.layout==='list'?'list-view':''}`;
       pulseGrid.innerHTML=cards.join('') || `<div class="empty-state"><h3>No matches</h3><p>Try a different category or search.</p></div>`;
@@ -191,7 +193,7 @@ function renderCards(){
   if(undergroundGrid){
     const early=list.filter(t=> (t.score<70) || t.momentum==='Early signal').slice(0,12);
     const html=early.length? early.map(cardTrend).join('') : `<div class="empty-state"><span>⌁</span><h3>The surface is calm</h3><p>Early signals appear when fresh topics surface from a single source. Check back after the next sweep.</p></div>`;
-    undergroundGrid.innerHTML=html + adSlotHTML('ad-underground','underground');
+    undergroundGrid.innerHTML=html;
   }
   // Vault: keep saved snapshots available even after a signal leaves the live feed.
   if(vaultGrid){
