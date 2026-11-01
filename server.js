@@ -113,7 +113,7 @@ async function sourceGoogleTrends(){
 }
 async function sourceMastodon(){
   const json=JSON.parse(await fetchText('https://mastodon.social/api/v1/trends/tags?limit=20',7000));
-  return (json||[]).map(x=>({title:'#'+clean(x.name),url:`https://mastodon.social/tags/${encodeURIComponent(x.name)}`,source:'Mastodon',sourceType:'social',publishedAt:new Date().toISOString(),engagement:(x.history||[]).reduce((n,h)=>n+Number(h.uses||0),0),detail:'Trending social hashtag'}));
+  return (json||[]).map(x=>{const uses=(x.history||[]).reduce((n,h)=>n+Number(h.uses||0),0);return {title:'#'+clean(x.name),url:`https://mastodon.social/tags/${encodeURIComponent(x.name)}`,source:'Mastodon',sourceType:'social',publishedAt:new Date().toISOString(),engagement:uses,detail:uses?`Trending hashtag · ${uses.toLocaleString()} uses in sampled history`:'Trending social hashtag'};}).filter(x=>x.engagement>0);
 }
 async function sourceGdelt(){
   const url='https://news.google.com/rss/search?q=trending&hl=en-US&gl=US&ceid=US:en';
@@ -245,7 +245,7 @@ const server=http.createServer(async(req,res)=>{
   };
 
   if(pathname==='/api/health'){
-    const body={ok:true,service:'ghost-mode',version:'1.2.1',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{adsEnabled:ADS_ENABLED, nodeEnv:process.env.NODE_ENV||'development'}};
+    const body={ok:true,service:'ghost-mode',version:'1.3.0',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{adsEnabled:ADS_ENABLED, nodeEnv:process.env.NODE_ENV||'development'}};
     res.writeHead(200,{'content-type':'application/json','cache-control':'no-store',...secHeaders});
     res.end(JSON.stringify(body));
     log(req,200,Date.now()-start);
