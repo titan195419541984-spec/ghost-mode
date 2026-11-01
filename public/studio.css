@@ -7,3 +7,6 @@
 .studio-action-row button{flex:0 0 auto}
 .studio-scene{break-inside:avoid}
 @media(max-width:520px){.studio-result-head{align-items:flex-start;flex-direction:column}.studio-ready{white-space:normal}.studio-action-row button{width:100%}.studio-preview{min-height:230px;padding:22px}.preview-brand{left:30px;top:30px}.studio-preview:after{inset:14px}}
+
+.studio-status{min-height:18px;margin:8px 0 0;color:#b8a7ff;font-size:11px;line-height:1.5}
+.studio-status:empty{display:none}
