@@ -99,7 +99,7 @@ function storyBeats(subject,seconds,tone,cta){
  if(short){
   lines=[
    ["THE HOOK",b.who+" found "+b.object+" at "+b.place+"."],
-   ["THE SETUP","The place was empty. Then "+b.clue+"."],
+   ["THE SETUP","The place was empty. Then came a clue: "+b.clue+"."],
    ["THE BUILD",b.who+" checked "+b.proof+"."],
    ["THE TWIST",b.reveal+"."],
    ["THE CTA","Would you go back? Comment below."]
@@ -107,7 +107,7 @@ function storyBeats(subject,seconds,tone,cta){
  }else if(medium){
   lines=[
    ["THE HOOK","Just after midnight at "+b.place+", "+b.who+" found "+b.object+"."],
-   ["THE SETUP","The doors were locked. The lights were off. Then "+b.clue+"."],
+   ["THE SETUP","The doors were locked. The lights were off. Then she noticed "+b.clue+"."],
    ["THE BUILD",b.who+" checked "+b.proof+", expecting a glitch. The timestamp matched tonight."],
    ["THE TWIST",b.reveal+". There was no second person in the building."],
    ["THE CTA",b.ending+". Would you go back? Tell me below."]
@@ -175,7 +175,7 @@ export function generateContentPackage(input={}){
  const seconds=allocateSeconds(duration,beats.map((_,i)=>[1.3,1.15,1.1,1.1,1][i]||1));
  const scenes=beats.map(([label,text],i)=>({number:i+1,label,text,seconds:seconds[i],visual:visualFor(label,format,i)}));
  const storyCaption=format==="story"
-  ?`Some stories about ${subject.toLowerCase()} blur the line between memory and legend. Which detail would make you turn around?`
+  ?`A fictional ${subject.toLowerCase()} story with an unsettling turn. Which moment would make you leave?`
   :`Before you believe the conversation around ${subject}, check the original source, the date, and what independent evidence actually confirms.`;
  const caption=platform==="YouTube Shorts"
   ?`${titleCase(subject)} | ${format==="story"?"A short mystery":"What to know"}\n\n${storyCaption}\n\n${PLATFORM[platform].cta}`
@@ -186,7 +186,7 @@ export function generateContentPackage(input={}){
     :`${storyCaption}\n\n${PLATFORM[platform].cta}`;
  const tags=hashtags(topic,category);
  const editorialNote=format==="story"
-  ?"Story framing uses atmosphere and folklore-style language. No specific haunting or incident is asserted as verified. If you name a real location or person, verify the account and label dramatization."
+  ?"Fictional dramatization: the characters, setting details, and events in this story are invented. Do not present the narration, generated visuals, or props as real evidence. If adapting a real location or person, verify every claim and clearly separate documented facts from invented scenes."
   :"This is a general explainer draft, not a sourced report. Add primary sources and verify each factual claim before publishing.";
  return {topic,platform,format,tone,duration,category,scenes,script:scenes.map(s=>s.text).join("\n\n"),caption,tags,voiceDirection:TONE[tone].voice,platformDirection:PLATFORM[platform].opener,editorialNote,createdAt:new Date().toISOString()};
 }
