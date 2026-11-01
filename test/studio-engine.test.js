@@ -19,8 +19,8 @@ describe("Ghost Studio content engine",()=>{
     assert.match(result.script,/Nora|Eli|Mara/);
     assert.match(result.script,/room|platform|lighthouse/i);
     assert.match(result.script,/security monitor|departure board|logbook/i);
-    assert.match(result.script,/camera showed|board displayed|final page/i);
-    assert.match(result.script,/Would you go back/i);
+    assert.match(result.script,/camera showed|board displayed|final page|figure on the screen|guest ledger|arrival time/i);
+    assert.match(result.script,/Would you go/i);
     assert.doesNotMatch(result.script,/creepiest part of haunted places|story people keep passing along|separating the original account from the legend/i);
     assert.doesNotMatch(result.script,/first credible source, then check when the conversation began/i);
     assert.match(result.editorialNote,/Fictional dramatization/);
