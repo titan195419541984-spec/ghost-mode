@@ -43,8 +43,8 @@ describe("Ghost Studio content engine",()=>{
   it("keeps unsupported claims out of the generated editorial guidance",()=>{
     const result=generateContentPackage({topic:"New social media trend"});
     const pack=formatPublishingPack(result);
-    assert.match(pack,/Verify names, dates, statistics, claims, and original sources/);
-    assert.match(pack,/does not guarantee reach or virality/);
+    assert.match(pack,/Verify names, dates, statistics, claims, quotations, and original sources/);
+    assert.match(pack,/not a guarantee of reach or virality/);
   });
   it("includes complete scenes, caption, and hashtags in the downloadable pack",()=>{
     const result=generateContentPackage({topic:"Creator economy"});
