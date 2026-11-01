@@ -50,10 +50,10 @@ function allocateSeconds(total,weights){
 function storyBeats(subject,seconds,tone,cta){
  const short=seconds<=15,medium=seconds<=30;
  const beats=short?[
-  ["THE HOOK",`The strangest thing about ${subject.toLowerCase()} isn't always what people see.`],
-  ["THE BUILD","It's the detail that makes the story hard to forget."],
-  ["THE TURN","But a chilling story and a confirmed event are not the same thing."],
-  ["THE PAYOFF","Sometimes the mystery is how the legend began."],
+  ["THE HOOK","Haunted places have one chilling detail."],
+  ["THE BUILD","The story changes every time it is told."],
+  ["THE TURN","But a legend is not proof."],
+  ["THE PAYOFF","Where did it begin?"],
   ["THE CTA",cta]
  ]:medium?[
   ["THE HOOK",`The creepiest part of ${subject.toLowerCase()} isn't always what people claim to have seen.`],
@@ -81,7 +81,13 @@ function storyBeats(subject,seconds,tone,cta){
 }
 function explainerBeats(subject,seconds,tone,cta){
  const medium=seconds<=30;
- const beats=medium?[
+ const beats=seconds<=15?[
+  ["THE HOOK",`What should you know about ${subject.toLowerCase()}?`],
+  ["THE CONTEXT","Start with the original source."],
+  ["THE CHECK","Look for independent evidence."],
+  ["THE TAKEAWAY","Separate fact from speculation."],
+  ["THE CTA",cta]
+ ]:medium?[
   ["THE HOOK",`What should you actually know about ${subject.toLowerCase()}?`],
   ["THE CONTEXT","Start with the original source. Check who made the claim and when."],
   ["THE CHECK","Look for independent confirmation. Repeated posts are not separate evidence."],
