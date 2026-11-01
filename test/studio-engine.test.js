@@ -18,13 +18,16 @@ describe("Ghost Studio content engine",()=>{
     const result=generateContentPackage({topic:"Haunted places",format:"story",duration:30});
     assert.match(result.script,/Nora|Eli|Mara/);
     assert.match(result.script,/room|platform|lighthouse/i);
+    assert.match(result.script,/security monitor|departure board|logbook/i);
+    assert.match(result.script,/camera showed|board displayed|final page/i);
+    assert.match(result.script,/Would you go back/i);
     assert.doesNotMatch(result.script,/first credible source, then check when the conversation began/i);
     assert.match(result.editorialNote,/Fictional dramatization/);
     assert.ok(result.tags.includes("#hauntedplaces"));
     assert.ok(result.tags.includes("#paranormal"));
     assert.ok(!result.tags.includes("#places"));
   });
-  it("changes copy for the selected platform",()=>{
+  it("keeps story scenes within the selected runtime at every supported length",()=>{\n    for(const duration of [15,30,45,60]){\n      const result=generateContentPackage({topic:"Haunted places",format:"story",duration});\n      assert.equal(result.scenes.reduce((sum,scene)=>sum+scene.seconds,0),duration);\n      assert.ok(result.scenes.every(scene=>scene.seconds>=3));\n      const count=result.script.trim().split(/\\s+/).length;\n      assert.ok(count<=duration*2.6, duration+"s story is too long: "+count+" words");\n    }\n  });\n  it("changes copy for the selected platform",()=>{
     const topic="AI search trends";
     const tiktok=generateContentPackage({topic,platform:"TikTok"});
     const shorts=generateContentPackage({topic,platform:"YouTube Shorts"});
