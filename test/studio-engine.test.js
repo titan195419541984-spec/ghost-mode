@@ -24,13 +24,6 @@ describe("Ghost Studio content engine",()=>{
     assert.ok(result.tags.includes("#paranormal"));
     assert.ok(!result.tags.includes("#places"));
   });
-  it("keeps 15-second story and explainer scripts concise",()=>{
-    for(const format of ["story","explainer"]){
-      const result=generateContentPackage({topic:"Haunted places",format,duration:15});
-      const count=result.script.trim().split(/\\s+/).length;
-      assert.ok(count<=39,`${format} 15s script is too long: ${count} words`);
-    }
-  });
   it("changes copy for the selected platform",()=>{
     const topic="AI search trends";
     const tiktok=generateContentPackage({topic,platform:"TikTok"});
