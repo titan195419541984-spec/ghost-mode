@@ -2,20 +2,29 @@
 
 Production site: https://ghost-mode-umm5.onrender.com
 
-## HilltopAds
-A HilltopAds loader is installed at public/hilltop.js. It loads the supplied ad script from https://unrealistic-push.com. The loader is served from this site's own origin so the Content Security Policy does not need an inline-script exception. The CSP permits the supplied host for script, frame, and connection requests.
+## Current production state
 
-The HilltopAds verification meta tag supplied for this Ghost Mode site remains in public/index.html. If the HilltopAds dashboard requests an ads.txt seller record, add only the exact line supplied by that dashboard; do not guess or reuse another network's seller ID.
+- Google AdSense is disabled by default. Do not enable it until the site is approved and real numeric ad-unit IDs are configured.
+- Ad containers are restricted to the live Pulse feed. Inactive placements are hidden and do not reserve screen space in Radar, Studio, or Rewards.
+- The AdSense publisher record is present in `public/ads.txt` and `public/app-ads.txt`:
+  
+      google.com, pub-5558048915852406, DIRECT, f08c47fec0942fa0
+
+- The HilltopAds verification meta tag is present in `public/index.html`. Verification metadata alone does not serve ads.
+- A HilltopAds serving script is not present in the current production source. The exact provider script/zone code and any required seller record must come from the HilltopAds dashboard; do not invent them or reuse another site's code.
 
 ## Google AdSense
-The site includes publisher verification for ca-pub-5558048915852406, and public/ads.txt contains:
 
-    google.com, pub-5558048915852406, DIRECT, f08c47fec0942fa0
+Enable only after Google approval, using:
 
-AdSense ad serving is disabled on the current Render deployment. Enable it only after Google approval, using ADS_ENABLED=true, AD_CLIENT_ID=ca-pub-5558048915852406, and real numeric ad-unit IDs for the placements. The module will not request ads without an enabled flag, valid publisher ID, and at least one numeric slot ID.
+- `ADS_ENABLED=true`
+- `AD_CLIENT_ID=ca-pub-5558048915852406`
+- Real numeric IDs for the configured Pulse placement(s): `AD_SLOT_PULSE_TOP` and/or `AD_SLOT_PULSE_MID`
 
-## Important
-- Do not enable AdSense before approval.
-- Do not invent ad-unit IDs or seller records.
-- Do not reward points for ad clicks or unverified video completion.
-- Rewarded video requires a provider completion callback and server-side verification; HilltopAds' current script integration does not provide that reward ledger.
+The app will not request ads without the enabled flag, a valid publisher ID, and at least one numeric slot ID.
+
+## Rewards and advertising integrity
+
+- Do not reward points for ad clicks.
+- Do not award video points without a rewarded-video provider completion callback and server-side verification.
+- HilltopAds' verification tag is not a rewarded-video completion callback and cannot be used to authorize points.
