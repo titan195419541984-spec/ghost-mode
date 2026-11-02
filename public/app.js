@@ -1,7 +1,8 @@
 
 const $=(q,root=document)=>root.querySelector(q);const $$=(q,root=document)=>[...root.querySelectorAll(q)];
 const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'pulse',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
-const rewardState={points:0,level:0,providerReady:false};
+const rewardState={points:0,level:0,providerReady:false,dailyPoints:0,day:''};
+try{const saved=JSON.parse(localStorage.getItem('gm-rewards-v1')||'{}');const today=new Date().toISOString().slice(0,10);rewardState.points=Math.max(0,Number(saved.points)||0);rewardState.day=saved.day===today?today:today;rewardState.dailyPoints=saved.day===today?Math.max(0,Number(saved.dailyPoints)||0):0;}catch{}
 const rewardLevels=[{level:1,name:'Scout',points:250},{level:2,name:'Tracker',points:450},{level:3,name:'Analyst',points:1200},{level:4,name:'Insider',points:2000}];
 const DEMO=[
  {id:'ai-agents',title:'AI agents move from demos into everyday workflows',category:'Technology',score:91,momentum:'Surging',confidence:'Moderate',sources:['Hacker News','Global News'],sourceCount:2,source:'Hacker News',detail:'Discussion and coverage are appearing across more than one source.',url:'https://news.ycombinator.com/',publishedAt:new Date(Date.now()-14*60000).toISOString(),engagement:1250,kind:'cross-source'},
@@ -270,6 +271,7 @@ function persist(){try{
   localStorage.setItem('gm-saved',JSON.stringify([...state.saved]));
   localStorage.setItem('gm-saved-items',JSON.stringify([...state.savedItems.entries()]));
   localStorage.setItem('gm-interests',JSON.stringify([...state.interests]));
+  localStorage.setItem('gm-rewards-v1',JSON.stringify({points:rewardState.points,dailyPoints:rewardState.dailyPoints,day:rewardState.day}));
 }catch{}}
 function loadPrefs(){try{
   state.saved=new Set(JSON.parse(localStorage.getItem('gm-saved')||'[]'));
@@ -294,26 +296,27 @@ function renderRewards(){
   $$('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier);const level=rewardLevels.find(x=>x.level===tier);const unlocked=rewardState.points>=level.points;card.classList.toggle('current',tier===current.level);card.classList.toggle('unlocked',unlocked);card.classList.toggle('locked',!unlocked);const stateLabel=card.querySelector('.tier-state');const lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent=tier===current.level?'CURRENT':unlocked?'UNLOCKED':'LOCKED';if(lock)lock.textContent=unlocked?(tier===current.level?'✓ Your current level':'✓ Unlocked'):`🔒 Unlock at ${level.points} points`;});
   const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function');
   rewardState.providerReady=ready;
-  if(nav)nav.textContent=ready?`LV ${current.level}`:'PREVIEW';
-  if(!ready){if(progress)progress.textContent='Progression preview only';if(nextLabel)nextLabel.textContent='Reward points are inactive';}
-  if(!ready){$('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier),level=rewardLevels.find(x=>x.level===tier);const stateLabel=card.querySelector('.tier-state'),lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent='PREVIEW';if(lock&&level)lock.textContent=`Planned unlock at ${level.points.toLocaleString()} points`;});}
+  if(nav)nav.textContent=`LV ${current.level}`;
   const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
-  if(btn){btn.hidden=!ready;btn.disabled=!ready;btn.textContent='▶  Watch to earn';btn.setAttribute('aria-disabled',String(!ready));btn.title=ready?'Watch a verified video to earn points':'Rewarded video provider is not connected';}
-  if(note)note.textContent=ready?'Complete the full rewarded video to receive points.':'Preview only: points, tier unlocks, and rewarded videos are not active in this beta.';
+  if(btn){btn.hidden=false;btn.disabled=!ready||rewardState.dailyPoints>=40;btn.textContent='▶  Watch to earn 5 points';btn.setAttribute('aria-disabled',String(btn.disabled));btn.title=ready?'Watch a complete video ad to earn 5 points':'Video ad player is loading or unavailable';}
+  if(note)note.textContent=ready?`Video ads are connected · 5 points per completed ad · ${Math.max(0,40-rewardState.dailyPoints)} points left today. Points are stored on this device.`:'Loading the video ad player…';
 }
 async function watchRewardedVideo(){
   renderRewards();
-  if(!rewardState.providerReady){openInfo('Reward videos are not connected yet','<p>The level and unlock system is built, but this deployment does not yet have a rewarded-ad provider configured.</p><p>To prevent fake rewards and abuse, Ghost Mode will not award points from a button click or a skipped/failed video. The next integration needs a real provider completion callback and server-side verification before points can be issued.</p>');return;}
+  if(!rewardState.providerReady){toast('Video ad player is not ready. Try again in a moment.');return;}
+  if(rewardState.dailyPoints>=40){toast('You have reached today’s 40-point reward limit.');return;}
   const btn=$('#watch-reward-button');if(btn)btn.disabled=true;
   try{
     const result=await window.GhostRewardsProvider.showRewardedAd();
-    if(!result||result.completed!==true||!result.verificationToken){toast('No points awarded — video completion could not be verified.');return;}
-    const response=await fetch('/api/rewards/claim',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({verificationToken:result.verificationToken})});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok||!data.verified){toast(data.error||'Reward verification failed. No points awarded.');return;}
-    rewardState.points=Math.max(0,Number(data.points)||0);persist();renderRewards();toast('Verified reward added. Your level progress is updated.');
-  }catch{toast('Video unavailable or incomplete. No points awarded.');}
-  finally{if(btn)btn.disabled=!rewardState.providerReady;}
+    if(!result||result.completed!==true){toast('No points awarded — the ad was skipped, interrupted, or did not finish.');return;}
+    const today=new Date().toISOString().slice(0,10);
+    if(rewardState.day!==today){rewardState.day=today;rewardState.dailyPoints=0;}
+    if(rewardState.dailyPoints>=40){toast('Daily reward limit reached.');return;}
+    const award=Math.min(5,40-rewardState.dailyPoints);
+    rewardState.points+=award;rewardState.dailyPoints+=award;
+    persist();renderRewards();toast(`+${award} points added. ${40-rewardState.dailyPoints} points remain today.`);
+  }catch(error){console.warn('reward video failed',error);toast('No ad was completed. No points awarded.');}
+  finally{if(btn)btn.disabled=!rewardState.providerReady||rewardState.dailyPoints>=40;}
 }
 function renderInterestControls(){ $$('#interest-grid input').forEach(i=>{ if(i) i.checked=state.interests.has(i.value); });const el=$('#interest-count'); if(el) el.textContent=state.interests.size?`${state.interests.size} interest${state.interests.size===1?'':'s'} selected`:'No interests selected';}
 function openInfo(title,copy){$('#info-title').textContent=title;$('#info-copy').innerHTML=copy;$('#info-modal').classList.add('open');$('#info-modal').setAttribute('aria-hidden','false');}
