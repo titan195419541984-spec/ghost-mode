@@ -294,7 +294,7 @@ function renderRewards(){
   if(progress) progress.textContent=next?`${Math.max(0,rewardState.points-prev)} / ${goal-prev} points`:'MAX LEVEL REACHED';
   if(nextLabel) nextLabel.textContent=next?`${Math.max(0,goal-rewardState.points)} pts to Level ${next.level}`:'All tiers unlocked';
   $$('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier);const level=rewardLevels.find(x=>x.level===tier);const unlocked=rewardState.points>=level.points;card.classList.toggle('current',tier===current.level);card.classList.toggle('unlocked',unlocked);card.classList.toggle('locked',!unlocked);const stateLabel=card.querySelector('.tier-state');const lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent=tier===current.level?'CURRENT':unlocked?'UNLOCKED':'LOCKED';if(lock)lock.textContent=unlocked?(tier===current.level?'✓ Your current level':'✓ Unlocked'):`🔒 Unlock at ${level.points} points`;});
-  const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function');
+  const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function'&&window.google?.ima);
   rewardState.providerReady=ready;
   if(nav)nav.textContent=`LV ${current.level}`;
   const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
