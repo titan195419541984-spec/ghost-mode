@@ -10,8 +10,10 @@ Production site: https://ghost-mode-umm5.onrender.com
   
       google.com, pub-5558048915852406, DIRECT, f08c47fec0942fa0
 
-- The HilltopAds verification meta tag is present in `public/index.html`. Verification metadata alone does not serve ads.
-- A HilltopAds serving script is not present in the current production source. The exact provider script/zone code and any required seller record must come from the HilltopAds dashboard; do not invent them or reuse another site's code.
+- The HilltopAds verification meta tag is present in `public/index.html`.
+- One HilltopAds provider script supplied by the site owner is installed in a dedicated sponsored placement inside The Pulse feed. The supplied zone range is `7586785–7586789`; the provided snippet is included once, not duplicated five times.
+- The script loads third-party JavaScript from `realisticreply.com`. Its exact ad format and runtime behavior are controlled by the provider; placement inside Pulse does not guarantee the provider cannot open a new tab or pop-under.
+- No HilltopAds seller record has been added to `ads.txt` because no verified seller line was supplied. Add only the exact seller record shown in the HilltopAds dashboard, if HilltopAds requires one.
 
 ## Google AdSense
 
