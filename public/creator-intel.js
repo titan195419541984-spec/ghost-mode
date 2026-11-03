@@ -61,6 +61,8 @@
     if (coverage) coverage.textContent = String(data.sampleCount || videos.length) + " SAMPLED";
     if (baseline) baseline.textContent = String(data.baselineReady || 0) + " SCORED";
     if (indexState) indexState.textContent = "YouTube sample · " + (data.cached ? "cached" : "refreshed");
+    const integrity = $("#creator-data-integrity-note");
+    if (integrity) integrity.innerHTML = "<strong>Data integrity:</strong> This view combines public topic signals with a limited YouTube sample from the last seven days. Baselines compare each sampled Short with up to 15 recent Shorts from its channel and a sampled YouTube category median. It is not a platform-wide census or a millions-of-videos index. TikTok and Instagram video metrics are not connected.";
     if (!videos.length) {
       host.innerHTML = '<div class="creator-empty">The connector is active, but no eligible Shorts were returned in this sample. Check the API quota and try the next refresh.</div>';
       return;
