@@ -185,7 +185,7 @@ async function sourceYouTubeShorts(){
   const ids=[...new Set(searchResults.flat().map(x=>x.id?.videoId).filter(Boolean))];
   const current=[];
   for(let i=0;i<ids.length;i+=50)current.push(...await youtubeGet('videos',{part:'snippet,statistics,contentDetails',id:ids.slice(i,i+50).join(',')}));
-  const shorts=current.filter(v=>durationSeconds(v.contentDetails?.duration)>0&&durationSeconds(v.contentDetails?.duration)<=60&&v.statistics?.viewCount!==undefined);
+  const shorts=current.filter(v=>durationSeconds(v.contentDetails?.duration)>0&&durationSeconds(v.contentDetails?.duration)<=180&&v.statistics?.viewCount!==undefined);
   const channelIds=[...new Set(shorts.map(v=>v.snippet?.channelId).filter(Boolean))].slice(0,25);
   const channels=channelIds.length?await youtubeGet('channels',{part:'statistics,contentDetails,snippet',id:channelIds.join(',')}):[];
   const channelMap=new Map(channels.map(c=>[c.id,c]));
@@ -201,7 +201,7 @@ async function sourceYouTubeShorts(){
   const channelHistory=new Map();
   for(const v of baselineDetails){
     const ch=v.snippet?.channelId, seconds=durationSeconds(v.contentDetails?.duration), views=Number(v.statistics?.viewCount);
-    if(!ch||seconds<1||seconds>60||!Number.isFinite(views))continue;
+    if(!ch||seconds<1||seconds>180||!Number.isFinite(views))continue;
     const ageHours=Math.max(.5,(Date.now()-new Date(v.snippet.publishedAt).getTime())/3600000);
     if(!channelHistory.has(ch))channelHistory.set(ch,[]);
     channelHistory.get(ch).push(views/ageHours);
