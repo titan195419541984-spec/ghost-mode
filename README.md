@@ -11,9 +11,9 @@ Ghost Mode is a mobile-first creator intelligence workspace. The default landing
 - Clear separation between public topic signals and verified short-form video performance data.
 
 ## Data integrity and current limitations
-The live trend feed currently aggregates Google Trends RSS, Hacker News, Mastodon public trends, and public news RSS. It is refreshed by the existing server cache (default three minutes). This is a topic discovery feed, not a short-form video index.
+The live trend feed currently aggregates Google Trends RSS, Hacker News, Mastodon public trends, and public news RSS. It is refreshed by the existing server cache (default three minutes). The optional YouTube video sample is cached for three hours by default. Set `YOUTUBE_API_KEY` on the Render service to enable it. This is a topic discovery feed, not a short-form video index.
 
-The Creator Desk explicitly marks video-index coverage and creator baselines as not connected. It does not claim to have indexed millions of TikTok, Instagram Reels, or YouTube Shorts videos, nor does it manufacture creator-relative breakout scores. Those capabilities require a compliant video-level data provider and historical creator/niche performance observations. The current Ghost Score remains a directional score over available public topic signals; it is not a video virality prediction.
+An optional official YouTube Data API connector is implemented behind the `YOUTUBE_API_KEY` environment variable. When configured, it samples recent public Shorts and compares each video's average views per hour since publication with the channel's recent Shorts and the sampled YouTube category median. It only publishes a baseline-relative score when minimum sample thresholds are met; otherwise it labels the baseline as insufficient. Without the key, video coverage and baseline scoring remain unavailable. This is a limited YouTube sample, not a platform-wide census or a millions-of-videos index. TikTok and Instagram video metrics are not connected. The current Ghost Score remains a separate directional score over public topic signals; it is not a video virality prediction.
 
 The format suggestions are editorial recommendations based on topic context. They are not represented as formats proven to be trending by video-level evidence.
 
@@ -32,7 +32,7 @@ Ghost Studio turns a topic into a structured writing package: hook, script, scen
 ## Run locally
 Requires Node.js 20 or later. Run `npm start`. Startup runs syntax checks and the Node test suite before starting the HTTP server.
 
-Health: `/api/health`; trends: `/api/trends`; news: `/api/news`; config: `/api/config`.
+Health: `/api/health`; trends: `/api/trends`; video sample: `/api/videos`; news: `/api/news`; config: `/api/config`.
 
 ## Production
 The Render service is `ghost-mode-umm5`, connected to this repository's `master` branch. Render auto-deploys commits. Health endpoint: `/api/health`.
