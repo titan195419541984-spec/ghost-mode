@@ -441,10 +441,19 @@ const server=http.createServer(async(req,res)=>{
     return;
   }
   if(pathname==='/ads.txt' || pathname==='/.well-known/ads.txt'){
-    const content=ADS_TXT_CONTENT || (AD_CLIENT_ID? `google.com, ${AD_CLIENT_ID.replace('ca-pub-','pub-')}, DIRECT, f08c47fec0942fa0` : '# ads.txt not configured — set ADS_TXT_CONTENT env');
+    // Prefer an explicit deployment override, then derive the Google seller
+    // record from the publisher ID, then serve the checked-in public file.
+    let content=String(ADS_TXT_CONTENT||'').trim();
+    if(!content && AD_CLIENT_ID){
+      content=`google.com, ${AD_CLIENT_ID.replace('ca-pub-','pub-')}, DIRECT, f08c47fec0942fa0`;
+    }
+    if(!content){
+      try{ content=(await readFile(join(ROOT,'ads.txt'),'utf8')).trim(); }catch{}
+    }
+    if(!content) content='# ads.txt is not configured';
     res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'public, max-age=3600',...secHeaders});
-    res.end(content);
-    log(req,200,Date.now()-start);
+    res.end(content+'\\n');
+    log(req,200,Date.now()-start,'ads-txt');
     return;
   }
 
