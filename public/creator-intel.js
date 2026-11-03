@@ -82,7 +82,7 @@
     try {
       const r = await fetch("/api/videos", {cache:"no-store"});
       const data = await r.json();
-      if (!r.ok && !data.configured) throw new Error(data.error || "Video source unavailable");
+      if (!r.ok) throw new Error(data.error || data.note || "Video source unavailable");
       renderVideos(data);
     } catch (e) {
       host.innerHTML = '<div class="creator-empty">Video source refresh failed. Public topic discovery and the format library remain available.</div>';
