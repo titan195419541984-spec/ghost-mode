@@ -452,7 +452,7 @@ const server=http.createServer(async(req,res)=>{
     }
     if(!content) content='# ads.txt is not configured';
     res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'public, max-age=3600',...secHeaders});
-    res.end(content+'\\n');
+    res.end(content+'\n');
     log(req,200,Date.now()-start,'ads-txt');
     return;
   }
