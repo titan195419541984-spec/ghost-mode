@@ -36,6 +36,6 @@ describe('Ad configuration and reward integrity', () => {
   it('does not issue client-side points from an ad playback callback', () => {
     assert.match(rewardApp, /const ready=false/);
     assert.match(rewardApp, /Server-side rewarded-video verification is not configured/);
-    assert.doesNotMatch(rewardApp, /rewardState\\.points\\+=award/);
+    assert.equal(rewardApp.includes('rewardState.points+=award'), false);
   });
 });
