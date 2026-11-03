@@ -2,6 +2,7 @@
 (() => {
   "use strict";
   const $ = (s, root=document) => root.querySelector(s);
+  const safeHttp = raw => { try { const u = new URL(raw); return ["http:","https:"].includes(u.protocol) ? u.href : ""; } catch { return ""; } };
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const STORE = "gm-creator-formats-v1";
   const formats = [
@@ -143,9 +144,10 @@
     const params = new URLSearchParams(location.hash.split("?")[1] || "");
     const source = params.get("source");
     const title = params.get("title");
-    if (source) {
+    const safeSource = source ? safeHttp(source) : "";
+    if (safeSource) {
       $("#creator-source-capture").hidden = false;
-      $("#creator-source-capture").innerHTML = 'Captured page: <a href="' + esc(source) + '" target="_blank" rel="noopener noreferrer">' + esc(title || source) + '</a>';
+      $("#creator-source-capture").innerHTML = 'Captured page: <a href="' + esc(safeSource) + '" target="_blank" rel="noopener noreferrer">' + esc(title || safeSource) + '</a>';
       if (title) $("#creator-hook-topic").value = title.slice(0,180);
     }
     try {
