@@ -11,8 +11,8 @@ const Ads={
       const c=await r.json();
       this.clientId=String(c.adClientId||'');
       this.slots=c.adSlots||{};
-      const hasSlot=Object.values(this.slots).some(v=>/^\\d+$/.test(String(v||'')));
-      this.enabled=!!c.adsEnabled&&/^ca-pub-\\d{10,}$/.test(this.clientId)&&hasSlot;
+      const hasSlot=Object.values(this.slots).some(v=>/^\d+$/.test(String(v||'')));
+      this.enabled=!!c.adsEnabled&&/^ca-pub-\d{10,}$/.test(this.clientId)&&hasSlot;
       this.refresh();
       if(this.enabled)this.loadScript();
     }catch{
@@ -26,7 +26,7 @@ const Ads={
     document.querySelectorAll('#view-pulse .ad-container').forEach(el=>{
       const slot=String(this.slots[el.dataset.slot]||'');
       const ins=el.querySelector('ins.adsbygoogle');
-      const active=this.enabled&&/^\\d+$/.test(slot)&&!!ins;
+      const active=this.enabled&&/^\d+$/.test(slot)&&!!ins;
       el.dataset.enabled=String(active);
       el.hidden=!active;
       if(active&&ins){
