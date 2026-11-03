@@ -30,6 +30,6 @@ describe("Creator Desk cache versioning", () => {
   it("loads the updated Creator Desk bundle and pre-caches the same version", () => {
     assert.match(index, /creator-intel\.js\?v=1\.0\.3/);
     assert.match(worker, /creator-intel\.js\?v=1\.0\.3/);
-    assert.match(worker, /ghost-mode-v1-4-12/);
+    assert.match(worker, /ghost-mode-v1-4-13/);
   });
 });
