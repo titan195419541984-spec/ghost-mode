@@ -12,6 +12,7 @@
   <meta property="og:description" content="Your internet radar. Discover emerging trends, inspect the sources, and share the signals worth watching." />
   <meta name="color-scheme" content="dark" />
   <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/creator-intel.css?v=1.0.0" />
   <link rel="icon" href="/ghost.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/styles.css?v=2.6.1" />
   <link rel="stylesheet" href="/studio.css?v=2.0.1" />
@@ -27,6 +28,7 @@
       <div class="workspace-label">WORKSPACE <span class="live-dot"></span></div>
       <nav class="main-nav" aria-label="Main navigation">
         <button class="nav-item active" data-view="pulse"><span class="nav-icon">◈</span><span>The Pulse</span><kbd>1</kbd></button>
+        <button class="nav-item" data-view="creator"><span class="nav-icon">✦</span><span>Creator Desk</span><span class="nav-level">NEW</span></button>
         <button class="nav-item" data-view="radar"><span class="nav-icon">◎</span><span>Trend Radar</span><kbd>2</kbd></button>
         <button class="nav-item" data-view="underground"><span class="nav-icon">⌁</span><span>The Underground</span><kbd>3</kbd></button>
         <button class="nav-item" data-view="signal"><span class="nav-icon">⌘</span><span>Your Signal</span><kbd>4</kbd></button>
@@ -110,6 +112,23 @@
         </div>
       </section>
 
+
+      <section class="view secondary-view" id="view-creator">
+        <div class="creator-page">
+          <div class="creator-hero"><div><div class="eyebrow"><span class="eyebrow-line"></span> DAILY CREATOR INTELLIGENCE</div><h1>The morning <em>edge.</em></h1><p>Scan emerging public signals, select a repeatable content structure, and build hooks without switching tools. This desk separates verified data from editorial suggestions.</p></div><div class="creator-hero-actions"><button class="subtle-button" id="creator-bookmarklet">＋ Add browser capture bookmarklet</button><button class="primary-button" id="creator-refresh">↻ Refresh scan</button></div></div>
+          <div class="creator-status-grid">
+            <div class="creator-status-cell"><small>PUBLIC SIGNALS IN SCAN</small><strong id="creator-scan-count">—</strong><span id="creator-scan-time">CONNECTING</span></div>
+            <div class="creator-status-cell"><small>VIDEO INDEX COVERAGE</small><strong>NOT CONNECTED</strong><span id="creator-index-state">No platform video catalog</span></div>
+            <div class="creator-status-cell"><small>CREATOR BASELINE</small><strong>NOT YET MEASURABLE</strong><span>Requires video-level creator history</span></div>
+          </div>
+          <div class="creator-baseline-warning"><strong>Data integrity:</strong> The current feed aggregates public topic signals from Google Trends, Hacker News, Mastodon and news RSS. It does not yet index short-form videos or creator follower/view histories. No breakout score is shown until those measurements are connected. The suggestions below are editorial starting points, not verified viral formats.</div>
+          <section class="creator-section"><div class="creator-section-head"><div><div class="eyebrow small-eyebrow">01 / MORNING SCAN</div><h2>Signals worth investigating</h2><p id="creator-data-note">Loading the latest public signal feed…</p></div></div><div class="creator-opportunities" id="creator-opportunities"><div class="creator-empty">Scanning public sources…</div></div></section>
+          <section class="creator-section"><div class="creator-section-head"><div><div class="eyebrow small-eyebrow">02 / FORMAT INTELLIGENCE</div><h2>Structures you can reuse</h2><p>Portable storytelling mechanics—not saturated topic lists.</p></div></div><div class="creator-format-grid" id="creator-format-grid"></div></section>
+          <section class="creator-section"><div class="creator-section-head"><div><div class="eyebrow small-eyebrow">YOUR PRIVATE SWIPE FILE</div><h2>Saved structures</h2><p>Stored locally in this browser.</p></div></div><div class="creator-saved-list" id="creator-saved-list"><p class="creator-muted">Save a structure to build your personal swipe file.</p></div></section>
+          <section class="creator-section"><div class="creator-section-head"><div><div class="eyebrow small-eyebrow">03 / HOOK LAB</div><h2>Turn a signal into an opening</h2><p>Generate three starting hooks from a topic and a selected structure.</p></div></div><div class="creator-hook-layout"><div class="creator-hook-controls"><div class="creator-field"><label for="creator-hook-topic">TOPIC OR CAPTURED PAGE TITLE</label><input id="creator-hook-topic" maxlength="180" placeholder="Choose a signal or enter your own topic" /></div><div class="creator-field"><label for="creator-hook-format">CONTENT STRUCTURE</label><select id="creator-hook-format"><option value="open-loop">Open-loop reveal</option><option value="reverse">Reverse-order reveal</option><option value="visual-proof">Visual proof first</option><option value="myth-check">Expectation vs. reality</option><option value="three-beat">Three-beat escalation</option><option value="hidden-detail">The overlooked detail</option><option value="constraint">Constraint challenge</option><option value="before-after">Before / after with the why</option></select></div><button class="primary-button" id="creator-hook-generate">Generate hooks ↗</button><div id="creator-source-capture" class="creator-capture" hidden></div><div class="creator-format-detail" id="creator-format-detail"><p class="creator-muted">Choose a structure to see its beat-by-beat sequence.</p></div></div><div class="creator-hook-output"><div class="eyebrow small-eyebrow">HOOK OPTIONS</div><div class="creator-hook-results" id="creator-hook-results"><p class="creator-muted">Your generated hooks will appear here.</p></div></div></div></section>
+        </div>
+      </section>
+
       <section class="view secondary-view" id="view-studio">
         <div class="studio-page">
           <div class="studio-hero"><div><div class="eyebrow"><span class="eyebrow-line"></span> TREND-TO-CONTENT WORKFLOW</div><h1>Ghost <em>Studio.</em></h1><p>Turn a trend or topic into a practical publishing package: hook, script, scene-by-scene plan, caption and topic-aware hashtags.</p></div><span class="studio-engine-pill">● CREATOR WORKSPACE</span></div>
@@ -176,6 +195,7 @@
   <script src="/rewards.js?v=1.0.0" defer></script>
   <script src="/ads.js?v=2.2.0" defer></script>
   <script src="/app.js?v=2.8.3" defer></script>
+  <script type="module" src="/creator-intel.js?v=1.0.0"></script>
   <script type="module" src="/studio.js?v=2.3.0"></script>
 </body>
 </html>
