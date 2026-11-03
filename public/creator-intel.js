@@ -62,7 +62,7 @@
     if (baseline) baseline.textContent = String(data.baselineReady || 0) + " SCORED";
     if (indexState) indexState.textContent = "YouTube sample · " + (data.cached ? "cached" : "refreshed");
     const integrity = $("#creator-data-integrity-note");
-    if (integrity) integrity.innerHTML = "<strong>Data integrity:</strong> This view combines public topic signals with a limited YouTube sample from the last seven days. Baselines compare each sampled Short with up to 15 recent Shorts from its channel and a sampled YouTube category median. It is not a platform-wide census or a millions-of-videos index. TikTok and Instagram video metrics are not connected.";
+    if (integrity) integrity.innerHTML = "<strong>Data integrity:</strong> This view combines public topic signals with a limited YouTube sample from the last seven days. Baselines compare each sampled Short with up to 15 recent Shorts from its channel and a sampled YouTube category median; when public subscriber counts exist, audience reach is normalized against the category sample. It is not a platform-wide census or a millions-of-videos index. TikTok and Instagram video metrics are not connected.";
     if (!videos.length) {
       host.innerHTML = '<div class="creator-empty">The connector is active, but no eligible Shorts were returned in this sample. Check the API quota and try the next refresh.</div>';
       return;
@@ -71,6 +71,7 @@
       const score = Number.isFinite(v.breakoutScore) ? '<b class="creator-video-score">' + v.breakoutScore + '</b>' : '<b class="creator-video-score is-pending">—</b>';
       const creator = v.creatorLift ? v.creatorLift.toFixed(2) + '× creator' : 'Creator baseline building';
       const niche = v.nicheLift ? v.nicheLift.toFixed(2) + '× niche' : 'Niche baseline building';
+      const audience = v.audienceLift ? v.audienceLift.toFixed(2) + '× audience reach' : 'No public subscriber baseline';
       const thumb = v.thumbnail ? '<img src="' + esc(v.thumbnail) + '" alt="" loading="lazy">' : '';
       return '<article class="creator-video-card"><a class="creator-video-thumb" href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer">' + thumb + '<span>OPEN VIDEO ↗</span></a><div class="creator-video-body"><div class="creator-video-kicker">YOUTUBE SHORT · ' + esc(v.channelTitle || "Creator") + '</div><h3><a href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer">' + esc(v.title) + '</a></h3><div class="creator-video-stats"><span>' + Number(v.views).toLocaleString() + ' views</span><span>' + Number(v.viewsPerHour).toLocaleString() + ' avg views/hr</span></div><div class="creator-video-baselines"><span>' + esc(creator) + '</span><span>' + esc(niche) + '</span></div><div class="creator-video-score-row"><span>BASELINE-RELATIVE SCORE</span>' + score + '</div></div></article>';
     }).join("");
