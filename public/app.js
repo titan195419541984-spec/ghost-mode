@@ -1,6 +1,6 @@
 
 const $=(q,root=document)=>root.querySelector(q);const $$=(q,root=document)=>[...root.querySelectorAll(q)];
-const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'pulse',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
+const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'creator',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
 const rewardState={points:0,level:0,providerReady:false,dailyPoints:0,day:''};
 try{const saved=JSON.parse(localStorage.getItem('gm-rewards-v1')||'{}');const today=new Date().toISOString().slice(0,10);rewardState.points=Math.max(0,Number(saved.points)||0);rewardState.day=saved.day===today?today:today;rewardState.dailyPoints=saved.day===today?Math.max(0,Number(saved.dailyPoints)||0):0;}catch{}
 const rewardLevels=[{level:1,name:'Scout',points:250},{level:2,name:'Tracker',points:450},{level:3,name:'Analyst',points:1200},{level:4,name:'Insider',points:2000}];
@@ -464,7 +464,7 @@ async function init(){
   renderRewards();
   renderInterestControls();
   const hash=location.hash.replace('#','').split('?')[0];
-  if(['pulse','creator','radar','underground','signal','vault','rewards','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash);
+  if(['pulse','creator','radar','underground','signal','vault','rewards','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash); else switchView('creator');
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('/sw.js'); }catch{} }
   await Promise.all([loadTrends(),loadNews()]);
 }
