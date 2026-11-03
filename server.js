@@ -207,11 +207,14 @@ async function sourceYouTubeShorts(){
     channelHistory.get(ch).push(views/ageHours);
   }
   const nicheHistory=new Map();
+  const nicheAudienceHistory=new Map();
   for(const v of shorts){
     const cat=v.snippet?.categoryId,views=Number(v.statistics.viewCount);
     const ageHours=Math.max(.5,(Date.now()-new Date(v.snippet.publishedAt).getTime())/3600000);
     if(!nicheHistory.has(cat))nicheHistory.set(cat,[]);
     nicheHistory.get(cat).push(views/ageHours);
+    const subs=Number(channelMap.get(v.snippet.channelId)?.statistics?.subscriberCount);
+    if(subs>0){if(!nicheAudienceHistory.has(cat))nicheAudienceHistory.set(cat,[]);nicheAudienceHistory.get(cat).push(views/subs);}
   }
   const videos=shorts.map(v=>{
     const channel=channelMap.get(v.snippet.channelId),views=Number(v.statistics.viewCount);
@@ -219,15 +222,20 @@ async function sourceYouTubeShorts(){
     const velocity=views/ageHours;
     const creatorSamples=channelHistory.get(v.snippet.channelId)||[];
     const nicheSamples=nicheHistory.get(v.snippet.categoryId)||[];
+    const audienceSamples=nicheAudienceHistory.get(v.snippet.categoryId)||[];
     const creatorBaseline=creatorSamples.length>=5?median(creatorSamples):null;
     const nicheBaseline=nicheSamples.length>=8?median(nicheSamples):null;
     const creatorLift=creatorBaseline>0?velocity/creatorBaseline:null;
     const nicheLift=nicheBaseline>0?velocity/nicheBaseline:null;
-    const ratio=creatorLift&&nicheLift?Math.sqrt(creatorLift*nicheLift):null;
+    const viewsPerSubscriber=Number(channel?.statistics?.subscriberCount)>0?views/Number(channel.statistics.subscriberCount):null;
+    const audienceBaseline=audienceSamples.length>=8?median(audienceSamples):null;
+    const audienceLift=viewsPerSubscriber&&audienceBaseline>0?viewsPerSubscriber/audienceBaseline:null;
+    const lifts=[creatorLift,nicheLift,...(audienceLift?[audienceLift]:[])].filter(x=>Number.isFinite(x)&&x>0);
+    const ratio=creatorLift&&nicheLift?Math.pow(lifts.reduce((product,x)=>product*x,1),1/lifts.length):null;
     const score=ratio?Math.max(1,Math.min(99,Math.round(50+12*Math.log2(ratio)))):null;
-    return {id:v.id,title:v.snippet.title,description:String(v.snippet.description||'').slice(0,240),channelId:v.snippet.channelId,channelTitle:v.snippet.channelTitle,subscribers:Number(channel?.statistics?.subscriberCount)||null,views,viewsPerHour:Math.round(velocity),durationSeconds:durationSeconds(v.contentDetails.duration),publishedAt:v.snippet.publishedAt,categoryId:v.snippet.categoryId,thumbnail:v.snippet.thumbnails?.high?.url||v.snippet.thumbnails?.medium?.url||'',url:'https://www.youtube.com/shorts/'+v.id,creatorBaselineViewsPerHour:creatorBaseline?Math.round(creatorBaseline):null,nicheBaselineViewsPerHour:nicheBaseline?Math.round(nicheBaseline):null,creatorBaselineSamples:creatorSamples.length,nicheBaselineSamples:nicheSamples.length,creatorLift:creatorLift?Number(creatorLift.toFixed(2)):null,nicheLift:nicheLift?Number(nicheLift.toFixed(2)):null,breakoutScore:score,baselineStatus:score===null?'insufficient-sample':'measured'};
+    return {id:v.id,title:v.snippet.title,description:String(v.snippet.description||'').slice(0,240),channelId:v.snippet.channelId,channelTitle:v.snippet.channelTitle,subscribers:Number(channel?.statistics?.subscriberCount)||null,views,viewsPerHour:Math.round(velocity),durationSeconds:durationSeconds(v.contentDetails.duration),publishedAt:v.snippet.publishedAt,categoryId:v.snippet.categoryId,thumbnail:v.snippet.thumbnails?.high?.url||v.snippet.thumbnails?.medium?.url||'',url:'https://www.youtube.com/shorts/'+v.id,creatorBaselineViewsPerHour:creatorBaseline?Math.round(creatorBaseline):null,nicheBaselineViewsPerHour:nicheBaseline?Math.round(nicheBaseline):null,creatorBaselineSamples:creatorSamples.length,nicheBaselineSamples:nicheSamples.length,creatorLift:creatorLift?Number(creatorLift.toFixed(2)):null,nicheLift:nicheLift?Number(nicheLift.toFixed(2)):null,viewsPerSubscriber:viewsPerSubscriber?Number(viewsPerSubscriber.toFixed(3)):null,audienceLift:audienceLift?Number(audienceLift.toFixed(2)):null,breakoutScore:score,baselineStatus:score===null?'insufficient-sample':'measured'};
   }).sort((a,b)=>(b.breakoutScore??-1)-(a.breakoutScore??-1));
-  return {configured:true,provider:'YouTube Data API',refreshedAt:new Date().toISOString(),sampleCount:videos.length,channelsSampled:channelIds.length,baselineReady:videos.filter(v=>v.breakoutScore!==null).length,videos,note:'Sampled recent public YouTube videos. Scores compare views-per-hour with each channel’s recent Shorts and the sampled category baseline; this is not a platform-wide census.'};
+  return {configured:true,provider:'YouTube Data API',refreshedAt:new Date().toISOString(),sampleCount:videos.length,channelsSampled:channelIds.length,baselineReady:videos.filter(v=>v.breakoutScore!==null).length,videos,note:'Sampled recent public YouTube videos. Scores compare views-per-hour with each channel’s recent Shorts and the sampled category baseline, and incorporate views-per-subscriber relative to the sampled category when public subscriber counts are available; this is not a platform-wide census.'};
 }
 
 function categoryFor(title=''){
