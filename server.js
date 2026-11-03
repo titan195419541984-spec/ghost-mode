@@ -40,6 +40,9 @@ const CACHE_MS = Number(process.env.CACHE_MS || 3*60*1000);
 const ADS_ENABLED = String(process.env.ADS_ENABLED||'false').toLowerCase()==='true';
 const AD_CLIENT_ID = process.env.AD_CLIENT_ID || '';
 const ADS_TXT_CONTENT = process.env.ADS_TXT_CONTENT || '';
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';
+const YOUTUBE_CACHE_MS = Number(process.env.YOUTUBE_CACHE_MS || 3 * 60 * 60 * 1000);
+let youtubeCache = { at: 0, data: null };
 
 let cache = { at: 0, data: null, staleAt: 0 };
 let newsCache = {at:0,items:[]};
@@ -155,6 +158,78 @@ function parseGdeltDate(value){
   const d=new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`);
   return Number.isFinite(d.getTime())?d.toISOString():new Date().toISOString();
 }
+
+function median(values){
+  const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
+  if(!a.length)return null;
+  const m=Math.floor(a.length/2);
+  return a.length%2?a[m]:(a[m-1]+a[m])/2;
+}
+function durationSeconds(value){
+  const m=String(value||'').match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/);
+  return m?(Number(m[1]||0)*3600+Number(m[2]||0)*60+Number(m[3]||0)):0;
+}
+async function youtubeGet(resource,params){
+  const u=new URL('https://www.googleapis.com/youtube/v3/'+resource);
+  for(const [key,value] of Object.entries({...params,key:YOUTUBE_API_KEY}))if(value!==undefined&&value!==null&&value!=='')u.searchParams.set(key,String(value));
+  const response=await fetch(u,{signal:AbortSignal.timeout(10000),headers:{accept:'application/json'}});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error?.message||('YouTube API HTTP '+response.status));
+  return data.items||[];
+}
+async function sourceYouTubeShorts(){
+  if(!YOUTUBE_API_KEY)return {configured:false,provider:'YouTube Data API',videos:[],sampleCount:0,note:'Set YOUTUBE_API_KEY to enable the official YouTube public-data connector.'};
+  const lookback=new Date(Date.now()-7*24*60*60*1000).toISOString();
+  const queries=['shorts storytime','shorts reveal','shorts challenge','shorts before after'];
+  const searchResults=await Promise.all(queries.map(q=>youtubeGet('search',{part:'snippet',type:'video',videoDuration:'short',order:'date',publishedAfter:lookback,maxResults:50,q})));
+  const ids=[...new Set(searchResults.flat().map(x=>x.id?.videoId).filter(Boolean))];
+  const current=[];
+  for(let i=0;i<ids.length;i+=50)current.push(...await youtubeGet('videos',{part:'snippet,statistics,contentDetails',id:ids.slice(i,i+50).join(',')}));
+  const shorts=current.filter(v=>durationSeconds(v.contentDetails?.duration)>0&&durationSeconds(v.contentDetails?.duration)<=60&&v.statistics?.viewCount!==undefined);
+  const channelIds=[...new Set(shorts.map(v=>v.snippet?.channelId).filter(Boolean))].slice(0,25);
+  const channels=channelIds.length?await youtubeGet('channels',{part:'statistics,contentDetails,snippet',id:channelIds.join(',')}):[];
+  const channelMap=new Map(channels.map(c=>[c.id,c]));
+  const uploadLists=await Promise.all(channels.map(async ch=>{
+    const uploads=ch.contentDetails?.relatedPlaylists?.uploads;
+    if(!uploads)return {channelId:ch.id,items:[]};
+    try{return {channelId:ch.id,items:await youtubeGet('playlistItems',{part:'contentDetails,snippet',playlistId:uploads,maxResults:15})};}
+    catch{return {channelId:ch.id,items:[]};}
+  }));
+  const baselineIds=[...new Set(uploadLists.flatMap(x=>x.items.map(v=>v.contentDetails?.videoId).filter(Boolean)))].filter(id=>!ids.includes(id));
+  const baselineDetails=[];
+  for(let i=0;i<baselineIds.length;i+=50)baselineDetails.push(...await youtubeGet('videos',{part:'snippet,statistics,contentDetails',id:baselineIds.slice(i,i+50).join(',')}));
+  const channelHistory=new Map();
+  for(const v of baselineDetails){
+    const ch=v.snippet?.channelId, seconds=durationSeconds(v.contentDetails?.duration), views=Number(v.statistics?.viewCount);
+    if(!ch||seconds<1||seconds>60||!Number.isFinite(views))continue;
+    const ageHours=Math.max(.5,(Date.now()-new Date(v.snippet.publishedAt).getTime())/3600000);
+    if(!channelHistory.has(ch))channelHistory.set(ch,[]);
+    channelHistory.get(ch).push(views/ageHours);
+  }
+  const nicheHistory=new Map();
+  for(const v of shorts){
+    const cat=v.snippet?.categoryId,views=Number(v.statistics.viewCount);
+    const ageHours=Math.max(.5,(Date.now()-new Date(v.snippet.publishedAt).getTime())/3600000);
+    if(!nicheHistory.has(cat))nicheHistory.set(cat,[]);
+    nicheHistory.get(cat).push(views/ageHours);
+  }
+  const videos=shorts.map(v=>{
+    const channel=channelMap.get(v.snippet.channelId),views=Number(v.statistics.viewCount);
+    const ageHours=Math.max(.5,(Date.now()-new Date(v.snippet.publishedAt).getTime())/3600000);
+    const velocity=views/ageHours;
+    const creatorSamples=channelHistory.get(v.snippet.channelId)||[];
+    const nicheSamples=nicheHistory.get(v.snippet.categoryId)||[];
+    const creatorBaseline=creatorSamples.length>=5?median(creatorSamples):null;
+    const nicheBaseline=nicheSamples.length>=8?median(nicheSamples):null;
+    const creatorLift=creatorBaseline>0?velocity/creatorBaseline:null;
+    const nicheLift=nicheBaseline>0?velocity/nicheBaseline:null;
+    const ratio=creatorLift&&nicheLift?Math.sqrt(creatorLift*nicheLift):null;
+    const score=ratio?Math.max(1,Math.min(99,Math.round(50+12*Math.log2(ratio)))):null;
+    return {id:v.id,title:v.snippet.title,description:String(v.snippet.description||'').slice(0,240),channelId:v.snippet.channelId,channelTitle:v.snippet.channelTitle,subscribers:Number(channel?.statistics?.subscriberCount)||null,views,viewsPerHour:Math.round(velocity),durationSeconds:durationSeconds(v.contentDetails.duration),publishedAt:v.snippet.publishedAt,categoryId:v.snippet.categoryId,thumbnail:v.snippet.thumbnails?.high?.url||v.snippet.thumbnails?.medium?.url||'',url:'https://www.youtube.com/shorts/'+v.id,creatorBaselineViewsPerHour:creatorBaseline?Math.round(creatorBaseline):null,nicheBaselineViewsPerHour:nicheBaseline?Math.round(nicheBaseline):null,creatorBaselineSamples:creatorSamples.length,nicheBaselineSamples:nicheSamples.length,creatorLift:creatorLift?Number(creatorLift.toFixed(2)):null,nicheLift:nicheLift?Number(nicheLift.toFixed(2)):null,breakoutScore:score,baselineStatus:score===null?'insufficient-sample':'measured'};
+  }).sort((a,b)=>(b.breakoutScore??-1)-(a.breakoutScore??-1));
+  return {configured:true,provider:'YouTube Data API',refreshedAt:new Date().toISOString(),sampleCount:videos.length,channelsSampled:channelIds.length,baselineReady:videos.filter(v=>v.breakoutScore!==null).length,videos,note:'Sampled recent public YouTube videos. Scores compare views-per-hour with each channel’s recent Shorts and the sampled category baseline; this is not a platform-wide census.'};
+}
+
 function categoryFor(title=''){
   const t=title.toLowerCase();
   if(/nfl|nba|mlb|nhl|soccer|football|basketball|baseball|hockey|sports|olympic/.test(t)) return 'Sports';
@@ -245,7 +320,7 @@ const server=http.createServer(async(req,res)=>{
   };
 
   if(pathname==='/api/health'){
-    const body={ok:true,service:'ghost-mode',version:'1.3.0',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{adsEnabled:ADS_ENABLED, nodeEnv:process.env.NODE_ENV||'development'}};
+    const body={ok:true,service:'ghost-mode',version:'1.3.0',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{adsEnabled:ADS_ENABLED,youtubeConfigured:!!YOUTUBE_API_KEY,nodeEnv:process.env.NODE_ENV||'development'}};
     res.writeHead(200,{'content-type':'application/json','cache-control':'no-store',...secHeaders});
     res.end(JSON.stringify(body));
     log(req,200,Date.now()-start);
@@ -284,6 +359,23 @@ const server=http.createServer(async(req,res)=>{
     const image=await findCommonsImage(title);
     res.writeHead(200);res.end(JSON.stringify({image}));
     log(req,200,Date.now()-start,image?'image-found':'no-image');return;
+  }
+
+
+  if(pathname==='/api/videos'){
+    res.setHeader('content-type','application/json; charset=utf-8');
+    res.setHeader('cache-control','no-store');
+    Object.entries(secHeaders).forEach(([k,v])=>res.setHeader(k,v));
+    if(!YOUTUBE_API_KEY){res.writeHead(200);res.end(JSON.stringify({configured:false,provider:'YouTube Data API',sampleCount:0,baselineReady:0,videos:[],note:'Video discovery is not connected. Set YOUTUBE_API_KEY to enable public YouTube Shorts sampling.'}));log(req,200,Date.now()-start,'youtube-not-configured');return;}
+    if(youtubeCache.data&&Date.now()-youtubeCache.at<YOUTUBE_CACHE_MS){res.writeHead(200);res.end(JSON.stringify({...youtubeCache.data,cached:true}));log(req,200,Date.now()-start,'youtube-cached');return;}
+    try{
+      const data=await sourceYouTubeShorts();
+      youtubeCache={at:Date.now(),data};
+      res.writeHead(200);res.end(JSON.stringify(data));log(req,200,Date.now()-start,'youtube-fresh-'+data.sampleCount);return;
+    }catch(e){
+      if(youtubeCache.data){res.writeHead(200);res.end(JSON.stringify({...youtubeCache.data,cached:true,stale:true,note:'Serving the previous YouTube sample because the latest refresh failed.'}));log(req,200,Date.now()-start,'youtube-stale-fallback');return;}
+      res.writeHead(502);res.end(JSON.stringify({configured:true,provider:'YouTube Data API',videos:[],error:'YouTube video sample unavailable.',note:String(e.message||e)}));log(req,502,Date.now()-start,'youtube-error');return;
+    }
   }
 
   if(pathname==='/api/news'){
