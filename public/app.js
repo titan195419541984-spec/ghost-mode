@@ -464,7 +464,7 @@ async function init(){
   renderRewards();
   renderInterestControls();
   const hash=location.hash.replace('#','');
-  if(['pulse','radar','underground','signal','vault','rewards','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash);
+  if(['pulse','creator','radar','underground','signal','vault','rewards','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash);
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('/sw.js'); }catch{} }
   await Promise.all([loadTrends(),loadNews()]);
 }
