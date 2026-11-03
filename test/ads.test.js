@@ -24,3 +24,18 @@ describe('Advertising placement policy', () => {
     assert.doesNotMatch(ads, /SPONSORED AREA/);
   });
 });
+
+const rewardApp = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+
+describe('Ad configuration and reward integrity', () => {
+  it('uses correct numeric AdSense slot and publisher ID validation patterns', () => {
+    assert.ok(ads.includes('/^\\d+$/'));
+    assert.ok(ads.includes('/^ca-pub-\\d{10,}$/'));
+  });
+
+  it('does not issue client-side points from an ad playback callback', () => {
+    assert.match(rewardApp, /const ready=false/);
+    assert.match(rewardApp, /Server-side rewarded-video verification is not configured/);
+    assert.doesNotMatch(rewardApp, /rewardState\\.points\\+=award/);
+  });
+});
