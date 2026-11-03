@@ -15,6 +15,7 @@
     {id:"before-after",name:"Before / after with the why",tag:"TRANSFORMATION",desc:"Make the change visible, then explain the decisions that produced it.",beats:["Show the after state first","Flash the starting point","Identify the key changes","Show the process in quick steps","Name the repeatable lesson"],hook:"The difference in {topic} looks dramatic. Here's what actually caused it.",fit:"Beauty, home, fitness, editing, learning"}
   ];
   let trends = [];
+  let videos = [];
   let saved = new Set();
   try { saved = new Set(JSON.parse(localStorage.getItem(STORE) || "[]")); } catch {}
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify([...saved])); } catch {} };
@@ -41,6 +42,52 @@
       savedHost.innerHTML = chosen.length ? chosen.map(f => '<button class="creator-saved-chip" data-format-use="' + f.id + '">' + f.name + ' <span>↗</span></button>').join("") : '<p class="creator-muted">Save a structure to build your personal swipe file.</p>';
     }
   }
+
+  function renderVideos(data) {
+    const host = $("#creator-video-grid");
+    if (!host) return;
+    const coverage = $("#creator-video-coverage");
+    const baseline = $("#creator-baseline-status");
+    const indexState = $("#creator-index-state");
+    if (!data || !data.configured) {
+      if (coverage) coverage.textContent = "NOT CONNECTED";
+      if (baseline) baseline.textContent = "NOT AVAILABLE";
+      if (indexState) indexState.textContent = "YouTube API key required";
+      host.innerHTML = '<div class="creator-empty"><strong>YouTube connector is ready to configure.</strong><br>Add YOUTUBE_API_KEY to the ghost-mode Render service environment to activate official public Shorts sampling. This is a sample connector, not a million-video catalog.</div>';
+      return;
+    }
+    videos = Array.isArray(data.videos) ? data.videos : [];
+    if (coverage) coverage.textContent = String(data.sampleCount || videos.length) + " SAMPLED";
+    if (baseline) baseline.textContent = String(data.baselineReady || 0) + " SCORED";
+    if (indexState) indexState.textContent = "YouTube sample · " + (data.cached ? "cached" : "refreshed");
+    if (!videos.length) {
+      host.innerHTML = '<div class="creator-empty">The connector is active, but no eligible Shorts were returned in this sample. Check the API quota and try the next refresh.</div>';
+      return;
+    }
+    host.innerHTML = videos.slice(0,18).map(v => {
+      const score = Number.isFinite(v.breakoutScore) ? '<b class="creator-video-score">' + v.breakoutScore + '</b>' : '<b class="creator-video-score is-pending">—</b>';
+      const creator = v.creatorLift ? v.creatorLift.toFixed(2) + '× creator' : 'Creator baseline building';
+      const niche = v.nicheLift ? v.nicheLift.toFixed(2) + '× niche' : 'Niche baseline building';
+      const thumb = v.thumbnail ? '<img src="' + esc(v.thumbnail) + '" alt="" loading="lazy">' : '';
+      return '<article class="creator-video-card"><a class="creator-video-thumb" href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer">' + thumb + '<span>OPEN VIDEO ↗</span></a><div class="creator-video-body"><div class="creator-video-kicker">YOUTUBE SHORT · ' + esc(v.channelTitle || "Creator") + '</div><h3><a href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer">' + esc(v.title) + '</a></h3><div class="creator-video-stats"><span>' + Number(v.views).toLocaleString() + ' views</span><span>' + Number(v.viewsPerHour).toLocaleString() + ' avg views/hr</span></div><div class="creator-video-baselines"><span>' + esc(creator) + '</span><span>' + esc(niche) + '</span></div><div class="creator-video-score-row"><span>BASELINE-RELATIVE SCORE</span>' + score + '</div></div></article>';
+    }).join("");
+    $("#creator-data-note").textContent += " · YouTube sample " + (data.refreshedAt ? new Date(data.refreshedAt).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}) : "available") + " · " + (data.note || "");
+  }
+  async function loadVideos() {
+    const host = $("#creator-video-grid");
+    if (!host) return;
+    try {
+      const r = await fetch("/api/videos", {cache:"no-store"});
+      const data = await r.json();
+      if (!r.ok && !data.configured) throw new Error(data.error || "Video source unavailable");
+      renderVideos(data);
+    } catch (e) {
+      host.innerHTML = '<div class="creator-empty">Video source refresh failed. Public topic discovery and the format library remain available.</div>';
+      const coverage = $("#creator-video-coverage");
+      if (coverage) coverage.textContent = "SOURCE ERROR";
+    }
+  }
+
   function renderScan() {
     const host = $("#creator-opportunities");
     if (!host) return;
@@ -113,6 +160,7 @@
       $("#creator-data-note").textContent = "Source feed unavailable";
     }
     renderFormats();
+    loadVideos();
   }
   document.addEventListener("click", e => {
     const saveBtn = e.target.closest("[data-format-save]");
