@@ -1,4 +1,4 @@
-const CACHE_NAME='ghost-mode-v1-4-8';
+const CACHE_NAME='ghost-mode-v1-4-9';
 const SHELL=['/','/index.html','/styles.css','/studio.css','/app.js','/studio.js','/studio-engine.js','/creator-intel.js?v=1.0.0','/creator-intel.css?v=1.0.0','/ads.js','/rewards.js?v=1.0.0','/ghost.svg','/manifest.webmanifest'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));
