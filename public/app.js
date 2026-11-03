@@ -294,29 +294,18 @@ function renderRewards(){
   if(progress) progress.textContent=next?`${Math.max(0,rewardState.points-prev)} / ${goal-prev} points`:'MAX LEVEL REACHED';
   if(nextLabel) nextLabel.textContent=next?`${Math.max(0,goal-rewardState.points)} pts to Level ${next.level}`:'All tiers unlocked';
   $$('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier);const level=rewardLevels.find(x=>x.level===tier);const unlocked=rewardState.points>=level.points;card.classList.toggle('current',tier===current.level);card.classList.toggle('unlocked',unlocked);card.classList.toggle('locked',!unlocked);const stateLabel=card.querySelector('.tier-state');const lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent=tier===current.level?'CURRENT':unlocked?'UNLOCKED':'LOCKED';if(lock)lock.textContent=unlocked?(tier===current.level?'✓ Your current level':'✓ Unlocked'):`🔒 Unlock at ${level.points} points`;});
-  const ready=!!(window.GhostRewardsProvider&&typeof window.GhostRewardsProvider.showRewardedAd==='function'&&window.google?.ima);
+  // A playable ad is not proof of a verified reward. The server remains the
+  // authority; this release intentionally keeps rewards disabled until it
+  // reports a configured provider and accepts a signed completion receipt.
+  const ready=false;
   rewardState.providerReady=ready;
   if(nav)nav.textContent=`LV ${current.level}`;
   const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
-  if(btn){btn.hidden=false;btn.disabled=!ready||rewardState.dailyPoints>=40;btn.textContent='▶  Watch to earn 5 points';btn.setAttribute('aria-disabled',String(btn.disabled));btn.title=ready?'Watch a complete video ad to earn 5 points':'Video ad player is loading or unavailable';}
-  if(note)note.textContent=ready?`Video ads are connected · 5 points per completed ad · ${Math.max(0,40-rewardState.dailyPoints)} points left today. Points are stored on this device.`:'Loading the video ad player…';
+  if(btn){btn.hidden=false;btn.disabled=true;btn.textContent='▶  Rewards temporarily unavailable';btn.setAttribute('aria-disabled','true');btn.title='Server-side rewarded-video verification is not configured';}
+  if(note)note.textContent='Rewarded ads are not verified on this release. No points are issued for unverified playback. Your displayed points are stored only on this device.';
 }
 async function watchRewardedVideo(){
-  renderRewards();
-  if(!rewardState.providerReady){toast('Video ad player is not ready. Try again in a moment.');return;}
-  if(rewardState.dailyPoints>=40){toast('You have reached today’s 40-point reward limit.');return;}
-  const btn=$('#watch-reward-button');if(btn)btn.disabled=true;
-  try{
-    const result=await window.GhostRewardsProvider.showRewardedAd();
-    if(!result||result.completed!==true){toast('No points awarded — the ad was skipped, interrupted, or did not finish.');return;}
-    const today=new Date().toISOString().slice(0,10);
-    if(rewardState.day!==today){rewardState.day=today;rewardState.dailyPoints=0;}
-    if(rewardState.dailyPoints>=40){toast('Daily reward limit reached.');return;}
-    const award=Math.min(5,40-rewardState.dailyPoints);
-    rewardState.points+=award;rewardState.dailyPoints+=award;
-    persist();renderRewards();toast(`+${award} points added. ${40-rewardState.dailyPoints} points remain today.`);
-  }catch(error){console.warn('reward video failed',error);toast('No ad was completed. No points awarded.');}
-  finally{if(btn)btn.disabled=!rewardState.providerReady||rewardState.dailyPoints>=40;}
+  toast('Rewarded ads are temporarily unavailable. No points can be issued until server-side verification is connected.');
 }
 function renderInterestControls(){ $$('#interest-grid input').forEach(i=>{ if(i) i.checked=state.interests.has(i.value); });const el=$('#interest-count'); if(el) el.textContent=state.interests.size?`${state.interests.size} interest${state.interests.size===1?'':'s'} selected`:'No interests selected';}
 function openInfo(title,copy){$('#info-title').textContent=title;$('#info-copy').innerHTML=copy;$('#info-modal').classList.add('open');$('#info-modal').setAttribute('aria-hidden','false');}
