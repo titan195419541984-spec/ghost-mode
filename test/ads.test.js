@@ -39,3 +39,17 @@ describe('Ad configuration and reward integrity', () => {
     assert.equal(rewardApp.includes('rewardState.points+=award'), false);
   });
 });
+
+const server = await readFile(new URL('../server.js', import.meta.url), 'utf8');
+const adsTxt = await readFile(new URL('../public/ads.txt', import.meta.url), 'utf8');
+const appAdsTxt = await readFile(new URL('../public/app-ads.txt', import.meta.url), 'utf8');
+
+describe('Publisher authorization files', () => {
+  it('serves the exact Google publisher record with a real newline', () => {
+    const record = 'google.com, pub-5558048915852406, DIRECT, f08c47fec0942fa0';
+    assert.equal(adsTxt.trim(), record);
+    assert.equal(appAdsTxt.trim(), record);
+    assert.ok(server.includes("res.end(content+'\\n');"));
+    assert.equal(server.includes("res.end(content+'\\\\n');"), false);
+  });
+});
