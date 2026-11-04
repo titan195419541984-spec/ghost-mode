@@ -1,5 +1,5 @@
-const CACHE_NAME='ghost-mode-v1-4-13';
-const SHELL=['/','/index.html','/styles.css','/studio.css','/app.js?v=2.8.5','/studio.js','/studio-engine.js','/creator-intel.js?v=1.0.3','/creator-intel.css?v=1.0.2','/ads.js?v=2.2.1','/rewards.js?v=1.0.0','/ghost.svg','/manifest.webmanifest'];
+const CACHE_NAME='ghost-mode-v1-4-14';
+const SHELL=['/','/index.html','/styles.css','/studio.css','/app.js?v=2.8.5','/studio.js','/studio-engine.js','/creator-intel.js?v=1.0.3','/creator-intel.css?v=1.0.2','/ghost.svg','/manifest.webmanifest'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
@@ -9,7 +9,6 @@ self.addEventListener('activate',e=>{
 self.addEventListener('fetch',e=>{
   const url=new URL(e.request.url);
   if(url.pathname.startsWith('/api/')) return; // never cache api
-  if(url.pathname==='/ads.txt') return;
   if(e.request.mode==='navigate'){
     e.respondWith(fetch(e.request).catch(()=>caches.match('/index.html')));
     return;
