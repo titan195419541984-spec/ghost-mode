@@ -37,9 +37,6 @@ async function findCommonsImage(title) {
   } catch { commonsImageCache.set(key, { at: Date.now(), image: null }); return null; }
 }
 const CACHE_MS = Number(process.env.CACHE_MS || 3*60*1000);
-const ADS_ENABLED = String(process.env.ADS_ENABLED||'false').toLowerCase()==='true';
-const AD_CLIENT_ID = process.env.AD_CLIENT_ID || '';
-const ADS_TXT_CONTENT = process.env.ADS_TXT_CONTENT || '';
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';
 const YOUTUBE_CACHE_MS = Number(process.env.YOUTUBE_CACHE_MS || 3 * 60 * 60 * 1000);
 let youtubeCache = { at: 0, data: null };
@@ -324,38 +321,14 @@ const server=http.createServer(async(req,res)=>{
     'referrer-policy':'strict-origin-when-cross-origin',
     'x-xss-protection':'0',
     'permissions-policy':'geolocation=(), microphone=(), camera=()',
-    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://imasdk.googleapis.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://fundingchoicesmessages.google.com https://wellgroomed-imagination.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://imasdk.googleapis.com https://pagead2.googlesyndication.com https://*.googlevideo.com https://*.doubleclick.net https://*.googlesyndication.com https://wellgroomed-imagination.com https://realisticreply.com; media-src 'self' blob: https:; frame-src https://*.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://wellgroomed-imagination.com; font-src 'self' data:; manifest-src 'self';"
+    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; media-src 'self' blob: https:; font-src 'self' data:; manifest-src 'self';"
   };
 
   if(pathname==='/api/health'){
-    const body={ok:true,service:'ghost-mode',version:'1.3.0',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{adsEnabled:ADS_ENABLED,youtubeConfigured:!!YOUTUBE_API_KEY,nodeEnv:process.env.NODE_ENV||'development'}};
+    const body={ok:true,service:'ghost-mode',version:'1.3.0',time:new Date().toISOString(),uptime:process.uptime(),cacheAge: cache.data? Date.now()-cache.at : null, sourcesCached: cache.data?.sources||null, env:{youtubeConfigured:!!YOUTUBE_API_KEY,nodeEnv:process.env.NODE_ENV||'development'}};
     res.writeHead(200,{'content-type':'application/json','cache-control':'no-store',...secHeaders});
     res.end(JSON.stringify(body));
     log(req,200,Date.now()-start);
-    return;
-  }
-  if(pathname==='/api/config'){
-    res.writeHead(200,{'content-type':'application/json','cache-control':'public, max-age=300',...secHeaders});
-    res.end(JSON.stringify({adsEnabled:ADS_ENABLED, adClientId: ADS_ENABLED? AD_CLIENT_ID : '', adSlots:{
-      pulseTop: process.env.AD_SLOT_PULSE_TOP||'',
-      pulseMid: process.env.AD_SLOT_PULSE_MID||'',
-      radar: process.env.AD_SLOT_RADAR||'',
-      underground: process.env.AD_SLOT_UNDERGROUND||''
-    }, siteUrl: process.env.SITE_URL||''}));
-    log(req,200,Date.now()-start);
-    return;
-  }
-  if(pathname==='/api/rewards/status' && req.method==='GET'){
-    const body={pointsPerVerifiedVideo:5,dailyCap:40,maxVideosPerDay:8,tiers:[{level:1,name:'Scout',points:250},{level:2,name:'Tracker',points:450},{level:3,name:'Analyst',points:1200},{level:4,name:'Insider',points:2000}],providerConfigured:false};
-    res.writeHead(200,{'content-type':'application/json; charset=utf-8','cache-control':'no-store',...secHeaders});
-    res.end(JSON.stringify(body));
-    log(req,200,Date.now()-start,'reward-policy');
-    return;
-  }
-  if(pathname==='/api/rewards/claim' && req.method==='POST'){
-    res.writeHead(503,{'content-type':'application/json; charset=utf-8','cache-control':'no-store',...secHeaders});
-    res.end(JSON.stringify({verified:false,error:'Rewarded video verification is not configured. No points were awarded.'}));
-    log(req,503,Date.now()-start,'reward-provider-not-configured');
     return;
   }
   if(pathname==='/api/image'){
@@ -440,22 +413,6 @@ const server=http.createServer(async(req,res)=>{
     }
     return;
   }
-  if(pathname==='/ads.txt' || pathname==='/.well-known/ads.txt'){
-    // Prefer an explicit deployment override, then derive the Google seller
-    // record from the publisher ID, then serve the checked-in public file.
-    let content=String(ADS_TXT_CONTENT||'').trim();
-    if(!content && AD_CLIENT_ID){
-      content=`google.com, ${AD_CLIENT_ID.replace('ca-pub-','pub-')}, DIRECT, f08c47fec0942fa0`;
-    }
-    if(!content){
-      try{ content=(await readFile(join(ROOT,'ads.txt'),'utf8')).trim(); }catch{}
-    }
-    if(!content) content='# ads.txt is not configured';
-    res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'public, max-age=3600',...secHeaders});
-    res.end(content+'\n');
-    log(req,200,Date.now()-start,'ads-txt');
-    return;
-  }
 
   // static file handling
   let safePath=decodeURIComponent(pathname==='/'?'/index.html':pathname);
@@ -487,4 +444,4 @@ const server=http.createServer(async(req,res)=>{
   }
 });
 
-server.listen(PORT,'0.0.0.0',()=>console.log(`Ghost Mode listening on ${PORT} env=${process.env.NODE_ENV||'dev'} ads=${ADS_ENABLED?'enabled':'disabled'}`));
+server.listen(PORT,'0.0.0.0',()=>console.log(`Ghost Mode listening on ${PORT} env=${process.env.NODE_ENV||'dev'}`));
