@@ -1,9 +1,6 @@
 
 const $=(q,root=document)=>root.querySelector(q);const $$=(q,root=document)=>[...root.querySelectorAll(q)];
 const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'creator',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
-const rewardState={points:0,level:0,providerReady:false,dailyPoints:0,day:''};
-try{const saved=JSON.parse(localStorage.getItem('gm-rewards-v1')||'{}');const today=new Date().toISOString().slice(0,10);rewardState.points=Math.max(0,Number(saved.points)||0);rewardState.day=saved.day===today?today:today;rewardState.dailyPoints=saved.day===today?Math.max(0,Number(saved.dailyPoints)||0):0;}catch{}
-const rewardLevels=[{level:1,name:'Scout',points:250},{level:2,name:'Tracker',points:450},{level:3,name:'Analyst',points:1200},{level:4,name:'Insider',points:2000}];
 const DEMO=[
  {id:'ai-agents',title:'AI agents move from demos into everyday workflows',category:'Technology',score:91,momentum:'Surging',confidence:'Moderate',sources:['Hacker News','Global News'],sourceCount:2,source:'Hacker News',detail:'Discussion and coverage are appearing across more than one source.',url:'https://news.ycombinator.com/',publishedAt:new Date(Date.now()-14*60000).toISOString(),engagement:1250,kind:'cross-source'},
  {id:'creator-economy',title:'Creators are experimenting with new ways to own their audience',category:'Entertainment',score:84,momentum:'Surging',confidence:'Limited',sources:['Google Trends'],sourceCount:1,source:'Google Trends',detail:'Search interest is a useful early signal, but does not confirm future popularity.',url:'https://trends.google.com/trending?geo=US',publishedAt:new Date(Date.now()-25*60000).toISOString(),engagement:0,kind:'single-source'},
@@ -47,9 +44,6 @@ function cardImageHTML(t){
   return `<a class="trend-card-image-wrap" href="${safeURL(img.pageUrl)}" target="_blank" rel="noopener noreferrer" aria-label="View image source: ${escapeHTML(img.title||'Wikimedia Commons photo')}"><img class="trend-card-image" src="${safeURL(img.url)}" alt="${escapeHTML(img.alt||t.title)}" loading="lazy" decoding="async"><span class="image-credit">PHOTO · ${escapeHTML(img.artist||'Wikimedia Commons')} · ${escapeHTML(img.license||'license')}</span></a>`;
 }
 function cardTrend(t){const saved=state.saved.has(t.id);const sources=(t.sources||[t.source||'Public source']);const pills=sources.slice(0,2).map(s=>`<span class="source-pill">${escapeHTML(s)}</span>`).join('')+(sources.length>2?`<span class="source-pill more-sources">+${sources.length-2}</span>`:'');const momentum=String(t.momentum||'Early signal');const mclass=momentum.toLowerCase().includes('surging')?'surging':momentum.toLowerCase().includes('early')?'early':'';return `<article class="trend-card" data-id="${escapeHTML(t.id)}">${cardImageHTML(t)}<div class="trend-card-top"><span class="category-tag ${catClass(t.category)}">${escapeHTML((t.category||'Culture').toUpperCase())}</span><span class="momentum ${mclass}"><i class="momentum-dot"></i>${escapeHTML(momentum)}</span></div><button class="trend-title title-button" data-detail="${escapeHTML(t.id)}">${escapeHTML(t.title)}</button><p class="trend-description">${escapeHTML(t.detail||'A signal surfaced from a connected public source.')}</p><div class="trend-card-meta"><span>${escapeHTML(t.source||sources[0]||'Public source')} · ${ago(t.publishedAt)}</span><span class="source-pills">${pills}</span></div><div class="trend-card-footer"><div class="score-block">${scoreRing(t.score)}<span class="score-copy"><strong>GHOST SCORE</strong><small>${escapeHTML(t.confidence||'Limited')} confidence</small></span></div><div class="card-actions"><button class="card-action share-action" data-share="${escapeHTML(t.id)}" aria-label="Share signal" title="Share signal">↗</button><button class="card-action ${saved?'saved':''}" data-save="${escapeHTML(t.id)}" aria-label="${saved?'Remove saved signal':'Save signal'}" title="${saved?'Remove from vault':'Save to vault'}">${saved?'◆':'◇'}</button><button class="card-action open-source" data-detail="${escapeHTML(t.id)}" aria-label="Open trend details" title="View signal details">⌁</button></div></div></article>`;}
-function adSlotHTML(id, slotKey){
-  return `<div class="ad-container" data-slot="${slotKey}" id="${id}" data-enabled="false"><span class="ad-label">SPONSORED</span><div class="ad-placeholder"><strong>SPONSORED AREA</strong> Ad space reserved.</div><ins class="adsbygoogle" style="display:block; min-height:90px" data-ad-client="" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins></div>`;
-}
 function toast(msg){const region=$('#toast-region');if(!region)return;const el=document.createElement('div');el.className='toast';el.textContent=msg;region.appendChild(el);setTimeout(()=>el.remove(),2600);}
 function switchView(name){
   state.view=name;
@@ -57,9 +51,7 @@ function switchView(name){
   $$('.view').forEach(v=>v.classList.toggle('active', v.id===`view-${name}`));
   $('#breadcrumb-current').textContent=name.toUpperCase();
   $('#sidebar').classList.remove('open');
-  if(name!=='pulse') $$('#pulse-grid .ad-container').forEach(el=>el.remove());
   if(['pulse','vault','signal','underground','radar'].includes(name)) renderCards();
-  if(name==='rewards') renderRewards();
   history.replaceState(null,'',`#${name}`);
 }
 function renderMetrics(){
@@ -176,14 +168,6 @@ function renderCards(){
     }else{
       const visible = searchVal? list.filter(t=> t.title.toLowerCase().includes(searchVal) || t.category.toLowerCase().includes(searchVal)) : list;
       const cards=visible.map(cardTrend);
-      // Only place ads on the primary live-content feed, never on demo data,
-      // empty searches, or secondary views with thin publisher content.
-      if(state.view==='pulse' && state.mode==='live' && cards.length>=5){
-        cards.splice(3,0, adSlotHTML('ad-pulse-top','pulseTop'));
-      }
-      if(state.view==='pulse' && state.mode==='live' && cards.length>=10){
-        cards.splice(9,0, adSlotHTML('ad-pulse-mid','pulseMid'));
-      }
       pulseGrid.className=`trend-grid ${state.layout==='list'?'list-view':''}`;
       pulseGrid.innerHTML=cards.join('') || `<div class="empty-state"><h3>No matches</h3><p>Try a different category or search.</p></div>`;
       // after inject, set ad client/slot if enabled
@@ -214,7 +198,6 @@ function renderCards(){
     renderRadar(radarCanvas, list.slice(0,18));
   }
   hydrateCardImages();
-  window.GhostAds?.refresh?.();
   renderMetrics();
   renderSources();
   renderInterestControls();
@@ -271,42 +254,12 @@ function persist(){try{
   localStorage.setItem('gm-saved',JSON.stringify([...state.saved]));
   localStorage.setItem('gm-saved-items',JSON.stringify([...state.savedItems.entries()]));
   localStorage.setItem('gm-interests',JSON.stringify([...state.interests]));
-  localStorage.setItem('gm-rewards-v1',JSON.stringify({points:rewardState.points,dailyPoints:rewardState.dailyPoints,day:rewardState.day}));
 }catch{}}
 function loadPrefs(){try{
   state.saved=new Set(JSON.parse(localStorage.getItem('gm-saved')||'[]'));
   state.savedItems=new Map(JSON.parse(localStorage.getItem('gm-saved-items')||'[]'));
   state.interests=new Set(JSON.parse(localStorage.getItem('gm-interests')||'[]'));
 }catch{state.saved=new Set();state.savedItems=new Map();state.interests=new Set();}}
-function getRewardLevel(points=rewardState.points){return [...rewardLevels].reverse().find(x=>points>=x.points)||{level:0,name:'Recruit',points:0};}
-function renderRewards(){
-  const current=getRewardLevel(); rewardState.level=current.level;
-  const next=rewardLevels.find(x=>x.level===current.level+1);
-  const points=$('#reward-points'), name=$('#reward-level-name'), pill=$('#reward-level-pill'), mark=$('#rewards-level-mark'), nav=$('#nav-level'), fill=$('#reward-progress-fill'), progress=$('#reward-progress-label'), nextLabel=$('#reward-next-label');
-  if(points) points.innerHTML=`${rewardState.points.toLocaleString()} <small>pts</small>`;
-  if(name) name.textContent=`Level ${current.level} · ${current.name}`;
-  if(pill) pill.textContent=`LV ${String(current.level).padStart(2,'0')}`;
-  if(mark) mark.textContent=String(current.level).padStart(2,'0');
-  if(nav) nav.textContent=`LV ${current.level}`;
-  const prev=current.points, goal=next?.points||current.points;
-  const pct=next?Math.max(0,Math.min(100,(rewardState.points-prev)/(goal-prev)*100)):100;
-  if(fill) fill.style.width=pct+'%';
-  if(progress) progress.textContent=next?`${Math.max(0,rewardState.points-prev)} / ${goal-prev} points`:'MAX LEVEL REACHED';
-  if(nextLabel) nextLabel.textContent=next?`${Math.max(0,goal-rewardState.points)} pts to Level ${next.level}`:'All tiers unlocked';
-  $$('.tier-card').forEach(card=>{const tier=Number(card.dataset.tier);const level=rewardLevels.find(x=>x.level===tier);const unlocked=rewardState.points>=level.points;card.classList.toggle('current',tier===current.level);card.classList.toggle('unlocked',unlocked);card.classList.toggle('locked',!unlocked);const stateLabel=card.querySelector('.tier-state');const lock=card.querySelector('.tier-lock');if(stateLabel)stateLabel.textContent=tier===current.level?'CURRENT':unlocked?'UNLOCKED':'LOCKED';if(lock)lock.textContent=unlocked?(tier===current.level?'✓ Your current level':'✓ Unlocked'):`🔒 Unlock at ${level.points} points`;});
-  // A playable ad is not proof of a verified reward. The server remains the
-  // authority; this release intentionally keeps rewards disabled until it
-  // reports a configured provider and accepts a signed completion receipt.
-  const ready=false;
-  rewardState.providerReady=ready;
-  if(nav)nav.textContent=`LV ${current.level}`;
-  const btn=$('#watch-reward-button'), note=$('#reward-provider-note');
-  if(btn){btn.hidden=false;btn.disabled=true;btn.textContent='▶  Rewards temporarily unavailable';btn.setAttribute('aria-disabled','true');btn.title='Server-side rewarded-video verification is not configured';}
-  if(note)note.textContent='Rewarded ads are not verified on this release. No points are issued for unverified playback. Your displayed points are stored only on this device.';
-}
-async function watchRewardedVideo(){
-  toast('Rewarded ads are temporarily unavailable. No points can be issued until server-side verification is connected.');
-}
 function renderInterestControls(){ $$('#interest-grid input').forEach(i=>{ if(i) i.checked=state.interests.has(i.value); });const el=$('#interest-count'); if(el) el.textContent=state.interests.size?`${state.interests.size} interest${state.interests.size===1?'':'s'} selected`:'No interests selected';}
 function openInfo(title,copy){$('#info-title').textContent=title;$('#info-copy').innerHTML=copy;$('#info-modal').classList.add('open');$('#info-modal').setAttribute('aria-hidden','false');}
 function closeModal(sel){const m=$(sel); if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }}
@@ -326,9 +279,7 @@ function openDetail(id){
       <div class="metric" style="padding:12px"><span class="metric-label">PUBLISHED</span><strong style="font-size:14px">${ago(t.publishedAt)}</strong><span class="metric-foot">${escapeHTML(new Date(t.publishedAt).toLocaleString())}</span></div>
     </div>
     <div style="margin:10px 0"><strong style="font-size:12px;letter-spacing:.12em">SOURCE TRAIL</strong><ul style="margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.7">${srcList}</ul><p style="color:var(--muted-2);font-size:11px;margin-top:10px">Ghost Score = f(recency, available engagement, source overlap). Not a prediction. Sources may be unavailable; confidence reflects only connected sources.</p></div>
-    <div style="display:flex;gap:10px;margin-top:16px"><a class="primary-button" href="${safeURL(t.url)}" target="_blank" rel="noopener noreferrer">Open original source ↗</a><button class="subtle-button" data-share="${escapeHTML(t.id)}">Share</button><button class="subtle-button" data-save="${escapeHTML(t.id)}">${state.saved.has(t.id)?'Remove from vault':'Save to vault'}</button></div>
-    <div style="margin-top:18px" class="ad-container" data-slot="detail" data-enabled="false"><span class="ad-label">SPONSORED</span><div class="ad-placeholder"><strong>SPONSORED AREA</strong> Reserved.</div></div>
-  </div>`;
+    <div style="display:flex;gap:10px;margin-top:16px"><a class="primary-button" href="${safeURL(t.url)}" target="_blank" rel="noopener noreferrer">Open original source ↗</a><button class="subtle-button" data-share="${escapeHTML(t.id)}">Share</button><button class="subtle-button" data-save="${escapeHTML(t.id)}">${state.saved.has(t.id)?'Remove from vault':'Save to vault'}</button></div>`;
   $('#detail-content').innerHTML=html;
   $('#detail-modal').classList.add('open');
   $('#detail-modal').setAttribute('aria-hidden','false');
@@ -399,10 +350,9 @@ document.addEventListener('click',e=>{const share=e.target.closest('[data-share]
   $('#clear-interests').addEventListener('click',()=>{state.interests.clear();persist();renderInterestControls();toast('Interest filters reset.');});
   $('#clear-vault').addEventListener('click',()=>{if(!state.saved.size){toast('Your vault is already empty.');return;}state.saved.clear();persist();renderCards();toast('Your vault has been cleared.');});
   $('#methodology-link').addEventListener('click',e=>{e.preventDefault();openInfo('How Ghost Score works','<p>Ghost Score is a directional index based on freshness, available engagement, and source overlap. It is not a probability of going viral, and source coverage is incomplete.</p><p>Each source has different coverage and limitations. Topics with a single source are labeled with limited confidence. Similar headlines are grouped heuristically, so some clusters may be imperfect.</p><p>Ghost Mode links back to the origin where possible and does not claim private platform data.</p>');});
-  $('#about-link').addEventListener('click',e=>{e.preventDefault();openInfo('About Ghost Mode','<p>Ghost Mode is a trend intelligence prototype designed to help curious people explore emerging topics across public sources.</p><p>This starter release aggregates Google Trends RSS, Hacker News, Mastodon public trends, and GDELT news results where those sources are reachable. Availability varies. It does not have privileged access to TikTok, Instagram, YouTube, or private platform analytics.</p><p>All sponsored placements are reserved and labeled; this build does not serve paid ads until AdSense is approved and configured.</p>');});
+  $('#about-link').addEventListener('click',e=>{e.preventDefault();openInfo('About Ghost Mode','<p>Ghost Mode is a trend intelligence prototype designed to help curious people explore emerging topics across public sources.</p><p>This starter release aggregates Google Trends RSS, Hacker News, Mastodon public trends, and GDELT news results where those sources are reachable. Availability varies. It does not have privileged access to TikTok, Instagram, YouTube, or private platform analytics.</p><p>Ghost Mode does not display third-party advertising in this release.</p>');});
   $('#alerts-button').addEventListener('click',()=>openInfo('Signal alerts','<p>Personalized push alerts are not active in this build yet. The next production step is to add opt-in notifications for followed categories and saved topics, with quiet hours and clear controls.</p>'));
   $('#profile-button').addEventListener('click',()=>switchView('signal'));
-  $('#watch-reward-button')?.addEventListener('click',watchRewardedVideo);
   window.addEventListener('online',()=>{state.offline=false;toast('Back online — refreshing signals.');loadTrends({quiet:true});});
   window.addEventListener('offline',()=>{state.offline=true;toast('You are offline — showing cached signals.');});
 }
@@ -450,10 +400,9 @@ async function loadTrends(opts={}){
 async function init(){
   loadPrefs();
   bindEvents();
-  renderRewards();
   renderInterestControls();
   const hash=location.hash.replace('#','').split('?')[0];
-  if(['pulse','creator','radar','underground','signal','vault','rewards','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash); else switchView('creator');
+  if(['pulse','creator','radar','underground','signal','vault','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash); else switchView('creator');
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('/sw.js'); }catch{} }
   await Promise.all([loadTrends(),loadNews()]);
 }
