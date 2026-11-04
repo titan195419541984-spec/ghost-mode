@@ -26,10 +26,14 @@ describe("Creator Desk video intelligence rendering", () => {
 const index = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
 const worker = await readFile(new URL("../public/sw.js", import.meta.url), "utf8");
 
-describe("Creator Desk cache versioning", () => {
-  it("loads the updated Creator Desk bundle and pre-caches the same version", () => {
+describe("Creator Desk and Monetag service worker integration", () => {
+  it("loads the current Creator Desk bundle", () => {
     assert.match(index, /creator-intel\.js\?v=1\.0\.3/);
-    assert.match(worker, /creator-intel\.js\?v=1\.0\.3/);
-    assert.match(worker, /ghost-mode-v1-4-14/);
+  });
+
+  it("keeps the configured Monetag service worker intact", () => {
+    assert.match(worker, /"domain":\s*"3nbf4\.com"/);
+    assert.match(worker, /"zoneId":\s*12187189/);
+    assert.match(worker, /importScripts\('https:\/\/3nbf4\.com\/act\/files\/service-worker\.min\.js\?r=sw'\)/);
   });
 });
