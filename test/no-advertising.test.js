@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const paths = ['../public/index.html','../public/app.js','../server.js','../public/sw.js'];
+const paths = ['../public/index.html','../public/app.js','../server.js','../public/sw.js','../public/about.html','../public/privacy.html','../public/terms.html'];
 const sources = await Promise.all(paths.map(path => readFile(new URL(path, import.meta.url), 'utf8')));
 
 test('production application contains no advertising or rewarded-video integrations', () => {
