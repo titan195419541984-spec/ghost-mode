@@ -12,7 +12,7 @@ test('Monetag zone script is permitted by the production Content Security Policy
   assert.match(server, /connect-src 'self' https:/);
   assert.match(server, /frame-src 'self' https:/);
   assert.match(server, /object-src 'none'/);
-  assert.match(html, /<script src="\\/monetag-loader\\.js"><\\/script>/);
+  assert.ok(html.includes('<script src="/monetag-loader.js"></script>'));
   assert.match(loader, /script\.dataset\.zone = '12206531'/);
   assert.match(loader, /https:\/\/nap5k\.com\/tag\.min\.js/);
   assert.doesNotMatch(html + loader, /https:\/\/quge5\.com\/88\/tag\.min\.js/);
