@@ -112,3 +112,33 @@ dialog h2 { margin: 5px 0 0; font: 20px var(--tech); }
   .ad-strip { padding-top: 7px; }.ad-frame { min-height: 48px; }
   .workspace { padding-top: 9px; }.workspace-head { padding-bottom: 8px; }
 }
+
+
+/* NexusFlow terminal finish */
+.system-footer {
+  flex: 0 0 auto;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 7px 17px;
+  border-top: 1px solid var(--line);
+  background: rgba(10,15,29,.98);
+  color: #64748b;
+  font-size: 8px;
+  letter-spacing: .1em;
+}
+.footer-status { display: flex; align-items: center; gap: 10px; }
+.footer-status b { color: var(--cyan); font-weight: 700; }
+.footer-status em { color: #94a3b8; font-style: normal; }
+.footer-divider { color: #263650; }
+.footer-caption { color: #00f0ff66; font: 8px var(--tech); letter-spacing: .18em; }
+.trend-cyber-card { cursor: default; }
+@media (max-width: 760px) {
+  .system-footer { padding: 7px 10px; font-size: 7px; }
+  .footer-caption { font-size: 6px; letter-spacing: .08em; text-align: right; }
+}
+@media (max-width: 380px) {
+  .footer-caption { display: none; }
+}
