@@ -1,7 +1,105 @@
-const PREFIX="ghost-mode-alt-",SHELL=PREFIX+"shell-v1",DATA=PREFIX+"data-v1";
-const FILES=["/","/index.html","/styles.css","/app.js","/manifest.json","/icons/ghost.svg"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(SHELL).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
-self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&![SHELL,DATA].includes(k)).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-async function networkFirst(req){const c=await caches.open(DATA);try{const r=await fetch(req);if(r.ok)await c.put(req,r.clone());return r;}catch(e){const cached=await c.match(req);if(cached)return cached;throw e;}}
-async function cacheFirst(req){const c=await caches.open(SHELL),hit=await c.match(req);if(hit)return hit;const r=await fetch(req);if(r.ok&&r.type==="basic")await c.put(req,r.clone());return r;}
-self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;const u=new URL(r.url);if(u.origin!==self.location.origin)return;if(u.pathname.startsWith("/api/")){e.respondWith(networkFirst(r).catch(()=>new Response(JSON.stringify({items:[],sources:[],offline:true,error:"Offline: no new feed data."}),{status:200,headers:{"Content-Type":"application/json"}})));return;}if(r.mode==="navigate"){e.respondWith(fetch(r).then(async x=>{if(x.ok)await(await caches.open(SHELL)).put("/index.html",x.clone());return x;}).catch(async()=>await caches.match("/index.html")||await caches.match("/")));return;}if(["script","style","font","image"].includes(r.destination))e.respondWith(cacheFirst(r).catch(()=>Response.error()));});
+"use strict";
+const CACHE_PREFIX = "ghost-mode-alt-";
+const STATIC_CACHE = CACHE_PREFIX + "static-v2";
+const API_CACHE = CACHE_PREFIX + "api-v2";
+const STATIC_ASSETS = [
+  "/",
+  "/index.html",
+  "/styles.css",
+  "/app.js",
+  "/manifest.json",
+  "/icons/ghost.svg"
+];
+
+self.addEventListener("install", event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(STATIC_CACHE);
+    await cache.addAll(STATIC_ASSETS);
+    await self.skipWaiting();
+  })());
+});
+
+self.addEventListener("activate", event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(key => {
+      const isOurCache = key.startsWith(CACHE_PREFIX);
+      const isCurrentCache = key === STATIC_CACHE || key === API_CACHE;
+      return isOurCache && !isCurrentCache ? caches.delete(key) : Promise.resolve(false);
+    }));
+    await self.clients.claim();
+  })());
+});
+
+async function cacheFirst(request) {
+  const cache = await caches.open(STATIC_CACHE);
+  const cached = await cache.match(request, { ignoreSearch: true });
+  if (cached) return cached;
+
+  const response = await fetch(request);
+  if (response && response.ok && response.type === "basic") {
+    await cache.put(request, response.clone());
+  }
+  return response;
+}
+
+async function networkFirst(request) {
+  const cache = await caches.open(API_CACHE);
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    return new Response(JSON.stringify({
+      items: [],
+      sources: [],
+      offline: true,
+      error: "Trend feed is unavailable while offline."
+    }), {
+      status: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }
+    });
+  }
+}
+
+self.addEventListener("fetch", event => {
+  const request = event.request;
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (url.pathname.startsWith("/api/")) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  if (request.mode === "navigate") {
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request);
+        if (response && response.ok) {
+          const cache = await caches.open(STATIC_CACHE);
+          await cache.put("/index.html", response.clone());
+        }
+        return response;
+      } catch (error) {
+        return (await caches.match("/index.html")) ||
+          (await caches.match("/")) ||
+          new Response("Ghost Mode is unavailable offline.", {
+            status: 503,
+            headers: { "Content-Type": "text/plain; charset=utf-8" }
+          });
+      }
+    })());
+    return;
+  }
+
+  if (["style", "script", "font", "image"].includes(request.destination)) {
+    event.respondWith(cacheFirst(request));
+  }
+});
