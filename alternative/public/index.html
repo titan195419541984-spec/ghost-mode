@@ -3,22 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#020617">
-  <meta name="description" content="Ghost Mode Terminal — live public signals, emerging conversations, and internet intelligence.">
+  <meta name="theme-color" content="#05070c">
+  <meta name="description" content="Ghost Mode Trend Lab — live public signals, emerging conversations, and internet intelligence.">
   <meta name="monetag" content="51a9582a1f37dbc327a9f9179371f855">
-  <title>Ghost Mode — Signal Terminal</title>
+  <title>Ghost Mode // Core Matrix</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icons/ghost.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/ghost-192.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <script>
-    window.GHOST_AD_CONFIG = Object.freeze({
-      zoneId: "12206531",
-      scriptUrl: "https://nap5k.com/tag.min.js"
-    });
+    window.GHOST_AD_CONFIG = Object.freeze({ zoneId: "12206531", scriptUrl: "https://nap5k.com/tag.min.js" });
     (function () {
       function loadMonetag() {
         if (window.__ghostMonetagStarted) return;
@@ -34,102 +31,85 @@
         };
         (document.body || document.documentElement).appendChild(script);
       }
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", loadMonetag, { once: true });
-      } else {
-        loadMonetag();
-      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", loadMonetag, { once: true });
+      else loadMonetag();
     })();
   </script>
 </head>
-<body class="h-full">
-  <header class="topbar">
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+  <header class="terminal-header">
+    <div class="header-accent"></div>
     <a class="brand" href="/" aria-label="Ghost Mode home">
-      <span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 10-13h-7l1-7Z"/></svg></span>
-      <span class="brand-name">GHOST<span>MODE</span><small>SIGNAL TERMINAL</small></span>
+      <span class="brand-mark"><b>█</b></span>
+      <span class="brand-name">SYS.GHOSTMODE // <strong>CORE_MATRIX</strong><small>INTERNET INTELLIGENCE</small></span>
     </a>
-    <div class="top-status"><i></i><span class="mono">STREAM_ENGINES: ACTIVE</span></div>
-    <div class="top-actions">
-      <span class="mono" id="last-updated">FEED INITIALIZING</span>
+    <div class="secure-status"><i></i><span>SECURE SIGNAL CONDUIT ONLINE</span></div>
+    <div class="header-tools">
+      <span id="last-updated">FEED INITIALIZING</span>
       <button id="refresh" class="icon-button" aria-label="Refresh feeds" title="Refresh feeds">↻</button>
     </div>
   </header>
 
   <div class="ad-strip">
-    <div class="ad-label mono">GLOBAL BROADCAST / AD PLACEMENT</div>
-    <div id="monetag-header-ad-frame" class="ad-frame">
-      <span class="ad-fallback mono">SPONSORED PLACEMENT</span>
+    <div class="ad-frame" id="monetag-header-ad-frame">
+      <span class="ad-fallback">[ BROADCAST_MATRIX_ALLOCATION_TARGET ]</span>
     </div>
   </div>
 
   <main class="workspace">
-    <div class="workspace-head">
-      <div>
-        <p class="eyebrow mono">INTERNET INTELLIGENCE / LIVE MONITOR</p>
-        <h1>Catch the signal<span>.</span> <small>Before the noise.</small></h1>
+    <section class="workspace-head">
+      <div class="title-block">
+        <p class="eyebrow">INTERNET INTELLIGENCE / LIVE MONITOR</p>
+        <h1>CATCH THE SIGNAL<span>.</span></h1>
+        <p class="subtitle">PUBLIC SIGNALS. EMERGING CONVERSATIONS. LESS NOISE.</p>
       </div>
       <div class="controls">
-        <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Filter signals…" autocomplete="off"></label>
+        <label class="search-box"><span aria-hidden="true">&gt;</span><input id="search" type="search" placeholder="FILTER SIGNALS..." autocomplete="off"></label>
         <select id="category" aria-label="Filter by category">
-          <option value="all">All categories</option>
-          <option value="News">News</option>
-          <option value="Technology">Technology</option>
-          <option value="Business">Business</option>
-          <option value="Science">Science</option>
-          <option value="Culture">Culture</option>
+          <option value="all">ALL CATEGORIES</option>
+          <option value="News">NEWS</option>
+          <option value="Technology">TECHNOLOGY</option>
+          <option value="Business">BUSINESS</option>
+          <option value="Science">SCIENCE</option>
+          <option value="Culture">CULTURE</option>
         </select>
       </div>
-    </div>
+    </section>
 
     <div class="feed-toolbar">
-      <span><i class="pulse-dot"></i><span id="feed-status">Connecting to public signal sources…</span></span>
-      <span class="mono" id="feed-count">0 ITEMS INDEXED</span>
+      <span><i class="pulse-dot"></i><span id="feed-status">CONNECTING TO PUBLIC SIGNAL SOURCES...</span></span>
+      <span id="feed-count">0 ITEMS INDEXED</span>
     </div>
 
-    <div class="columns custom-scroll" id="columns">
+    <div class="columns" id="columns">
       <section class="stream-column" data-stream="search">
-        <header class="column-head">
-          <div><i class="blue-dot"></i><h2>Search Signals</h2></div>
-          <span class="mono">PUBLIC NEWS INDEX</span>
-        </header>
-        <div class="column-body custom-scroll" id="stream-search">
-          <div class="loading mono">CONNECTING TO SIGNAL…</div>
-        </div>
+        <header class="column-head"><div><b class="node-cyan">&gt;</b><h2>VOLATILITY_STREAM // NEWS</h2></div><span>[ NODE_01 ]</span></header>
+        <div class="column-body" id="stream-search"><div class="loading">CONNECTING TO SIGNAL...</div></div>
       </section>
 
       <section class="stream-column" data-stream="tech">
-        <header class="column-head">
-          <div><i class="orange-dot"></i><h2>Tech Intelligence</h2></div>
-          <span class="mono">TECH / CULTURE</span>
-        </header>
-        <div class="column-body custom-scroll" id="stream-tech">
-          <div class="infeed-ad">
-            <span class="mono">IN-FEED SPONSORED PLACEMENT</span>
-            <small>Advertising supports independent signal research.</small>
-          </div>
-          <div class="loading mono">CONNECTING TO SIGNAL…</div>
+        <header class="column-head"><div><b class="node-purple">&gt;</b><h2>INTELLIGENCE_REGISTRY // TECH</h2></div><span>[ NODE_02 ]</span></header>
+        <div class="column-body" id="stream-tech">
+          <div class="infeed-ad"><span>IN-FEED SPONSORED PLACEMENT</span><small>Advertising supports independent signal research.</small></div>
+          <div class="loading">CONNECTING TO SIGNAL...</div>
         </div>
       </section>
 
       <section class="stream-column" data-stream="macro">
-        <header class="column-head">
-          <div><i class="purple-dot"></i><h2>Macro Signals</h2></div>
-          <span class="mono">BUSINESS / SCIENCE</span>
-        </header>
-        <div class="column-body custom-scroll" id="stream-macro">
-          <div class="loading mono">CONNECTING TO SIGNAL…</div>
-        </div>
+        <header class="column-head"><div><b class="node-green">&gt;</b><h2>MACRO_SIGNAL_ARRAY</h2></div><span>[ NODE_03 ]</span></header>
+        <div class="column-body" id="stream-macro"><div class="loading">CONNECTING TO SIGNAL...</div></div>
       </section>
     </div>
 
     <section class="bottom-bar">
-      <div><span class="eyebrow mono">SOURCE TRANSPARENCY</span><p>Headlines are aggregated from public RSS feeds. Open each publisher for the full report. This terminal does not invent virality scores or claim access to private platform analytics.</p></div>
+      <div><span class="eyebrow">SOURCE TRANSPARENCY / DATA INTEGRITY</span><p>Headlines are aggregated from public RSS feeds. Open each publisher for the full report. No fabricated virality scores or private platform analytics.</p></div>
       <button id="sources" class="text-button">SOURCE HEALTH ↗</button>
     </section>
   </main>
 
   <dialog id="source-dialog">
-    <header><div><span class="eyebrow mono">INGESTION STATUS</span><h2>Source health</h2></div><button id="close-dialog" class="icon-button" aria-label="Close">×</button></header>
+    <header><div><span class="eyebrow">INGESTION STATUS</span><h2>SOURCE HEALTH</h2></div><button id="close-dialog" class="icon-button" aria-label="Close">×</button></header>
     <div id="source-list"></div>
   </dialog>
   <script src="/app.js" defer></script>
