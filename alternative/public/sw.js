@@ -1,7 +1,10 @@
 "use strict";
+
+// Keep this namespace unique to the alternative service so activation never
+// deletes caches belonging to another application on the same origin.
 const CACHE_PREFIX = "ghost-mode-alt-";
-const STATIC_CACHE = CACHE_PREFIX + "static-v4";
-const API_CACHE = CACHE_PREFIX + "api-v4";
+const STATIC_CACHE = CACHE_PREFIX + "nexusflow-v5";
+const API_CACHE = CACHE_PREFIX + "api-v5";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
@@ -16,6 +19,8 @@ const STATIC_ASSETS = [
 self.addEventListener("install", event => {
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC_CACHE);
+    // All precache entries are same-origin, required shell assets. Avoid
+    // third-party URLs here: a failed external request would abort installation.
     await cache.addAll(STATIC_ASSETS);
     await self.skipWaiting();
   })());
@@ -25,9 +30,9 @@ self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys.map(key => {
-      const isOurCache = key.startsWith(CACHE_PREFIX);
-      const isCurrentCache = key === STATIC_CACHE || key === API_CACHE;
-      return isOurCache && !isCurrentCache ? caches.delete(key) : Promise.resolve(false);
+      const isOurs = key.startsWith(CACHE_PREFIX);
+      const isCurrent = key === STATIC_CACHE || key === API_CACHE;
+      return isOurs && !isCurrent ? caches.delete(key) : Promise.resolve(false);
     }));
     await self.clients.claim();
   })());
@@ -60,10 +65,13 @@ async function networkFirst(request) {
       items: [],
       sources: [],
       offline: true,
-      error: "Trend feed is unavailable while offline."
+      error: "Public signal feeds are unavailable while offline."
     }), {
       status: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store"
+      }
     });
   }
 }
@@ -81,9 +89,16 @@ self.addEventListener("fetch", event => {
   }
 
   if (request.mode === "navigate") {
-    event.respondWith(cacheFirst(request).catch(() =>
-      caches.match("/index.html").then(hit => hit || caches.match("/"))
-    ));
+    event.respondWith(cacheFirst(request).catch(async () => {
+      const cachedShell = await caches.match("/index.html");
+      if (cachedShell) return cachedShell;
+      const cachedRoot = await caches.match("/");
+      if (cachedRoot) return cachedRoot;
+      return new Response("NexusFlow is unavailable offline. Reconnect and reload.", {
+        status: 503,
+        headers: { "Content-Type": "text/plain; charset=utf-8" }
+      });
+    }));
     return;
   }
 
