@@ -36,9 +36,9 @@ describe("Ghost Mode production entry and Monetag integration", () => {
   });
 
   it("loads the owner-configured Monetag page tag and verification marker", () => {
-    assert.match(index, /s\\.dataset\\.zone='12206531'/);
-    assert.match(index, /https:\\/\\/nap5k\\.com\\/tag\\.min\\.js/);
-    assert.doesNotMatch(index, /quge5\\.com|305577/);
+    assert.ok(index.includes("s.dataset.zone='12206531'"));
+    assert.ok(index.includes("https://nap5k.com/tag.min.js"));
+    assert.ok(!index.includes("quge5.com") && !index.includes("305577"));
     assert.match(index, /name="monetag" content="51a9582a1f37dbc327a9f9179371f855"/);
   });
 
