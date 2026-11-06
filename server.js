@@ -321,7 +321,7 @@ const server=http.createServer(async(req,res)=>{
     'referrer-policy':'strict-origin-when-cross-origin',
     'x-xss-protection':'0',
     'permissions-policy':'geolocation=(), microphone=(), camera=()',
-    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://quge5.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; frame-src 'self' https:; media-src 'self' blob: https:; font-src 'self' data:; manifest-src 'self';"
+    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://nap5k.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; frame-src 'self' https:; media-src 'self' blob: https:; font-src 'self' data:; manifest-src 'self';"
   };
 
   if(pathname==='/api/health'){
