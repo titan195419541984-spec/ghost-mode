@@ -1,7 +1,44 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script>(function(s){s.dataset.zone='12206531',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+  <!-- Monetag: load once, asynchronously, after the document is interactive. -->
+  <script>
+    (function () {
+      "use strict";
+      window.GHOST_AD_CONFIG = Object.freeze({
+        zoneId: "12206531",
+        scriptUrl: "https://nap5k.com/tag.min.js"
+      });
+
+      function loadGhostMonetag() {
+        if (window.__ghostMonetagLoaded) return;
+        var target = document.body || document.documentElement;
+        if (!target) return;
+
+        var script = document.createElement("script");
+        script.async = true;
+        script.dataset.zone = window.GHOST_AD_CONFIG.zoneId;
+        script.src = window.GHOST_AD_CONFIG.scriptUrl;
+        script.onload = function () {
+          document.documentElement.dataset.monetag = "loaded";
+        };
+        script.onerror = function () {
+          window.__ghostMonetagLoaded = false;
+          document.documentElement.dataset.monetag = "unavailable";
+          console.warn("Ghost Mode: Monetag script could not be loaded.");
+        };
+
+        window.__ghostMonetagLoaded = true;
+        target.appendChild(script);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadGhostMonetag, { once: true });
+      } else {
+        loadGhostMonetag();
+      }
+    })();
+  </script>
   <!-- Monetag global click/popunder tag removed: use user-initiated, non-redirecting ad placements only. -->
   <meta name="monetag" content="51a9582a1f37dbc327a9f9179371f855">
   <meta name="7dd965508b6e56c67a82fe3b01f8eb53bac3bfce" content="7dd965508b6e56c67a82fe3b01f8eb53bac3bfce" />
@@ -64,6 +101,13 @@
       </header>
 
       <section class="view active" id="view-pulse">
+      <aside id="monetag-native-zone" class="monetag-native-zone" data-zone-id="12206531" aria-label="Sponsored content" style="margin:0 0 18px;padding:12px 14px;min-height:90px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(135deg,rgba(124,92,255,.07),rgba(34,211,238,.04));overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+          <span style="font-size:9px;letter-spacing:.18em;color:var(--muted-2);font-weight:700">SPONSORED</span>
+          <span style="font-size:9px;letter-spacing:.12em;color:var(--muted-2)">ADVERTISEMENT</span>
+        </div>
+        <div class="monetag-native-creative" data-monetag-zone="12206531" style="width:100%;min-height:58px;display:flex;align-items:center;justify-content:center"></div>
+      </aside>
       <section class="news-ticker" aria-label="Live news ticker">
         <div class="ticker-label"><span class="ticker-live-dot"></span><span>LIVE WIRE</span><small>CULTURE · TECH · VIRAL</small></div>
         <div class="ticker-window"><div class="ticker-track" id="news-ticker-track"><span class="ticker-placeholder">Connecting to live headlines…</span></div></div>
