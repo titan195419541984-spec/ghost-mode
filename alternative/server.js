@@ -23,7 +23,7 @@ app.set("trust proxy", 1);
 
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || ALLOWED_ORIGINS.length === 0 || ALLOWED_ORIGINS.includes(origin)) {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
       return callback(null, true);
     }
     return callback(new Error("Origin is not allowed by CORS."));
