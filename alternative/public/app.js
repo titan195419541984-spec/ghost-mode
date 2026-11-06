@@ -1,12 +1,119 @@
-const state={items:[],sources:[],query:"",category:"all",view:"pulse",updatedAt:null};
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function age(v){if(!v)return"TIME UNKNOWN";const m=Math.max(0,Math.floor((Date.now()-Date.parse(v))/60000));return m<1?"JUST NOW":m<60?m+"M AGO":Math.floor(m/60)<24?Math.floor(m/60)+"H AGO":Math.floor(m/1440)+"D AGO";}
-function render(){const q=state.query.toLowerCase();const rows=state.items.filter(x=>(state.category==="all"||x.category===state.category)&&(!q||[x.title,x.summary,x.source].join(" ").toLowerCase().includes(q)));$("#count").textContent=String(state.items.length).padStart(2,"0");$("#updated").textContent=state.updatedAt?"UPDATED "+new Date(state.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"WAITING";$("#status").textContent=state.items.length?state.items.length+" headlines from public sources":"No feed items returned. Retry shortly.";$("#grid").innerHTML=rows.length?rows.map(x=>'<article class="card"><div class="card-top"><span class="tag">'+esc(x.category||"Signal")+'</span><span class="age">'+age(x.publishedAt)+'</span></div><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary||"Open the original publisher for the full report.")+'</p><div class="card-bottom"><span class="source">'+esc(x.source||"Public source")+'</span><a class="open" href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">OPEN SOURCE ↗</a></div></article>').join(""):'<div class="empty">No signals match these filters. Try another search or category.</div>';}
-async function load(quiet=false){if(!quiet)$("#grid").innerHTML='<div class="loading"><i></i>Scanning public signals…</div>';try{const r=await fetch("/api/feeds",{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw Error("Feed request failed: "+r.status);const d=await r.json();state.items=Array.isArray(d.items)?d.items:[];state.sources=Array.isArray(d.sources)?d.sources:[];state.updatedAt=d.updatedAt||new Date().toISOString();render();}catch(e){$("#status").textContent="Feed service unavailable.";if(!state.items.length)$("#grid").innerHTML='<div class="empty">The feed service is temporarily unavailable. Check your connection and retry.</div>';console.error(e);}}
-$("#search").addEventListener("input",e=>{state.query=e.target.value.trim();render();});$("#category").addEventListener("change",e=>{state.category=e.target.value;render();});$("#refresh").addEventListener("click",()=>load());$("#menu").addEventListener("click",()=>$("#sidebar").classList.toggle("open"));
-$("#sources").addEventListener("click",()=>{$("#source-list").innerHTML=state.sources.map(s=>'<div class="source-row"><span>'+esc(s.name)+'</span><span class="'+(s.ok?"":"failed")+'">'+(s.ok?"ONLINE · "+s.count:"UNAVAILABLE")+'</span></div>').join("")||"No source report yet.";$("#dialog").showModal();});$("#close").addEventListener("click",()=>$("#dialog").close());
-document.querySelectorAll("[data-view]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();document.querySelectorAll("[data-view]").forEach(n=>n.classList.remove("active"));a.classList.add("active");state.view=a.dataset.view;$("#view-label").textContent=a.textContent.trim().toUpperCase();$("#sidebar").classList.remove("open");$("#stream-title").textContent=state.view==="pulse"?"What’s moving now":state.view==="radar"?"Trend radar":state.view==="underground"?"Emerging conversations":state.view==="signal"?"Your signal stream":"Your saved signals";if(state.view==="vault"){state.items=JSON.parse(localStorage.getItem("ghost-mode-saved")||"[]");render();}else load(true);}));
-$("#grid").addEventListener("dblclick",e=>{const card=e.target.closest(".card");if(!card)return;const item=state.items.find(x=>x.title===card.querySelector("h3")?.textContent);if(!item)return;const saved=JSON.parse(localStorage.getItem("ghost-mode-saved")||"[]");if(!saved.some(x=>x.id===item.id)){saved.unshift(item);localStorage.setItem("ghost-mode-saved",JSON.stringify(saved.slice(0,100)));}});
-if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(console.error));
-load();setInterval(()=>{if(document.visibilityState==="visible"&&state.view!=="vault")load(true);},180000);
+const state = { items: [], sources: [], query: "", category: "all" };
+const $ = selector => document.querySelector(selector);
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[char]));
+
+function relativeTime(value) {
+  if (!value) return "TIME UNKNOWN";
+  const minutes = Math.max(0, Math.floor((Date.now() - Date.parse(value)) / 60000));
+  if (minutes < 1) return "JUST NOW";
+  if (minutes < 60) return minutes + "M AGO";
+  if (minutes < 1440) return Math.floor(minutes / 60) + "H AGO";
+  return Math.floor(minutes / 1440) + "D AGO";
+}
+
+function cardMarkup(item) {
+  return `
+    <article class="signal-card">
+      <div class="card-meta">
+        <span class="category-tag">${escapeHTML(item.category || "SIGNAL")}</span>
+        <time>${escapeHTML(relativeTime(item.publishedAt))}</time>
+      </div>
+      <h3>${escapeHTML(item.title)}</h3>
+      <p>${escapeHTML(item.summary || "Open the original publisher for the full report.")}</p>
+      <div class="card-footer">
+        <span class="publisher" title="${escapeHTML(item.source || "Public source")}">${escapeHTML(item.source || "PUBLIC SOURCE")}</span>
+        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">OPEN SOURCE ↗</a>
+      </div>
+    </article>`;
+}
+
+function filteredItems() {
+  const query = state.query.toLowerCase();
+  return state.items.filter(item => {
+    const categoryMatch = state.category === "all" || item.category === state.category;
+    const text = [item.title, item.summary, item.source, item.category].join(" ").toLowerCase();
+    return categoryMatch && (!query || text.includes(query));
+  });
+}
+
+function render() {
+  const rows = filteredItems();
+  const groups = {
+    search: rows.filter(item => item.category === "News"),
+    tech: rows.filter(item => ["Technology", "Culture"].includes(item.category)),
+    macro: rows.filter(item => ["Business", "Science"].includes(item.category))
+  };
+
+  Object.entries(groups).forEach(([key, items]) => {
+    const container = $("#stream-" + key);
+    const ad = key === "tech" ? container.querySelector(".infeed-ad") : null;
+    container.innerHTML = items.length
+      ? items.map(cardMarkup).join("")
+      : '<div class="empty mono">NO MATCHING SIGNALS</div>';
+    if (ad) container.prepend(ad);
+  });
+
+  $("#feed-count").textContent = rows.length + " ITEMS INDEXED";
+  $("#feed-status").textContent = state.items.length
+    ? "PUBLIC SOURCES RESPONDING · " + state.sources.filter(source => source.ok).length + "/" + state.sources.length + " ONLINE"
+    : "NO FEED ITEMS RETURNED · RETRY AVAILABLE";
+}
+
+async function loadFeeds() {
+  $("#refresh").classList.add("spinning");
+  $("#feed-status").textContent = "REQUESTING PUBLIC SOURCE UPDATES…";
+  try {
+    const response = await fetch("/api/feeds", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+    if (!response.ok) throw new Error("Feed request failed: " + response.status);
+    const payload = await response.json();
+    state.items = Array.isArray(payload.items) ? payload.items : [];
+    state.sources = Array.isArray(payload.sources) ? payload.sources : [];
+    render();
+    const stamp = payload.updatedAt ? new Date(payload.updatedAt) : new Date();
+    $("#last-updated").textContent = "UPDATED " + stamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch (error) {
+    console.error(error);
+    $("#feed-status").textContent = "FEED CONNECTION INTERRUPTED";
+    ["search", "tech", "macro"].forEach(key => {
+      const target = $("#stream-" + key);
+      const ad = key === "tech" ? target.querySelector(".infeed-ad") : null;
+      target.innerHTML = '<div class="empty mono">SOURCE CONNECTION UNAVAILABLE<br>USE REFRESH TO RETRY</div>';
+      if (ad) target.prepend(ad);
+    });
+  } finally {
+    $("#refresh").classList.remove("spinning");
+  }
+}
+
+$("#search").addEventListener("input", event => {
+  state.query = event.target.value.trim();
+  render();
+});
+$("#category").addEventListener("change", event => {
+  state.category = event.target.value;
+  render();
+});
+$("#refresh").addEventListener("click", loadFeeds);
+$("#sources").addEventListener("click", () => {
+  $("#source-list").innerHTML = state.sources.map(source => `
+    <div class="source-row">
+      <span>${escapeHTML(source.name)}</span>
+      <b class="${source.ok ? "online" : "offline"}">${source.ok ? "ONLINE · " + source.count + " ITEMS" : "UNAVAILABLE"}</b>
+    </div>`).join("") || '<p class="empty">No source report available yet.</p>';
+  $("#source-dialog").showModal();
+});
+$("#close-dialog").addEventListener("click", () => $("#source-dialog").close());
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(console.error));
+}
+
+loadFeeds();
+window.setInterval(() => {
+  if (document.visibilityState === "visible") loadFeeds();
+}, 180000);
