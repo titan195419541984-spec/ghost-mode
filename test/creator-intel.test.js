@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 
 const creator = await readFile(new URL("../public/creator-intel.js", import.meta.url), "utf8");
 
-describe("Creator Desk video intelligence rendering", () => {
+describe("Creator intelligence data integrity", () => {
   it("shows creator, niche, and audience-normalized lift on video cards", () => {
     assert.match(creator, /const audience = v\.audienceLift/);
     assert.match(creator, /esc\(audience\)/);
@@ -24,16 +24,25 @@ describe("Creator Desk video intelligence rendering", () => {
 });
 
 const index = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+const app = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const worker = await readFile(new URL("../public/sw.js", import.meta.url), "utf8");
 
-describe("Creator Desk and Monetag service worker integration", () => {
-  it("loads the current Creator Desk bundle", () => {
-    assert.match(index, /creator-intel\.js\?v=1\.0\.3/);
+describe("Ghost Mode production entry and Monetag integration", () => {
+  it("opens on The Pulse rather than the creator workspace", () => {
+    assert.match(index, /class="nav-item active" data-view="pulse"/);
+    assert.match(index, /class="view active" id="view-pulse"/);
+    assert.match(app, /view:'pulse'/);
+    assert.match(app, /else switchView\('pulse'\)/);
   });
 
-  it("keeps the configured Monetag service worker intact", () => {
-    assert.match(worker, /"domain":\s*"3nbf4\.com"/);
-    assert.match(worker, /"zoneId":\s*12187189/);
-    assert.match(worker, /importScripts\('https:\/\/3nbf4\.com\/act\/files\/service-worker\.min\.js\?r=sw'\)/);
+  it("loads the owner-configured Monetag page tag and verification marker", () => {
+    assert.match(index, /https:\/\/quge5\.com\/88\/tag\.min\.js" data-zone="305577"/);
+    assert.match(index, /name="monetag" content="51a9582a1f37dbc327a9f9179371f855"/);
+  });
+
+  it("does not install the mismatched third-party advertising worker", () => {
+    assert.match(worker, /ghost-mode-shell-v1-5-0/);
+    assert.doesNotMatch(worker, /3nbf4\.com|12187189|importScripts\(/);
+    assert.match(worker, /url\.pathname\.startsWith\("\/api\/"\)/);
   });
 });
