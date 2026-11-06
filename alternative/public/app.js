@@ -15,7 +15,7 @@ function relativeTime(value) {
 
 function cardMarkup(item) {
   return `
-    <article class="signal-card">
+    <article class="signal-card trend-cyber-card">
       <div class="card-meta">
         <span class="category-tag">${escapeHTML(item.category || "SIGNAL")}</span>
         <time>${escapeHTML(relativeTime(item.publishedAt))}</time>
