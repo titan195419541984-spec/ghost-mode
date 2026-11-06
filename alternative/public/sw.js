@@ -79,23 +79,9 @@ self.addEventListener("fetch", event => {
   }
 
   if (request.mode === "navigate") {
-    event.respondWith((async () => {
-      try {
-        const response = await fetch(request);
-        if (response && response.ok) {
-          const cache = await caches.open(STATIC_CACHE);
-          await cache.put("/index.html", response.clone());
-        }
-        return response;
-      } catch (error) {
-        return (await caches.match("/index.html")) ||
-          (await caches.match("/")) ||
-          new Response("Ghost Mode is unavailable offline.", {
-            status: 503,
-            headers: { "Content-Type": "text/plain; charset=utf-8" }
-          });
-      }
-    })());
+    event.respondWith(cacheFirst(request).catch(() =>
+      caches.match("/index.html").then(hit => hit || caches.match("/"))
+    ));
     return;
   }
 
