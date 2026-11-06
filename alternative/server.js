@@ -10,7 +10,7 @@ const port=Number.parseInt(process.env.PORT||"3000",10);
 const origins=(process.env.CORS_ORIGINS||"").split(",").map(x=>x.trim()).filter(Boolean);
 app.disable("x-powered-by");
 app.set("trust proxy",1);
-app.use(cors({origin(origin,cb){if(!origin||!origins.length||origins.includes(origin))return cb(null,true);return cb(new Error("Origin is not allowed by CORS"));},methods:["GET","HEAD","OPTIONS"],allowedHeaders:["Content-Type","Authorization"],maxAge:600}));
+app.use(cors({origin(origin,cb){if(!origin||origins.includes(origin))return cb(null,true);return cb(new Error("Origin is not allowed by CORS"));},methods:["GET","HEAD","OPTIONS"],allowedHeaders:["Content-Type","Authorization"],maxAge:600}));
 app.use(helmet({contentSecurityPolicy:false,crossOriginEmbedderPolicy:false,referrerPolicy:{policy:"strict-origin-when-cross-origin"}}));
 app.use((req,res,next)=>{res.setHeader("X-Content-Type-Options","nosniff");res.setHeader("X-Frame-Options","SAMEORIGIN");res.setHeader("Permissions-Policy","camera=(), microphone=(), geolocation=()");res.setHeader("Cross-Origin-Resource-Policy","same-site");if(process.env.NODE_ENV==="production")res.setHeader("Strict-Transport-Security","max-age=31536000; includeSubDomains");next();});
 app.use(express.json({limit:"32kb",strict:true}));
