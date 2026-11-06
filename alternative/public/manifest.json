@@ -1,15 +1,15 @@
 {
   "id": "/",
-  "name": "Ghost Mode — Signal Intelligence",
-  "short_name": "Ghost Mode",
-  "description": "A premium live dashboard for emerging internet trends, public signals, and attention shifts.",
-  "start_url": "/",
+  "name": "NexusFlow Digital Terminal",
+  "short_name": "NexusFlow",
+  "description": "Automated intelligence stream tracking aggregated public data indices and multi-feed volatility routing.",
+  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#080B14",
-  "theme_color": "#080B14",
-  "categories": ["news", "productivity", "social"],
+  "background_color": "#05070c",
+  "theme_color": "#05070c",
+  "orientation": "portrait-primary",
+  "categories": ["utilities", "news"],
   "icons": [
     {
       "src": "/icons/ghost-192.svg",
