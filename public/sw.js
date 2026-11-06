@@ -1,6 +1,53 @@
-self.options = {
-    "domain": "3nbf4.com",
-    "zoneId": 12187189
-}
-self.lary = ""
-importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
+/* Ghost Mode same-origin PWA cache. Ad networks load from the page; no third-party worker is installed here. */
+const CACHE_NAME = "ghost-mode-shell-v1-5-0";
+const SHELL_URLS = ["/", "/manifest.webmanifest"];
+
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(SHELL_URLS))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(key => key.startsWith("ghost-mode-shell-") && key !== CACHE_NAME).map(key => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", event => {
+  const request = event.request;
+  if (request.method !== "GET") return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put("/", copy));
+          }
+          return response;
+        })
+        .catch(async () => (await caches.match("/")) || Response.error())
+    );
+    return;
+  }
+
+  if (["script", "style", "font"].includes(request.destination)) {
+    event.respondWith(
+      caches.match(request).then(cached => cached || fetch(request).then(response => {
+        if (response.ok && response.type === "basic") {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+        }
+        return response;
+      }))
+    );
+  }
+});
