@@ -1,7 +1,7 @@
 "use strict";
 const CACHE_PREFIX = "ghost-mode-alt-";
-const STATIC_CACHE = CACHE_PREFIX + "static-v2";
-const API_CACHE = CACHE_PREFIX + "api-v2";
+const STATIC_CACHE = CACHE_PREFIX + "static-v3";
+const API_CACHE = CACHE_PREFIX + "api-v3";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
