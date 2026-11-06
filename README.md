@@ -38,7 +38,7 @@ Health: `/api/health`; trends: `/api/trends`; video sample: `/api/videos`; news:
 The Render service is `ghost-mode-umm5`, connected to this repository's `master` branch. Render auto-deploys commits. Health endpoint: `/api/health`.
 
 ## Advertising and rewards
-HilltopAds is loaded from a same-origin loader file. Google AdSense remains disabled unless the publisher account is approved and valid ad-unit IDs are configured. See `ADVERTISING.md`.
+Monetag's owner-supplied page tag (zone `305577`) and verification meta tag are included in `public/index.html`. The service worker is a same-origin PWA cache and does not load a third-party ad-network worker. Actual domain approval, ad delivery, and recorded impressions must still be verified in the Monetag dashboard. See `ADVERTISING.md`.
 
 The intended verified-video reward is 5 points per completed video, capped at 40 points per day. Tier thresholds are 250, 450, 1,200, and 2,000 points. No points are issued until a rewarded-video provider and server-side completion verification are integrated. Production tier gating requires authenticated accounts and server-side storage; client-side point totals are not secure entitlements.
 
