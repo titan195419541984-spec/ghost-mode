@@ -1,6 +1,6 @@
 
 const $=(q,root=document)=>root.querySelector(q);const $$=(q,root=document)=>[...root.querySelectorAll(q)];
-const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'creator',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
+const state={trends:[],sources:[],mode:'connecting',updatedAt:null,category:'All',sort:'score',layout:'grid',view:'pulse',saved:new Set(),savedItems:new Map(),interests:new Set(),lastPayload:null, offline:false};
 const DEMO=[
  {id:'ai-agents',title:'AI agents move from demos into everyday workflows',category:'Technology',score:91,momentum:'Surging',confidence:'Moderate',sources:['Hacker News','Global News'],sourceCount:2,source:'Hacker News',detail:'Discussion and coverage are appearing across more than one source.',url:'https://news.ycombinator.com/',publishedAt:new Date(Date.now()-14*60000).toISOString(),engagement:1250,kind:'cross-source'},
  {id:'creator-economy',title:'Creators are experimenting with new ways to own their audience',category:'Entertainment',score:84,momentum:'Surging',confidence:'Limited',sources:['Google Trends'],sourceCount:1,source:'Google Trends',detail:'Search interest is a useful early signal, but does not confirm future popularity.',url:'https://trends.google.com/trending?geo=US',publishedAt:new Date(Date.now()-25*60000).toISOString(),engagement:0,kind:'single-source'},
@@ -402,7 +402,7 @@ async function init(){
   bindEvents();
   renderInterestControls();
   const hash=location.hash.replace('#','').split('?')[0];
-  if(['pulse','creator','radar','underground','signal','vault','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash); else switchView('creator');
+  if(['pulse','creator','radar','underground','signal','vault','studio','privacy','terms','contact','ads'].includes(hash)) switchView(hash); else switchView('pulse');
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('/sw.js'); }catch{} }
   await Promise.all([loadTrends(),loadNews()]);
 }
